@@ -13,12 +13,12 @@
 
 更新时间：2026-05-09
 
-当前重点：API 层已补齐，继续把前端页面从 mock skeleton 逐步接入 D1-backed API，并保留本地开发兜底数据。
+当前重点：v1 开发、验证和部署已基本完成；继续处理 Cloudflare Git-backed Pages 自动部署和 R2 开通这两个平台侧事项。
 
 当前进展：
 
 - DONE：Frontend route shell 已完成。顶部导航、侧栏、文章详情、公司、发射、资本、专题均有真实路由路径。
-- IN_PROGRESS：Mock-backed page skeletons 已完成第一版，但列表分页、真实 API 数据和复杂筛选仍待接入。
+- DONE：Mock-backed page skeletons 已完成，并且主要页面已接入 D1-backed API；本地 API 不可用时保留示例数据兜底。
 - DONE：D1 persistence layer 已完成第一版，包含 source upsert、article `dedupe_hash` 去重写入、ingestion log 成功/失败记录和测试。
 - DONE：受保护 SNAPI ingest endpoint 已添加到 `/api/admin/ingest/snapi`，需要 `ADMIN_TOKEN` Bearer token 才可触发。
 - DONE：Article list/detail API 已完成第一版，支持 D1 读取、分页、region/source/query/tag/company 过滤参数和 JSON 错误响应。
@@ -40,12 +40,12 @@
 - DONE：Ranking rules 已完成第一版，`/api/home` 按人工精选权重、发布时间、来源可信度排序输出首页信息流。
 - DONE：Local scheduled job test 已完成第一版，`runScheduledIngestion` 覆盖小时采集和每日精选同步，测试验证重复运行不会重复写入文章。
 - DONE：Reference review notes 已完成，`docs/REFERENCE_REVIEW.md` 记录 Glance、Miniflux、feeds.fun 和 AI/news automation 类项目的可借鉴点与本项目约束边界。
-- DONE：GitHub repository 已创建为私有仓库 `Kindeed/space-intel`，`main` 和 `dev` 分支已推送，CI workflow 已创建且两个分支的 CI 均通过。
-- BLOCKED：Branch protection 在当前私有仓库上被 GitHub API 拒绝，提示需要 GitHub Pro 或改为 public repository；未擅自改变仓库可见性。
+- DONE：GitHub repository `Kindeed/space-intel` 已由用户更新为 public，`main` 和 `dev` 分支已推送，CI workflow 已创建且两个分支的 CI 均通过。
+- DONE：GitHub repository visibility 已由用户更新为 public；`main` 和 `dev` 已添加 branch protection，要求 `verify` check 通过、分支最新、PR review 和 conversation resolution。
 - DONE：Cloudflare D1 `space_intel` 已创建并执行 `0001_initial_schema.sql` migration；Pages 项目 `space-intel` 已创建，生产和预览部署均可访问。
 - DONE：`ADMIN_TOKEN` 已分别配置为 Cloudflare Pages secret 和 GitHub Actions secret；未把 secret 值写入仓库。
 - DONE：Production subdomain `space.bytebaud.com` 已添加到 Pages custom domain，并创建 CNAME 到 `space-intel.pages.dev`；当前使用 DNS Only 通过 Pages HTTP validation，健康检查可访问。
-- BLOCKED：Git-backed Cloudflare Pages 自动绑定、GitHub branch protection 和 R2 bucket 仍受账号权限/产品开通限制；Cloudflare API 明确返回 Direct Uploads project 不能更新 `source` 对象，未擅自改仓库公开性或现有服务 DNS。
+- BLOCKED：Git-backed Cloudflare Pages 自动绑定和 R2 bucket 仍受平台限制；当前 Pages 项目是 Direct Uploads project，Cloudflare API 明确返回不能更新 `source` 对象；R2 API 返回需要先在 Cloudflare Dashboard 启用 R2。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：
@@ -77,8 +77,8 @@
 
 | Status | Task | Acceptance |
 | --- | --- | --- |
-| DONE | Create GitHub repository | Private repository `Kindeed/space-intel` exists with `main` and `dev` branches pushed. |
-| BLOCKED | Add repository protection rules | GitHub API returned 403: private branch protection requires GitHub Pro or changing repository visibility to public. |
+| DONE | Create GitHub repository | Public repository `Kindeed/space-intel` exists with `main` and `dev` branches pushed. |
+| DONE | Add repository protection rules | `main` and `dev` require the `verify` check, up-to-date branch, pull request review, conversation resolution, no force pushes, and no branch deletion. |
 | BLOCKED | Connect Cloudflare Pages to GitHub | Pages project exists, but Cloudflare API says Direct Uploads projects cannot update the `source` object; Git-backed binding requires Cloudflare Dashboard GitHub integration or recreating the project as Git-backed. |
 | DONE | Reserve production subdomain | `space.bytebaud.com` resolves to the Pages project and `/api/health` responds successfully. |
 | DONE | Configure GitHub Secrets | `ADMIN_TOKEN` is stored as a GitHub secret; Cloudflare deployment is handled by Pages/Cloudflare rather than exposing a Cloudflare token to GitHub. |
@@ -168,7 +168,7 @@
 
 | Status | Decision | Default |
 | --- | --- | --- |
-| DONE | Final GitHub repository visibility | Default decision recorded: private repository unless public release is desired. |
+| DONE | Final GitHub repository visibility | Repository is public as of 2026-05-09, which allowed branch protection on the free GitHub plan. |
 | DONE | Final production subdomain | Default decision recorded: `space.bytebaud.com`; no DNS change has been made. |
 | DONE | AI summary provider | Deferred decision recorded: Cloudflare AI Gateway or external LLM API after cost and quality review. |
 | DONE | RSSHub hosting mode | Default decision recorded: public routes first; VPS Docker only when necessary and isolated. |
