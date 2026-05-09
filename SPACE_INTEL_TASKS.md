@@ -44,7 +44,8 @@
 - BLOCKED：Branch protection 在当前私有仓库上被 GitHub API 拒绝，提示需要 GitHub Pro 或改为 public repository；未擅自改变仓库可见性。
 - DONE：Cloudflare D1 `space_intel` 已创建并执行 `0001_initial_schema.sql` migration；Pages 项目 `space-intel` 已创建，生产和预览部署均可访问。
 - DONE：`ADMIN_TOKEN` 已分别配置为 Cloudflare Pages secret 和 GitHub Actions secret；未把 secret 值写入仓库。
-- BLOCKED：Git-backed Cloudflare Pages 自动绑定、GitHub branch protection、R2 bucket、生产子域名 DNS 最终记录仍受账号权限/产品开通限制；Cloudflare API 明确返回 Direct Uploads project 不能更新 `source` 对象，未擅自改仓库公开性或现有服务 DNS。
+- DONE：Production subdomain `space.bytebaud.com` 已添加到 Pages custom domain，并创建 CNAME 到 `space-intel.pages.dev`；当前使用 DNS Only 通过 Pages HTTP validation，健康检查可访问。
+- BLOCKED：Git-backed Cloudflare Pages 自动绑定、GitHub branch protection 和 R2 bucket 仍受账号权限/产品开通限制；Cloudflare API 明确返回 Direct Uploads project 不能更新 `source` 对象，未擅自改仓库公开性或现有服务 DNS。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：
@@ -79,7 +80,7 @@
 | DONE | Create GitHub repository | Private repository `Kindeed/space-intel` exists with `main` and `dev` branches pushed. |
 | BLOCKED | Add repository protection rules | GitHub API returned 403: private branch protection requires GitHub Pro or changing repository visibility to public. |
 | BLOCKED | Connect Cloudflare Pages to GitHub | Pages project exists, but Cloudflare API says Direct Uploads projects cannot update the `source` object; Git-backed binding requires Cloudflare Dashboard GitHub integration or recreating the project as Git-backed. |
-| BLOCKED | Reserve production subdomain | `space.bytebaud.com` was added to Pages custom domains, but DNS record creation requires DNS Edit permission not present in Wrangler OAuth token. |
+| DONE | Reserve production subdomain | `space.bytebaud.com` resolves to the Pages project and `/api/health` responds successfully. |
 | DONE | Configure GitHub Secrets | `ADMIN_TOKEN` is stored as a GitHub secret; Cloudflare deployment is handled by Pages/Cloudflare rather than exposing a Cloudflare token to GitHub. |
 
 ## Milestone 2: Project Skeleton
