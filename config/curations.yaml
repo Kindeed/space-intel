@@ -1,0 +1,12 @@
+home_highlights:
+  # - url: https://example.com/article
+  #   weight: 100
+  #   note: Manual top story for home page.
+pinned_items:
+  # - target: capital
+  #   url: https://example.com/filing
+  #   weight: 80
+topics:
+  # - slug: reusable-rockets
+  #   urls:
+  #     - https://example.com/article

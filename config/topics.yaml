@@ -1,0 +1,25 @@
+topics:
+  - slug: reusable-rockets
+    name: 可回收火箭
+    category: technology
+    keywords: [可回收火箭, 垂直回收, reusable rocket, booster recovery]
+  - slug: satellite-internet
+    name: 卫星互联网
+    category: market
+    keywords: [卫星互联网, 低轨通信, satellite internet, LEO broadband]
+  - slug: lunar-commercial-services
+    name: 月球商业服务
+    category: launch
+    keywords: [月球商业服务, CLPS, lunar payload, lunar lander]
+  - slug: commercial-remote-sensing
+    name: 商业遥感
+    category: company
+    keywords: [商业遥感, remote sensing, earth observation]
+  - slug: domestic-private-launch
+    name: 国内民营火箭
+    category: company
+    keywords: [民营火箭, 商业火箭, 蓝箭航天, 星河动力]
+  - slug: policy-and-regulation
+    name: 政策监管
+    category: policy
+    keywords: [政策, 监管, 工信部, 国家航天局]

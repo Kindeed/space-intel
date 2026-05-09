@@ -1,0 +1,15 @@
+name = "space-intel"
+compatibility_date = "2026-05-09"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "space_intel"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[[r2_buckets]]
+binding = "R2_ASSETS"
+bucket_name = "space-intel-assets"
+
+[triggers]
+crons = ["0 * * * *", "15 0 * * *"]
