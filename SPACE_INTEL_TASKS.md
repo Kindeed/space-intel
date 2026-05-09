@@ -40,7 +40,9 @@
 - DONE：Ranking rules 已完成第一版，`/api/home` 按人工精选权重、发布时间、来源可信度排序输出首页信息流。
 - DONE：Local scheduled job test 已完成第一版，`runScheduledIngestion` 覆盖小时采集和每日精选同步，测试验证重复运行不会重复写入文章。
 - DONE：Reference review notes 已完成，`docs/REFERENCE_REVIEW.md` 记录 Glance、Miniflux、feeds.fun 和 AI/news automation 类项目的可借鉴点与本项目约束边界。
-- BLOCKED：GitHub repository/protection/secrets、Cloudflare Pages 绑定、生产/预览部署和生产子域名保留需要真实 GitHub/Cloudflare 账号操作与用户确认，当前仓库内不能安全代办。
+- DONE：GitHub repository 已创建为私有仓库 `Kindeed/space-intel`，`main` 和 `dev` 分支已推送，CI workflow 已创建且两个分支的 CI 均通过。
+- BLOCKED：Branch protection 在当前私有仓库上被 GitHub API 拒绝，提示需要 GitHub Pro 或改为 public repository；未擅自改变仓库可见性。
+- BLOCKED：Cloudflare Pages 绑定、生产/预览部署、生产子域名和 Cloudflare/部署 secrets 仍需要 Cloudflare 登录或 API token；当前 wrangler 未认证，Chrome 自动化桥接不可用。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：
@@ -72,11 +74,11 @@
 
 | Status | Task | Acceptance |
 | --- | --- | --- |
-| BLOCKED | Create GitHub repository | Requires authenticated GitHub account action and final repository visibility confirmation. |
-| BLOCKED | Add repository protection rules | Requires the real GitHub repository to exist. |
-| BLOCKED | Connect Cloudflare Pages to GitHub | Requires authenticated Cloudflare/GitHub account binding. |
+| DONE | Create GitHub repository | Private repository `Kindeed/space-intel` exists with `main` and `dev` branches pushed. |
+| BLOCKED | Add repository protection rules | GitHub API returned 403: private branch protection requires GitHub Pro or changing repository visibility to public. |
+| BLOCKED | Connect Cloudflare Pages to GitHub | Requires authenticated Cloudflare account/API token; local wrangler is not logged in. |
 | BLOCKED | Reserve production subdomain | Requires Cloudflare DNS/Pages domain action; must not affect existing services without explicit confirmation. |
-| BLOCKED | Configure GitHub Secrets | Requires real GitHub repository and secret values outside the repo. |
+| BLOCKED | Configure GitHub Secrets | Requires actual deployment/API secret values; none were exposed or written to the repo. |
 
 ## Milestone 2: Project Skeleton
 
@@ -153,7 +155,7 @@
 | Status | Task | Acceptance |
 | --- | --- | --- |
 | DONE | Run local scheduled job test | Wrangler scheduled handler runs locally and does not duplicate records. |
-| BLOCKED | Run CI successfully | GitHub Actions run requires the GitHub repository; local equivalent checks are passing. |
+| DONE | Run CI successfully | GitHub Actions CI passed on both `main` and `dev`. |
 | DONE | Verify responsive layouts | Desktop and mobile screenshots show no text overlap or broken controls. |
 | BLOCKED | Deploy preview | Requires GitHub PR and Cloudflare Pages project binding. |
 | BLOCKED | Deploy production | Requires Cloudflare Pages project, real D1 binding, and production domain confirmation. |
