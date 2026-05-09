@@ -1,4 +1,5 @@
-import { createCollectorRegistry, googleNewsRssCollector, parseSourcesYaml, runSourceIngestion } from '../../../../src/ingestion';
+import sourcesConfig from '../../../../config/sources.generated.json';
+import { createCollectorRegistry, googleNewsRssCollector, parseSourcesConfig, runSourceIngestion } from '../../../../src/ingestion';
 
 type Env = {
   DB: D1Database;
@@ -13,8 +14,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const sourcesYaml = await import('../../../../config/sources.yaml?raw');
-  const sources = parseSourcesYaml(sourcesYaml.default).filter((item) => item.type === 'google_news_rss' && item.enabled);
+  const sources = parseSourcesConfig(sourcesConfig).filter((item) => item.type === 'google_news_rss' && item.enabled);
   const registry = createCollectorRegistry([googleNewsRssCollector]);
   const results = [];
 

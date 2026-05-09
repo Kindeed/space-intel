@@ -1,4 +1,5 @@
-import { createCollectorRegistry, parseSourcesYaml, runSourceIngestion, spaceflightNewsCollector } from '../../../../src/ingestion';
+import sourcesConfig from '../../../../config/sources.generated.json';
+import { createCollectorRegistry, parseSourcesConfig, runSourceIngestion, spaceflightNewsCollector } from '../../../../src/ingestion';
 
 type Env = {
   DB: D1Database;
@@ -13,8 +14,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const sourcesYaml = await import('../../../../config/sources.yaml?raw');
-  const source = parseSourcesYaml(sourcesYaml.default).find((item) => item.key === 'snapi');
+  const source = parseSourcesConfig(sourcesConfig).find((item) => item.key === 'snapi');
 
   if (!source) {
     return Response.json({ error: 'SNAPI source is not configured' }, { status: 500 });

@@ -33,8 +33,8 @@ export type CurationConfigRecord = {
   enabled: number;
 };
 
-export function parseCurationsYaml(yamlText: string): CurationConfigRecord[] {
-  const config = curationsConfigSchema.parse(parse(yamlText) ?? {});
+export function parseCurationsConfig(input: unknown): CurationConfigRecord[] {
+  const config = curationsConfigSchema.parse(input ?? {});
   const records: CurationConfigRecord[] = [];
 
   for (const item of config.home_highlights) {
@@ -73,4 +73,8 @@ export function parseCurationsYaml(yamlText: string): CurationConfigRecord[] {
   }
 
   return records;
+}
+
+export function parseCurationsYaml(yamlText: string): CurationConfigRecord[] {
+  return parseCurationsConfig(parse(yamlText));
 }

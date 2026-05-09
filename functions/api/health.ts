@@ -4,12 +4,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     service: 'space-intel',
     bindings: {
       d1: Boolean(env.DB),
-      r2: Boolean(env.ASSETS),
+      r2: Boolean(env.R2_ASSETS),
     },
   });
 };
 
 type Env = {
   DB: D1Database;
-  ASSETS: R2Bucket;
+  R2_ASSETS?: R2Bucket;
 };

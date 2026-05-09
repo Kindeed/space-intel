@@ -1,4 +1,5 @@
-import { launchLibraryCollector, parseSourcesYaml, runLaunchIngestion } from '../../../../src/ingestion';
+import sourcesConfig from '../../../../config/sources.generated.json';
+import { launchLibraryCollector, parseSourcesConfig, runLaunchIngestion } from '../../../../src/ingestion';
 
 type Env = {
   DB: D1Database;
@@ -13,8 +14,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const sourcesYaml = await import('../../../../config/sources.yaml?raw');
-  const source = parseSourcesYaml(sourcesYaml.default).find((item) => item.key === 'launch-library-2');
+  const source = parseSourcesConfig(sourcesConfig).find((item) => item.key === 'launch-library-2');
 
   if (!source) {
     return Response.json({ error: 'Launch Library 2 source is not configured' }, { status: 500 });

@@ -1,4 +1,5 @@
-import { parseCurationsYaml } from '../../../src/curations/config';
+import curationsConfig from '../../../config/curations.generated.json';
+import { parseCurationsConfig } from '../../../src/curations/config';
 import { replaceConfiguredCurations } from '../../../src/db';
 
 type Env = {
@@ -14,8 +15,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const curationsYaml = await import('../../../config/curations.yaml?raw');
-  const records = parseCurationsYaml(curationsYaml.default);
+  const records = parseCurationsConfig(curationsConfig);
   const result = await replaceConfiguredCurations(env.DB, records);
 
   return Response.json({
