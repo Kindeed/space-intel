@@ -28,15 +28,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
     return Response.json(result);
   } catch (error) {
-    return Response.json(
-      {
-        sourceKey: source.key,
-        collected: 0,
-        upserted: 0,
-        failures: 1,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 502 },
-    );
+    return Response.json({
+      sourceKey: source.key,
+      collected: 0,
+      upserted: 0,
+      failures: 1,
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };

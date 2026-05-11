@@ -23,19 +23,18 @@
 - 已完成工程化：GitHub repository、`main`/`dev` 分支、branch protection、GitHub Actions CI、Wrangler 配置、D1 migration、本地 typecheck/lint/test/build 流程。
 - 已完成部署验证：Cloudflare Pages 项目、Git-backed production 部署、`space.bytebaud.com` Pages custom domain、`/api/health` 可访问。
 - 已完成 R2 bucket 创建：`space-intel-assets` 已存在，仓库 `wrangler.toml` 绑定名为 `R2_ASSETS`。
+- 已完成 production runtime 验证：`/api/health` 返回 `d1: true`、`r2: true`；`ADMIN_TOKEN` 已配置到 Pages production，secret 值未进入仓库。
+- 已完成首批 production ingestion：SNAPI、Google News RSS、RSS 源已写入 D1；截至 2026-05-11，`articles` 表有 1185 条。
 
 当前待处理：
 
-- 新 Git-backed Pages 项目的 `ADMIN_TOKEN` secret 需要重新配置到 production/preview 环境。
-- 线上 `/api/health` 当前仍显示 `r2: false`，需要重新部署 Git-backed Pages 并确认 Pages 环境读取到 `R2_ASSETS` binding。
-- D1 schema 已存在，但文章、来源、公司、发射、精选等业务表当前记录数为 0，需要在 secret 配置后触发受保护 ingestion/curation endpoint 写入首批数据。
+- Launch Library 2 当前 production ingestion 被上游 HTTP 429 限流；已记录 ingestion log，待限流窗口恢复后复跑。
+- `companies`、`launches`、`market_items` 仍需要通过后续配置同步或采集写入真实数据。
 
 下一步：
 
-- 在 Cloudflare Pages production/preview 环境配置 `ADMIN_TOKEN`。
-- 推送包含 `R2_ASSETS` binding 的 `wrangler.toml` 后触发 Git-backed Pages 重新部署。
-- 验证 `/api/health` 返回 `d1: true` 和 `r2: true`。
-- 触发 curation 和 ingestion endpoints 写入首批 D1 数据。
+- 复跑 Launch Library 2 ingestion，确认 `launches` 表写入。
+- 补齐公司库、标签和资本市场数据的 production seed/sync 路径。
 - 保持 `SPACE_INTEL_TASKS.md` 为日常开发进度的唯一详细记录；重大状态变化同步更新本快照。
 
 ## Platform And Repository
