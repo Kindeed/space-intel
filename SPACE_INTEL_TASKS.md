@@ -51,7 +51,8 @@
 - DONE：Production admin endpoint 1101 已排查并修复：空 `curations.yaml` 注释段解析为 `null` 导致 Zod error，已按空数组处理；Cloudflare global `fetch` 直接传递导致 Illegal invocation，已改为包装函数。
 - DONE：The Space Review RSS 旧地址 `tsr.xml` 返回 404，已改为 `https://www.thespacereview.com/articles.xml`；RSS/Google News 批量采集已改为单源失败不拖垮整批。
 - DONE：首批生产数据已写入 D1；截至 2026-05-11，`articles` 表有 1185 条，来源包括 Google News RSS、SNAPI、The Space Review、Space.com、ESA 等。
-- IN_PROGRESS：Company/topic catalog seed sync 已实现本地第一版，新增受保护 endpoint `/api/admin/catalog`，用于从 `config/companies.yaml` 和 `config/topics.yaml` 对应的 generated JSON 同步 `companies` 与 `tags` 表；待 PR 合并后在 production 执行。
+- DONE：Company/topic catalog seed sync 已部署并在 production 执行，`companies` 表有 23 条，`tags` 表有 6 条。
+- IN_PROGRESS：Article entity enrichment 已实现本地第一版，新增受保护 endpoint `/api/admin/enrich/entities`，用于按公司名称/英文名/股票代码和专题关键词重建 `article_companies` 与 `article_tags` 关联；待 PR 合并后在 production 执行。
 - BLOCKED：Launch Library 2 production ingestion 当前受上游 HTTP 429 限流，已记录 ingestion log；待限流窗口恢复后复跑。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
