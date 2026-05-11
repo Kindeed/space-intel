@@ -22,7 +22,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
   const registry = createCollectorRegistry([spaceflightNewsCollector]);
   const result = await runSourceIngestion(env.DB, source, registry, {
-    fetch,
+    fetch: (input, init) => fetch(input, init),
     now: () => new Date(),
   });
 

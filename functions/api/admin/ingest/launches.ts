@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   }
 
   const result = await runLaunchIngestion(env.DB, source, launchLibraryCollector, {
-    fetch,
+    fetch: (input, init) => fetch(input, init),
     now: () => new Date(),
   });
 
