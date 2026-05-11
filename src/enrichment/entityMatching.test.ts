@@ -39,4 +39,58 @@ describe('entity matching', () => {
       topicSlugs: ['reusable-rockets'],
     });
   });
+
+  it('does not match stock symbols inside ordinary words', () => {
+    const match = matchArticleEntities(
+      {
+        id: 7,
+        title: 'Supplies arrive for a NASA mission',
+        originalTitle: null,
+        summary: 'No company is named in this article.',
+      },
+      [
+        {
+          slug: 'planet-labs',
+          name: 'Planet Labs',
+          englishName: 'Planet Labs',
+          country: 'United States',
+          sector: 'Remote sensing',
+          website: '',
+          profile: '',
+          stockSymbol: 'PL',
+          logoUrl: '',
+        },
+      ],
+      [],
+    );
+
+    expect(match.companySlugs).toEqual([]);
+  });
+
+  it('matches stock symbols as standalone tokens', () => {
+    const match = matchArticleEntities(
+      {
+        id: 8,
+        title: 'RKLB reports quarterly results',
+        originalTitle: null,
+        summary: 'Rocket company update.',
+      },
+      [
+        {
+          slug: 'rocket-lab',
+          name: 'Rocket Lab',
+          englishName: 'Rocket Lab',
+          country: 'United States',
+          sector: 'Launch',
+          website: '',
+          profile: '',
+          stockSymbol: 'RKLB',
+          logoUrl: '',
+        },
+      ],
+      [],
+    );
+
+    expect(match.companySlugs).toEqual(['rocket-lab']);
+  });
 });
