@@ -80,7 +80,7 @@ sources:
     name: The Space Review
     type: rss
     region: global
-    url: https://www.thespacereview.com/tsr.xml
+    url: https://www.thespacereview.com/articles.xml
     credibility: 4
     enabled: true
     purpose: Long-form policy, market, and commercial space analysis references.

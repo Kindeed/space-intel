@@ -19,12 +19,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const results = [];
 
   for (const source of sources) {
-    results.push(
-      await runSourceIngestion(env.DB, source, registry, {
-        fetch: (input, init) => fetch(input, init),
-        now: () => new Date(),
-      }),
-    );
+    try {
+      results.push(
+        await runSourceIngestion(env.DB, source, registry, {
+          fetch: (input, init) => fetch(input, init),
+          now: () => new Date(),
+        }),
+      );
+    } catch (error) {
+      results.push({
+        sourceKey: source.key,
+        collected: 0,
+        inserted: 0,
+        skipped: 0,
+        failures: 1,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   return Response.json({ items: results });
