@@ -11,9 +11,9 @@
 
 ## Current Development Plan
 
-更新时间：2026-05-09
+更新时间：2026-05-11
 
-当前重点：v1 开发、验证和部署已基本完成；继续处理 Cloudflare Git-backed Pages 自动部署和 R2 开通这两个平台侧事项。
+当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages 已接通，继续处理 R2 runtime binding、Pages secret 和首次生产数据写入。
 
 当前进展：
 
@@ -42,10 +42,12 @@
 - DONE：Reference review notes 已完成，`docs/REFERENCE_REVIEW.md` 记录 Glance、Miniflux、feeds.fun 和 AI/news automation 类项目的可借鉴点与本项目约束边界。
 - DONE：GitHub repository `Kindeed/space-intel` 已由用户更新为 public，`main` 和 `dev` 分支已推送，CI workflow 已创建且两个分支的 CI 均通过。
 - DONE：GitHub repository visibility 已由用户更新为 public；`main` 和 `dev` 已添加 branch protection，要求 `verify` check 通过、分支最新、PR review 和 conversation resolution。
-- DONE：Cloudflare D1 `space_intel` 已创建并执行 `0001_initial_schema.sql` migration；Pages 项目 `space-intel` 已创建，生产和预览部署均可访问。
-- DONE：`ADMIN_TOKEN` 已分别配置为 Cloudflare Pages secret 和 GitHub Actions secret；未把 secret 值写入仓库。
+- DONE：Cloudflare D1 `space_intel` 已创建并执行 `0001_initial_schema.sql` migration；远程 schema 已确认包含 sources、articles、companies、tags、launches、market_items、curations 和 ingestion_logs 等表。
+- NEEDS_ACTION：新 Git-backed Pages 项目的 `ADMIN_TOKEN` secret 列表为空，需要在 Cloudflare Pages production/preview 环境重新配置；未把 secret 值写入仓库。
 - DONE：Production subdomain `space.bytebaud.com` 已添加到 Pages custom domain，并创建 CNAME 到 `space-intel.pages.dev`；当前使用 DNS Only 通过 Pages HTTP validation，健康检查可访问。
-- BLOCKED：Git-backed Cloudflare Pages 自动绑定和 R2 bucket 仍受平台限制；当前 Pages 项目是 Direct Uploads project，Cloudflare API 明确返回不能更新 `source` 对象；R2 API 返回需要先在 Cloudflare Dashboard 启用 R2。
+- DONE：Git-backed Cloudflare Pages 已接通，`space-intel` 项目显示 `Git Provider: Yes`，production 部署来自 `main`。
+- DONE：R2 bucket `space-intel-assets` 已创建。
+- NEEDS_ACTION：`wrangler.toml` 已新增 `R2_ASSETS` binding，但线上 `/api/health` 当前仍显示 `r2: false`；需要通过 Git-backed Pages 重新部署并确认 Pages production/preview 环境读取到 R2 binding。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：
@@ -79,9 +81,9 @@
 | --- | --- | --- |
 | DONE | Create GitHub repository | Public repository `Kindeed/space-intel` exists with `main` and `dev` branches pushed. |
 | DONE | Add repository protection rules | `main` and `dev` require the `verify` check, up-to-date branch, pull request review, conversation resolution, no force pushes, and no branch deletion. |
-| BLOCKED | Connect Cloudflare Pages to GitHub | Pages project exists, but Cloudflare API says Direct Uploads projects cannot update the `source` object; Git-backed binding requires Cloudflare Dashboard GitHub integration or recreating the project as Git-backed. |
+| DONE | Connect Cloudflare Pages to GitHub | Pages project `space-intel` shows `Git Provider: Yes`; production deployment is sourced from `main`. |
 | DONE | Reserve production subdomain | `space.bytebaud.com` resolves to the Pages project and `/api/health` responds successfully. |
-| DONE | Configure GitHub Secrets | `ADMIN_TOKEN` is stored as a GitHub secret; Cloudflare deployment is handled by Pages/Cloudflare rather than exposing a Cloudflare token to GitHub. |
+| NEEDS_ACTION | Configure Pages Secrets | GitHub secret exists, but the new Git-backed Cloudflare Pages project currently lists no `ADMIN_TOKEN` secret; configure it in Pages before triggering protected ingestion endpoints. |
 
 ## Milestone 2: Project Skeleton
 

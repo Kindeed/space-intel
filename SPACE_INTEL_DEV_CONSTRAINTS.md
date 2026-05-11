@@ -7,6 +7,37 @@
 - 内容策略：自动聚合 + 人工精选；英文内容自动生成中文标题/摘要，但保留原文标题和来源链接。
 - 版权约束：不全文转载新闻正文，只展示摘要、元数据、标签、相关公司、相关发射和原文链接。
 
+## Development Progress Snapshot
+
+更新时间：2026-05-11
+
+进度主记录文件：`SPACE_INTEL_TASKS.md`。本节只保留约束文件内的高层快照，详细任务状态、里程碑、验收项和阻塞项以 `SPACE_INTEL_TASKS.md` 为准。
+
+当前状态：
+
+- v1 核心开发已基本完成：React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序和主要业务页面均已有第一版实现。
+- 已完成页面：首页、文章列表、文章详情、公司页、发射页、资本页、专题页，均保留本地 API 不可用时的示例数据兜底。
+- 已完成 API：`/api/home`、`/api/articles`、`/api/articles/:id`、`/api/companies`、`/api/companies/:slug`、`/api/launches`、`/api/launches/:id`、`/api/market`、`/api/topics`、`/api/topics/:slug`。
+- 已完成采集能力：Spaceflight News API、Launch Library 2、标准 RSS、Google News RSS、去重写入、ingestion logs、scheduled ingestion 测试。
+- 已完成配置能力：`config/sources.yaml`、`config/companies.yaml`、`config/topics.yaml`、`config/curations.yaml`，以及人工精选同步到 D1。
+- 已完成工程化：GitHub repository、`main`/`dev` 分支、branch protection、GitHub Actions CI、Wrangler 配置、D1 migration、本地 typecheck/lint/test/build 流程。
+- 已完成部署验证：Cloudflare Pages 项目、Git-backed production 部署、`space.bytebaud.com` Pages custom domain、`/api/health` 可访问。
+- 已完成 R2 bucket 创建：`space-intel-assets` 已存在，仓库 `wrangler.toml` 绑定名为 `R2_ASSETS`。
+
+当前待处理：
+
+- 新 Git-backed Pages 项目的 `ADMIN_TOKEN` secret 需要重新配置到 production/preview 环境。
+- 线上 `/api/health` 当前仍显示 `r2: false`，需要重新部署 Git-backed Pages 并确认 Pages 环境读取到 `R2_ASSETS` binding。
+- D1 schema 已存在，但文章、来源、公司、发射、精选等业务表当前记录数为 0，需要在 secret 配置后触发受保护 ingestion/curation endpoint 写入首批数据。
+
+下一步：
+
+- 在 Cloudflare Pages production/preview 环境配置 `ADMIN_TOKEN`。
+- 推送包含 `R2_ASSETS` binding 的 `wrangler.toml` 后触发 Git-backed Pages 重新部署。
+- 验证 `/api/health` 返回 `d1: true` 和 `r2: true`。
+- 触发 curation 和 ingestion endpoints 写入首批 D1 数据。
+- 保持 `SPACE_INTEL_TASKS.md` 为日常开发进度的唯一详细记录；重大状态变化同步更新本快照。
+
 ## Platform And Repository
 
 - 代码托管：GitHub 新建私有或公开仓库，建议仓库名 `space-intel`。
