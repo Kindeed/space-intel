@@ -1,0 +1,181 @@
+{
+  "companies": [
+    {
+      "slug": "spacex",
+      "name": "SpaceX",
+      "english_name": "SpaceX",
+      "country": "United States",
+      "sector": "Launch, satellite internet",
+      "website": "https://www.spacex.com/"
+    },
+    {
+      "slug": "rocket-lab",
+      "name": "Rocket Lab",
+      "english_name": "Rocket Lab",
+      "country": "United States",
+      "sector": "Launch, spacecraft",
+      "website": "https://www.rocketlabusa.com/",
+      "stock_symbol": "RKLB"
+    },
+    {
+      "slug": "blue-origin",
+      "name": "Blue Origin",
+      "english_name": "Blue Origin",
+      "country": "United States",
+      "sector": "Launch, lunar services",
+      "website": "https://www.blueorigin.com/"
+    },
+    {
+      "slug": "relativity-space",
+      "name": "Relativity Space",
+      "english_name": "Relativity Space",
+      "country": "United States",
+      "sector": "Launch",
+      "website": "https://www.relativityspace.com/"
+    },
+    {
+      "slug": "firefly-aerospace",
+      "name": "Firefly Aerospace",
+      "english_name": "Firefly Aerospace",
+      "country": "United States",
+      "sector": "Launch, lunar services",
+      "website": "https://fireflyspace.com/"
+    },
+    {
+      "slug": "sierra-space",
+      "name": "Sierra Space",
+      "english_name": "Sierra Space",
+      "country": "United States",
+      "sector": "Space stations, spacecraft",
+      "website": "https://www.sierraspace.com/"
+    },
+    {
+      "slug": "axiom-space",
+      "name": "Axiom Space",
+      "english_name": "Axiom Space",
+      "country": "United States",
+      "sector": "Commercial space station",
+      "website": "https://www.axiomspace.com/"
+    },
+    {
+      "slug": "intuitive-machines",
+      "name": "Intuitive Machines",
+      "english_name": "Intuitive Machines",
+      "country": "United States",
+      "sector": "Lunar commercial services",
+      "website": "https://www.intuitivemachines.com/",
+      "stock_symbol": "LUNR"
+    },
+    {
+      "slug": "planet-labs",
+      "name": "Planet Labs",
+      "english_name": "Planet Labs",
+      "country": "United States",
+      "sector": "Remote sensing",
+      "website": "https://www.planet.com/",
+      "stock_symbol": "PL"
+    },
+    {
+      "slug": "maxar",
+      "name": "Maxar",
+      "english_name": "Maxar",
+      "country": "United States",
+      "sector": "Remote sensing, spacecraft",
+      "website": "https://www.maxar.com/"
+    },
+    {
+      "slug": "ast-spacemobile",
+      "name": "AST SpaceMobile",
+      "english_name": "AST SpaceMobile",
+      "country": "United States",
+      "sector": "Satellite communications",
+      "website": "https://ast-science.com/",
+      "stock_symbol": "ASTS"
+    },
+    {
+      "slug": "landspace",
+      "name": "蓝箭航天",
+      "english_name": "LandSpace",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.landspace.com/"
+    },
+    {
+      "slug": "galactic-energy",
+      "name": "星河动力",
+      "english_name": "Galactic Energy",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "space-pioneer",
+      "name": "天兵科技",
+      "english_name": "Space Pioneer",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "orienspace",
+      "name": "东方空间",
+      "english_name": "Orienspace",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "ispace-china",
+      "name": "星际荣耀",
+      "english_name": "i-Space",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "deep-blue-aerospace",
+      "name": "深蓝航天",
+      "english_name": "Deep Blue Aerospace",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "cas-space",
+      "name": "中科宇航",
+      "english_name": "CAS Space",
+      "country": "China",
+      "sector": "Launch"
+    },
+    {
+      "slug": "charming-globe",
+      "name": "长光卫星",
+      "english_name": "Chang Guang Satellite Technology",
+      "country": "China",
+      "sector": "Remote sensing"
+    },
+    {
+      "slug": "galaxy-space",
+      "name": "银河航天",
+      "english_name": "GalaxySpace",
+      "country": "China",
+      "sector": "Satellite internet"
+    },
+    {
+      "slug": "geespace",
+      "name": "时空道宇",
+      "english_name": "Geespace",
+      "country": "China",
+      "sector": "Satellite internet"
+    },
+    {
+      "slug": "minospace",
+      "name": "微纳星空",
+      "english_name": "MinoSpace",
+      "country": "China",
+      "sector": "Satellite manufacturing"
+    },
+    {
+      "slug": "commsat",
+      "name": "九天微星",
+      "english_name": "Commsat",
+      "country": "China",
+      "sector": "Satellite manufacturing"
+    }
+  ]
+}

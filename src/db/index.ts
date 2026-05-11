@@ -1,5 +1,6 @@
 export * from './articles';
 export * from './articleQueries';
+export * from './catalog';
 export * from './companyQueries';
 export * from './curations';
 export * from './homeQueries';
