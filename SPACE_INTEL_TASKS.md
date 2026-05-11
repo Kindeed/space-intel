@@ -54,6 +54,7 @@
 - DONE：Company/topic catalog seed sync 已部署并在 production 执行，`companies` 表有 23 条，`tags` 表有 6 条。
 - DONE：Article entity enrichment 已部署并在 production 执行，`/api/admin/enrich/entities` 按公司名称/英文名/独立股票代码 token 和专题关键词重建 `article_companies` 与 `article_tags` 关联。
 - DONE：短股票代码误匹配已修复，`PL` 等 ticker 不再匹配普通英文单词片段；production enrichment 已重跑，当前 `article_companies` 44 条、`article_tags` 25 条。
+- IN_PROGRESS：Market item seed 已实现本地第一版，新增受保护 endpoint `/api/admin/market/seed`，从已采集文章元数据中筛选融资、IPO/上市、公告/财报、股价/ETF/概念股等资本市场资讯写入 `market_items`；待 PR 合并后在 production 执行。
 - BLOCKED：Launch Library 2 production ingestion 当前受上游 HTTP 429 限流，已记录 ingestion log；待限流窗口恢复后复跑。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
