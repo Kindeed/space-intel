@@ -13,7 +13,7 @@
 
 更新时间：2026-05-11
 
-当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages 已接通，继续处理 R2 runtime binding、Pages secret 和首次生产数据写入。
+当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret 和首批生产数据写入已验证，剩余 Launch Library 2 上游限流复跑。
 
 当前进展：
 
@@ -43,11 +43,15 @@
 - DONE：GitHub repository `Kindeed/space-intel` 已由用户更新为 public，`main` 和 `dev` 分支已推送，CI workflow 已创建且两个分支的 CI 均通过。
 - DONE：GitHub repository visibility 已由用户更新为 public；`main` 和 `dev` 已添加 branch protection，要求 `verify` check 通过、分支最新、PR review 和 conversation resolution。
 - DONE：Cloudflare D1 `space_intel` 已创建并执行 `0001_initial_schema.sql` migration；远程 schema 已确认包含 sources、articles、companies、tags、launches、market_items、curations 和 ingestion_logs 等表。
-- NEEDS_ACTION：新 Git-backed Pages 项目的 `ADMIN_TOKEN` secret 列表为空，需要在 Cloudflare Pages production/preview 环境重新配置；未把 secret 值写入仓库。
+- DONE：新 Git-backed Pages 项目的 `ADMIN_TOKEN` 已配置到 production；token 值只保存在本地 ignored `.dev.vars`，未写入仓库。
 - DONE：Production subdomain `space.bytebaud.com` 已添加到 Pages custom domain，并创建 CNAME 到 `space-intel.pages.dev`；当前使用 DNS Only 通过 Pages HTTP validation，健康检查可访问。
 - DONE：Git-backed Cloudflare Pages 已接通，`space-intel` 项目显示 `Git Provider: Yes`，production 部署来自 `main`。
 - DONE：R2 bucket `space-intel-assets` 已创建。
-- NEEDS_ACTION：`wrangler.toml` 已新增 `R2_ASSETS` binding，但线上 `/api/health` 当前仍显示 `r2: false`；需要通过 Git-backed Pages 重新部署并确认 Pages production/preview 环境读取到 R2 binding。
+- DONE：`wrangler.toml` 已新增 `R2_ASSETS` binding，production `/api/health` 已确认 `d1: true`、`r2: true`。
+- DONE：Production admin endpoint 1101 已排查并修复：空 `curations.yaml` 注释段解析为 `null` 导致 Zod error，已按空数组处理；Cloudflare global `fetch` 直接传递导致 Illegal invocation，已改为包装函数。
+- DONE：The Space Review RSS 旧地址 `tsr.xml` 返回 404，已改为 `https://www.thespacereview.com/articles.xml`；RSS/Google News 批量采集已改为单源失败不拖垮整批。
+- DONE：首批生产数据已写入 D1；截至 2026-05-11，`articles` 表有 1185 条，来源包括 Google News RSS、SNAPI、The Space Review、Space.com、ESA 等。
+- BLOCKED：Launch Library 2 production ingestion 当前受上游 HTTP 429 限流，已记录 ingestion log；待限流窗口恢复后复跑。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：
@@ -83,7 +87,7 @@
 | DONE | Add repository protection rules | `main` and `dev` require the `verify` check, up-to-date branch, pull request review, conversation resolution, no force pushes, and no branch deletion. |
 | DONE | Connect Cloudflare Pages to GitHub | Pages project `space-intel` shows `Git Provider: Yes`; production deployment is sourced from `main`. |
 | DONE | Reserve production subdomain | `space.bytebaud.com` resolves to the Pages project and `/api/health` responds successfully. |
-| NEEDS_ACTION | Configure Pages Secrets | GitHub secret exists, but the new Git-backed Cloudflare Pages project currently lists no `ADMIN_TOKEN` secret; configure it in Pages before triggering protected ingestion endpoints. |
+| DONE | Configure Pages Secrets | `ADMIN_TOKEN` is configured for the Git-backed Cloudflare Pages production environment; the value is kept out of Git. |
 
 ## Milestone 2: Project Skeleton
 
