@@ -13,7 +13,7 @@
 
 更新时间：2026-05-11
 
-当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret 和首批生产数据写入已验证，正在补齐公司库和专题标签 production seed/sync。
+当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync 和文章实体关联均已验证，剩余 Launch Library 2 上游限流复跑。
 
 当前进展：
 
@@ -52,7 +52,8 @@
 - DONE：The Space Review RSS 旧地址 `tsr.xml` 返回 404，已改为 `https://www.thespacereview.com/articles.xml`；RSS/Google News 批量采集已改为单源失败不拖垮整批。
 - DONE：首批生产数据已写入 D1；截至 2026-05-11，`articles` 表有 1185 条，来源包括 Google News RSS、SNAPI、The Space Review、Space.com、ESA 等。
 - DONE：Company/topic catalog seed sync 已部署并在 production 执行，`companies` 表有 23 条，`tags` 表有 6 条。
-- IN_PROGRESS：Article entity enrichment 已实现本地第一版，新增受保护 endpoint `/api/admin/enrich/entities`，用于按公司名称/英文名/股票代码和专题关键词重建 `article_companies` 与 `article_tags` 关联；待 PR 合并后在 production 执行。
+- DONE：Article entity enrichment 已部署并在 production 执行，`/api/admin/enrich/entities` 按公司名称/英文名/独立股票代码 token 和专题关键词重建 `article_companies` 与 `article_tags` 关联。
+- DONE：短股票代码误匹配已修复，`PL` 等 ticker 不再匹配普通英文单词片段；production enrichment 已重跑，当前 `article_companies` 44 条、`article_tags` 25 条。
 - BLOCKED：Launch Library 2 production ingestion 当前受上游 HTTP 429 限流，已记录 ingestion log；待限流窗口恢复后复跑。
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
