@@ -20,10 +20,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Launch Library 2 source is not configured' }, { status: 500 });
   }
 
-  const result = await runLaunchIngestion(env.DB, source, launchLibraryCollector, {
-    fetch: (input, init) => fetch(input, init),
-    now: () => new Date(),
-  });
+  try {
+    const result = await runLaunchIngestion(env.DB, source, launchLibraryCollector, {
+      fetch: (input, init) => fetch(input, init),
+      now: () => new Date(),
+    });
 
-  return Response.json(result);
+    return Response.json(result);
+  } catch (error) {
+    return Response.json(
+      {
+        sourceKey: source.key,
+        collected: 0,
+        upserted: 0,
+        failures: 1,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 502 },
+    );
+  }
 };
