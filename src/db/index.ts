@@ -3,6 +3,7 @@ export * from './articleQueries';
 export * from './catalog';
 export * from './companyQueries';
 export * from './curations';
+export * from './entityLinks';
 export * from './homeQueries';
 export * from './ingestionLogs';
 export * from './launches';
