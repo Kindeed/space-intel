@@ -2,6 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { parseCurationsYaml } from './config';
 
 describe('curation config', () => {
+  it('treats commented-out YAML sections as empty arrays', () => {
+    const records = parseCurationsYaml(`
+home_highlights:
+  # - url: https://example.com/top
+pinned_items:
+  # - target: capital
+topics:
+  # - slug: reusable-rockets
+`);
+
+    expect(records).toEqual([]);
+  });
+
   it('normalizes home, pinned, and topic curations', () => {
     const records = parseCurationsYaml(`
 home_highlights:

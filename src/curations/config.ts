@@ -18,10 +18,13 @@ const topicCurationSchema = z.object({
   note: z.string().default(''),
 });
 
+const nullableArray = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((value) => (value === null ? undefined : value), z.array(schema).default([]));
+
 const curationsConfigSchema = z.object({
-  home_highlights: z.array(weightedUrlSchema).default([]),
-  pinned_items: z.array(pinnedItemSchema).default([]),
-  topics: z.array(topicCurationSchema).default([]),
+  home_highlights: nullableArray(weightedUrlSchema),
+  pinned_items: nullableArray(pinnedItemSchema),
+  topics: nullableArray(topicCurationSchema),
 });
 
 export type CurationConfigRecord = {

@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   for (const source of sources) {
     results.push(
       await runSourceIngestion(env.DB, source, registry, {
-        fetch,
+        fetch: (input, init) => fetch(input, init),
         now: () => new Date(),
       }),
     );
