@@ -11,9 +11,9 @@
 
 ## Current Development Plan
 
-更新时间：2026-05-11
+更新时间：2026-05-13
 
-当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync 和文章实体关联均已验证，剩余 Launch Library 2 上游限流复跑。
+当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync、文章实体关联、market seed 和 launch cache 均已有 production 数据验证；剩余 Launch Library 2 endpoint 请求头修正部署后复跑验证。
 
 当前进展：
 
@@ -54,8 +54,11 @@
 - DONE：Company/topic catalog seed sync 已部署并在 production 执行，`companies` 表有 23 条，`tags` 表有 6 条。
 - DONE：Article entity enrichment 已部署并在 production 执行，`/api/admin/enrich/entities` 按公司名称/英文名/独立股票代码 token 和专题关键词重建 `article_companies` 与 `article_tags` 关联。
 - DONE：短股票代码误匹配已修复，`PL` 等 ticker 不再匹配普通英文单词片段；production enrichment 已重跑，当前 `article_companies` 44 条、`article_tags` 25 条。
-- IN_PROGRESS：Market item seed 已实现本地第一版，新增受保护 endpoint `/api/admin/market/seed`，从已采集文章元数据中筛选融资、IPO/上市、公告/财报、股价/ETF/概念股等资本市场资讯写入 `market_items`；待 PR 合并后在 production 执行。
-- BLOCKED：Launch Library 2 production ingestion 当前受上游 HTTP 429 限流，已记录 ingestion log；待限流窗口恢复后复跑。
+- DONE：Market item seed 实现已合入 `main`，新增受保护 endpoint `/api/admin/market/seed`，从已采集文章元数据中筛选融资、IPO/上市、公告/财报、股价/ETF/概念股等资本市场资讯写入 `market_items`。
+- DONE：Market item seed 已在 production 执行并验证，`market_items` 当前 234 条，其中 financing 100、filing 58、market 51、ipo 25。
+- DONE：Launch cache 已用 Launch Library 2 upcoming 数据写入 production D1，`launches` 当前 25 条。
+- IN_PROGRESS：Launch Library 2 endpoint 已定位到默认请求头触发 HTTP 429 的风险，采集器已加入明确 User-Agent；待部署后通过 `/api/admin/ingest/launches` 复跑验证。
+- DONE：Source configuration expanded to 37 total sources / 35 enabled sources, including additional verified RSS sources and Chinese Google News topic feeds.
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：

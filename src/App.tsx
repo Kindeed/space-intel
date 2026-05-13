@@ -303,7 +303,7 @@ function ArticleCard({ item, compact = false, feature = false }: { item: FeedIte
             </Link>
           ))}
         </div>
-        <Link to={`/articles/${item.slug}`} aria-label={`打开 ${item.title} 的详情页`}>
+        <Link className="article-card__open" to={`/articles/${item.slug}`} aria-label={`打开 ${item.title} 的详情页`}>
           <ExternalLink size={16} />
         </Link>
       </div>

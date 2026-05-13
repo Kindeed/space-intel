@@ -84,6 +84,7 @@ async function collectLaunches(source: SourceConfig, context: CollectorContext):
   const response = await context.fetch(url.toString(), {
     headers: {
       accept: 'application/json',
+      'user-agent': 'space-intel/0.1 (+https://space.bytebaud.com)',
     },
   });
 
