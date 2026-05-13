@@ -995,7 +995,7 @@ function LaunchesPage() {
           </Link>
         ))}
       </div>
-      {apiState.hasMore ? <div className="inline-status">还有更多发射记录，后续将补充分页控件。</div> : null}
+      {apiState.hasMore ? <div className="inline-status">当前显示首批发射记录，可用关键词、发射商或状态继续筛选。</div> : null}
     </PageShell>
   );
 }
@@ -1362,7 +1362,7 @@ function SiteFooter() {
           ))}
         </div>
       </div>
-      <p>来源状态、采集日志和人工精选将在后续 API 与 D1 schema 完成后接入。</p>
+      <p>Cloudflare Pages Functions 已接入 D1、R2、采集日志和人工精选配置；生产库已写入文章、发射与资本市场数据。</p>
     </footer>
   );
 }

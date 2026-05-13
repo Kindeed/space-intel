@@ -76,7 +76,7 @@
 
 - 只保存标题、摘要、元数据、标签、关联实体和原文链接，不保存全文。
 - 不接入任何 secrets，不改 Cloudflare DNS/VPS/nginx/现有服务。
-- 真实 D1 `database_id` 仍保持占位，等 Cloudflare 资源创建后再替换。
+- 真实 D1 `database_id` 已写入 `wrangler.toml`，生产 D1/R2 绑定已验证。
 
 ## Milestone 0: Project Governance
 
@@ -182,6 +182,6 @@
 | Status | Decision | Default |
 | --- | --- | --- |
 | DONE | Final GitHub repository visibility | Repository is public as of 2026-05-09, which allowed branch protection on the free GitHub plan. |
-| DONE | Final production subdomain | Default decision recorded: `space.bytebaud.com`; no DNS change has been made. |
+| DONE | Final production subdomain | `space.bytebaud.com` is configured as the production Pages custom domain. |
 | DONE | AI summary provider | Deferred decision recorded: Cloudflare AI Gateway or external LLM API after cost and quality review. |
 | DONE | RSSHub hosting mode | Default decision recorded: public routes first; VPS Docker only when necessary and isolated. |

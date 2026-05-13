@@ -9,7 +9,7 @@
 
 ## Development Progress Snapshot
 
-更新时间：2026-05-11
+更新时间：2026-05-13
 
 进度主记录文件：`SPACE_INTEL_TASKS.md`。本节只保留约束文件内的高层快照，详细任务状态、里程碑、验收项和阻塞项以 `SPACE_INTEL_TASKS.md` 为准。
 
@@ -24,18 +24,20 @@
 - 已完成部署验证：Cloudflare Pages 项目、Git-backed production 部署、`space.bytebaud.com` Pages custom domain、`/api/health` 可访问。
 - 已完成 R2 bucket 创建：`space-intel-assets` 已存在，仓库 `wrangler.toml` 绑定名为 `R2_ASSETS`。
 - 已完成 production runtime 验证：`/api/health` 返回 `d1: true`、`r2: true`；`ADMIN_TOKEN` 已配置到 Pages production，secret 值未进入仓库。
-- 已完成首批 production ingestion：SNAPI、Google News RSS、RSS 源已写入 D1；截至 2026-05-11，`articles` 表有 1185 条。
+- 已完成首批 production ingestion：SNAPI、Google News RSS、RSS 源已写入 D1；截至 2026-05-13，`articles` 表有 1185 条。
 - 已完成 production catalog/enrichment：`companies` 表 23 条、`tags` 表 6 条；文章实体关联已重建，当前 `article_companies` 44 条、`article_tags` 25 条。
+- 已完成 production market seed：`market_items` 表当前 234 条，其中 financing 100、filing 58、market 51、ipo 25。
+- 已完成 production launch cache seed：`launches` 表当前 25 条。
+- 已扩充来源配置：`config/sources.yaml` 当前 37 个来源，其中 35 个启用；包含 15 个 RSS 源和 11 个中文 Google News RSS 聚合源。
 
 当前待处理：
 
-- Launch Library 2 当前 production ingestion 被上游 HTTP 429 限流；已记录 ingestion log，待限流窗口恢复后复跑。
-- `launches` 和 `market_items` 仍需要通过后续采集或配置同步写入真实数据。
+- Launch Library 2 protected endpoint 已定位到默认请求头触发 HTTP 429 的风险，采集器已加入明确 User-Agent；待该变更随 Git-backed Pages 部署后复跑验证。
 
 下一步：
 
-- 复跑 Launch Library 2 ingestion，确认 `launches` 表写入。
-- 补齐资本市场数据的 production seed/sync 路径。
+- 合并并部署 Launch Library 2 User-Agent 修正后，复跑 `/api/admin/ingest/launches`。
+- 继续观察新增 RSS 和 Google News RSS 来源的采集质量、重复率和相关性。
 - 保持 `SPACE_INTEL_TASKS.md` 为日常开发进度的唯一详细记录；重大状态变化同步更新本快照。
 
 ## Platform And Repository

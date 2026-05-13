@@ -19,7 +19,7 @@ export const highlights: FeedItem[] = [
     time: '08:30',
     category: '国内商业航天',
     region: '国内',
-    summary: '用于验证复用发动机长程工作能力，后续将关联发射计划、融资动态和公司时间线。',
+    summary: '用于验证复用发动机长程工作能力，并关联发射计划、融资动态和公司时间线。',
     companies: ['蓝箭航天', '星河动力'],
     tags: ['可回收火箭', '国内民营火箭'],
     relatedLaunch: 'commercial-remote-sensing-rideshare',
@@ -64,7 +64,7 @@ export const highlights: FeedItem[] = [
     time: '昨日',
     category: '卫星互联网',
     region: '国内',
-    summary: '关注卫星平台、相控阵终端、网关站和运营侧的联动变化，后续将进入专题聚合。',
+    summary: '关注卫星平台、相控阵终端、网关站和运营侧的联动变化，并进入专题聚合。',
     companies: ['银河航天', '时空道宇'],
     tags: ['卫星互联网', '低轨通信'],
   },
@@ -131,15 +131,15 @@ export const upcomingLaunches = [
 ];
 
 export const marketBriefs = [
-  '商业遥感公司披露新合同收入，待关联公告原文。',
+  '商业遥感公司披露新合同收入，资本页保留公告原文链接。',
   '低轨通信产业链多家公司发布订单进展。',
   '融资动态页面固定展示非投资建议说明。',
 ];
 
 export const sourceStatus = [
   { label: 'API 源', value: '2', state: '正常' },
-  { label: 'RSS 源', value: '8', state: '待接入' },
-  { label: '中文聚合', value: '6', state: '待接入' },
+  { label: 'RSS 源', value: '15', state: '已启用' },
+  { label: '中文聚合', value: '11', state: '已启用' },
 ];
 
 export const trendTags = ['可回收火箭', '卫星互联网', '商业遥感', '月球商业服务', '低轨通信', '融资动态'];
