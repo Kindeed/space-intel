@@ -13,6 +13,11 @@ try {
   for (const viewport of viewports) {
     const page = await browser.newPage({ viewport });
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
+    await page.keyboard.press('ControlOrMeta+K');
+    const hasCommandPalette = (await page.locator('.command-palette').count()) > 0;
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    const commandPaletteClosed = (await page.locator('.command-palette').count()) === 0;
 
     const hasHighlights = (await page.locator('text=今日重点').count()) > 0;
     const hasCapitalNotice = (await page.locator('text=不构成投资建议').count()) > 0;
@@ -24,19 +29,19 @@ try {
     await page.waitForURL('**/articles/**');
     await page.waitForTimeout(250);
     const articleBody = await page.textContent('body');
-    const hasArticleDetail = articleBody?.includes('相关公司') ?? false;
+    const hasArticleDetail = articleBody?.includes('核心要点') ?? false;
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
-    await page.locator('a[href="/launches"]').first().click();
+    await page.locator('a[href="/launches"]:visible').first().click();
     await page.waitForURL('**/launches');
     await page.waitForTimeout(250);
     const launchBody = await page.textContent('body');
-    const hasLaunchPage = launchBody?.includes('发射日历') ?? false;
+    const hasLaunchPage = launchBody?.includes('发射时间轴') ?? false;
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
     await page.screenshot({ path: `test-results/${viewport.name}.png`, fullPage: true });
 
-    if (!hasHighlights || !hasCapitalNotice || hasHorizontalOverflow || !hasArticleDetail || !hasLaunchPage) {
+    if (!hasCommandPalette || !commandPaletteClosed || !hasHighlights || !hasCapitalNotice || hasHorizontalOverflow || !hasArticleDetail || !hasLaunchPage) {
       throw new Error(
-        `${viewport.name} layout check failed: highlights=${hasHighlights}, capitalNotice=${hasCapitalNotice}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, launchPage=${hasLaunchPage}`,
+        `${viewport.name} layout check failed: commandPalette=${hasCommandPalette}, commandPaletteClosed=${commandPaletteClosed}, highlights=${hasHighlights}, capitalNotice=${hasCapitalNotice}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, launchPage=${hasLaunchPage}`,
       );
     }
 

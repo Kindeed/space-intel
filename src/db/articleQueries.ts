@@ -12,6 +12,9 @@ export type ArticleSummaryRow = {
   language: string;
   region: string;
   fetchStatus: string;
+  storyKey?: string;
+  relatedSourceCount?: number;
+  relatedSources?: string[];
 };
 
 export type ArticleDetailRow = ArticleSummaryRow & {
@@ -56,6 +59,62 @@ function normalizeLimit(value: number | undefined): number {
 
 function likeValue(value: string): string {
   return `%${value.trim().toLowerCase()}%`;
+}
+
+function normalizeStoryText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\s+-\s+[^-]+$/, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\b(the|a|an|to|of|and|for|in|on|with|by|from|after|as|at|is|are)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function createStoryKey(row: Pick<ArticleSummaryRow, 'title' | 'publishedAt' | 'region'>): string {
+  const date = row.publishedAt.slice(0, 10);
+  const normalizedTitle = normalizeStoryText(row.title);
+  const compactTitle = normalizedTitle.replace(/\s/g, '');
+  const titleKey = /[\u3400-\u9fff]/.test(compactTitle)
+    ? compactTitle.slice(0, 18)
+    : normalizedTitle.split(' ').filter((word) => word.length > 2).slice(0, 8).join('-');
+
+  return `${row.region}:${date}:${titleKey || compactTitle.slice(0, 18)}`;
+}
+
+export function clusterArticleRows(rows: ArticleSummaryRow[], limit: number): ArticleSummaryRow[] {
+  const clusters = new Map<string, ArticleSummaryRow & { relatedSources: string[] }>();
+
+  for (const row of rows) {
+    const storyKey = createStoryKey(row);
+    const existing = clusters.get(storyKey);
+
+    if (!existing) {
+      clusters.set(storyKey, {
+        ...row,
+        storyKey,
+        relatedSourceCount: 1,
+        relatedSources: [row.sourceName],
+      });
+      continue;
+    }
+
+    if (!existing.relatedSources.includes(row.sourceName)) {
+      existing.relatedSources.push(row.sourceName);
+      existing.relatedSourceCount = existing.relatedSources.length;
+    }
+
+    if (new Date(row.publishedAt).getTime() > new Date(existing.publishedAt).getTime()) {
+      clusters.set(storyKey, {
+        ...row,
+        storyKey,
+        relatedSourceCount: existing.relatedSourceCount,
+        relatedSources: existing.relatedSources,
+      });
+    }
+  }
+
+  return Array.from(clusters.values()).slice(0, limit);
 }
 
 export async function listArticles(db: SqlDatabase, filters: ArticleListFilters = {}): Promise<ArticleListResult> {
@@ -104,6 +163,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const rawLimit = Math.min(limit * 4 + 1, maxLimit);
   const statement = db.prepare(
     `SELECT
       a.id,
@@ -123,19 +183,20 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
     ORDER BY a.published_at DESC, a.id DESC
     LIMIT ? OFFSET ?`,
   );
-  const queryResult = await statement.bind(...values, limit + 1, offset).all?.<ArticleSummaryRow>();
+  const queryResult = await statement.bind(...values, rawLimit, offset).all?.<ArticleSummaryRow>();
 
   if (!queryResult) {
     throw new Error('Database statement does not support all()');
   }
 
   const rows = queryResult.results;
+  const clusteredRows = clusterArticleRows(rows, limit);
 
   return {
-    items: rows.slice(0, limit),
+    items: clusteredRows,
     page,
     limit,
-    hasMore: rows.length > limit,
+    hasMore: rows.length > clusteredRows.length,
   };
 }
 
