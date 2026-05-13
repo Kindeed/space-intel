@@ -17,6 +17,8 @@
 
 当前进展：
 
+- DONE：Mission Control 优化已完成第一版，已降低 Google News 跨关键词重复、增加查询层 story clustering、提供 `/api/sources` 筛选源接口、改造暗色高密度三栏布局与紧凑筛选抽屉；本轮仍坚持不存全文，只展示摘要、要点、元数据和原文链接。
+- DONE：Mission Control 前端工程化优化已完成，`App.tsx` 已拆成 types/hooks/components/pages，数据请求升级为 TanStack Query，Command Palette 改用 `cmdk` 并支持快捷键、ESC 和键盘选择，CSS 已抽取暗色主题 design tokens。
 - DONE：Frontend route shell 已完成。顶部导航、侧栏、文章详情、公司、发射、资本、专题均有真实路由路径。
 - DONE：Mock-backed page skeletons 已完成，并且主要页面已接入 D1-backed API；本地 API 不可用时保留示例数据兜底。
 - DONE：D1 persistence layer 已完成第一版，包含 source upsert、article `dedupe_hash` 去重写入、ingestion log 成功/失败记录和测试。

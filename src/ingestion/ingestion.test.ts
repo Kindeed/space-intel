@@ -87,6 +87,21 @@ describe('dedupe', () => {
 
     expect(hash).toMatch(/^[a-f0-9]{64}$/);
   });
+
+  it('deduplicates the same Google News story across keyword feeds', () => {
+    const first = createDedupeKey({
+      sourceKey: 'google-news-cn-commercial-space',
+      title: '民营火箭企业完成发动机试车',
+      url: 'https://news.google.com/rss/articles/example?oc=5',
+    });
+    const second = createDedupeKey({
+      sourceKey: 'google-news-cn-private-launch',
+      title: '民营火箭企业完成发动机试车',
+      url: 'https://news.google.com/rss/articles/example?hl=zh-CN',
+    });
+
+    expect(first).toBe(second);
+  });
 });
 
 describe('collector registry', () => {
