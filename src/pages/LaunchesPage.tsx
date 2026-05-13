@@ -1,10 +1,46 @@
-import { type CSSProperties, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { upcomingLaunches } from '../data';
 import { PageShell } from '../components/PageShell';
 import { useLaunchesQuery } from '../hooks/queries';
-import { displayTime } from '../utils';
+import { displayLaunchStatus, formatLaunchWindow, friendlyError, launchProximity } from '../utils';
+import type { ApiLaunch } from '../types';
+
+function launchHref(launch: ApiLaunch): string | null {
+  if (launch.isFallback) {
+    return null;
+  }
+
+  return `/launches/${launch.id || launch.externalId}`;
+}
+
+function LaunchCard({ launch, index }: { launch: ApiLaunch; index: number }) {
+  const href = launchHref(launch);
+  const content = (
+    <>
+      <div className="launch-card__time">
+        <span>{launchProximity(launch.windowStart, upcomingLaunches[index]?.window)}</span>
+        <strong>{formatLaunchWindow(launch.windowStart)}</strong>
+      </div>
+      <div className="launch-card__body">
+        <strong>{launch.mission}</strong>
+        <span>{launch.provider ?? '发射商待定'} / {displayLaunchStatus(launch.status)}</span>
+        <em>{launch.rocket ?? '火箭型号未披露'} / {launch.site ?? '场站待定'}</em>
+      </div>
+    </>
+  );
+
+  return href ? (
+    <Link to={href} className="launch-card">
+      {content}
+    </Link>
+  ) : (
+    <div className="launch-card launch-card--static">
+      {content}
+    </div>
+  );
+}
 
 export function LaunchesPage() {
   const [searchParams] = useSearchParams();
@@ -22,7 +58,7 @@ export function LaunchesPage() {
   const state = useLaunchesQuery(apiPath);
   const fallback = upcomingLaunches.map((launch, index) => ({
     id: index + 1,
-    externalId: launch.slug,
+    externalId: `fallback-${launch.slug}`,
     mission: launch.mission,
     rocket: null,
     provider: launch.provider,
@@ -30,11 +66,12 @@ export function LaunchesPage() {
     site: launch.site,
     status: launch.status,
     rawUrl: null,
+    isFallback: true,
   }));
   const items = state.data?.items ?? fallback;
 
   return (
-    <PageShell title="发射时间轴" subtitle="横向 Gantt-style 时间轴和紧凑列表并行展示发射窗口、服务商和状态。">
+    <PageShell title="发射时间线" subtitle="等高时间轴和紧凑列表并行展示发射窗口、服务商和状态。">
       <details className="filter-drawer">
         <summary><Filter size={16} aria-hidden="true" /> 发射筛选</summary>
         <form className="filter-form" action="/launches">
@@ -44,16 +81,13 @@ export function LaunchesPage() {
           <button type="submit"><Search size={16} aria-hidden="true" /> 应用</button>
         </form>
       </details>
-      {state.error ? <div className="inline-status">发射数据暂不可用，当前显示离线缓存。错误：{state.error.message}</div> : null}
+      {friendlyError(state.error, '发射数据') ? <div className="inline-status">{friendlyError(state.error, '发射数据')}</div> : null}
       <div className="launch-timeline">
         {items.map((launch, index) => (
-          <Link to={`/launches/${launch.id || launch.externalId}`} key={launch.externalId || launch.id} style={{ '--lane': index % 4 } as CSSProperties}>
-            <span>{launch.windowStart ? displayTime(launch.windowStart) : `T+${index + 1}`}</span>
-            <strong>{launch.mission}</strong>
-            <em>{launch.provider ?? '发射商待定'} / {launch.status}</em>
-          </Link>
+          <LaunchCard key={launch.externalId || launch.id} launch={launch} index={index} />
         ))}
       </div>
+      {state.data?.hasMore ? <div className="inline-status">当前显示首批发射记录，可用关键词、发射商或状态继续筛选。</div> : null}
     </PageShell>
   );
 }

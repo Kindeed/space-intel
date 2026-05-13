@@ -58,6 +58,7 @@ export type ApiLaunch = {
   site: string | null;
   status: string;
   rawUrl: string | null;
+  isFallback?: boolean;
 };
 
 export type ApiLaunchListResult = {

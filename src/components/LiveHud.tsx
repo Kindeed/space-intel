@@ -2,6 +2,7 @@ import { Activity, CalendarDays, CircleDollarSign, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { marketBriefs, slugify, sourceStatus, trendTags, upcomingLaunches } from '../data';
 import { SectionTitle } from './SectionTitle';
+import { displayLaunchStatus } from '../utils';
 
 export function LiveHud({
   launches = upcomingLaunches,
@@ -13,17 +14,17 @@ export function LiveHud({
   return (
     <aside className="live-hud" aria-label="实时情报 HUD">
       <section className="panel launch-hud">
-        <SectionTitle icon={CalendarDays} title="Launch Timeline" kicker="Live HUD" />
+        <SectionTitle icon={CalendarDays} title="发射时间线" kicker="Live HUD" />
         <div className="launch-stack">
           {launches.slice(0, 4).map((launch, index) => (
-            <Link key={launch.slug} to={`/launches/${launch.slug}`} className="launch-strip">
+            <div key={launch.slug} className="launch-strip launch-strip--static">
               <span>{launch.window}</span>
               <div>
                 <strong>{launch.mission}</strong>
-                <em>{launch.provider} / {launch.status}</em>
+                <em>{launch.provider} / {displayLaunchStatus(launch.status)}</em>
               </div>
               <i style={{ inlineSize: `${Math.max(28, 92 - index * 16)}%` }} />
-            </Link>
+            </div>
           ))}
         </div>
       </section>

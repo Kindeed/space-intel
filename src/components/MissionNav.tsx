@@ -13,9 +13,21 @@ export function MissionNav() {
           </NavLink>
         ))}
       </div>
-      <div className="compliance-card">
-        <span>Content Policy</span>
-        <strong>不存全文，仅聚合摘要、元数据和原文链接</strong>
+      <div className="signal-card">
+        <span>来源透明</span>
+        <strong>摘要、标签、实体与原文链接</strong>
+        <p>保留来源入口，便于快速回看上下文。</p>
+      </div>
+      <div className="signal-card signal-card--metrics">
+        <span>今日统计</span>
+        <div>
+          <strong>24</strong>
+          <em>重点线索</em>
+        </div>
+        <div>
+          <strong>6</strong>
+          <em>追踪专题</em>
+        </div>
       </div>
     </aside>
   );

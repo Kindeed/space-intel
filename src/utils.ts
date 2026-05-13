@@ -22,11 +22,116 @@ export function displayTime(value: string): string {
   }
 
   return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+export function formatLaunchWindow(value: string | null): string {
+  if (!value) {
+    return '窗口待定';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const now = new Date();
+  const dateKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(date);
+  const nowKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(now);
+  const time = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+
+  if (dateKey === nowKey) {
+    return `今天 ${time}`;
+  }
+
+  return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+export function launchProximity(value: string | null, fallback?: string): string {
+  if (!value) {
+    return fallback ?? '待定';
+  }
+
+  const date = new Date(value);
+  const diffDays = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
+
+  if (!Number.isFinite(diffDays)) {
+    return fallback ?? '待定';
+  }
+
+  if (diffDays <= -1) {
+    return '已完成';
+  }
+
+  if (diffDays === 0) {
+    return '今天';
+  }
+
+  if (diffDays === 1) {
+    return '明天';
+  }
+
+  return `约 T+${diffDays} 天`;
+}
+
+export function displayLaunchStatus(status: string): string {
+  const normalized = status.toLowerCase();
+
+  if (normalized.includes('success')) {
+    return '发射成功';
+  }
+
+  if (normalized.includes('go')) {
+    return '准备发射';
+  }
+
+  if (normalized.includes('confirm')) {
+    return '待确认';
+  }
+
+  if (normalized.includes('review')) {
+    return '任务评审';
+  }
+
+  if (normalized.includes('hold')) {
+    return '等待窗口';
+  }
+
+  if (normalized.includes('fail')) {
+    return '发射异常';
+  }
+
+  return status || '状态待定';
+}
+
+export function friendlyError(error: Error | null, context: string): string | null {
+  if (!error) {
+    return null;
+  }
+
+  if (error.message.includes('404')) {
+    return `${context}已更新或不在当前缓存中。`;
+  }
+
+  return `${context}暂不可用，正在显示本地缓存。`;
 }
 
 export function articleFromApi(row: ApiArticleSummary): FeedStory {
