@@ -1,19 +1,16 @@
 import {
   Activity,
-  BarChart3,
   Building2,
   CalendarDays,
   CircleDollarSign,
-  Clock3,
   ExternalLink,
   Flame,
+  Gauge,
   Home,
   ListFilter,
   Newspaper,
-  RadioTower,
   Rocket,
   Search,
-  ShieldCheck,
   Tags,
 } from 'lucide-react';
 import { BrowserRouter, Link, NavLink, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
@@ -32,34 +29,22 @@ import {
 } from './data';
 
 const navItems = [
-  { label: '最新', to: '/articles' },
-  { label: '国内', to: '/articles?region=cn' },
-  { label: '国际', to: '/articles?region=global' },
-  { label: '发射', to: '/launches' },
-  { label: '公司', to: '/companies' },
-  { label: '资本', to: '/capital' },
-  { label: '政策', to: '/articles?category=policy' },
-  { label: '专题', to: '/topics' },
-  { label: '搜索', to: '/articles?query=' },
+  { label: '总览', icon: Home, to: '/', signal: '+24h' },
+  { label: '情报流', icon: Newspaper, to: '/articles', signal: '聚类' },
+  { label: '发射', icon: Rocket, to: '/launches', signal: 'T-窗口' },
+  { label: '公司', icon: Building2, to: '/companies', signal: '实体' },
+  { label: '资本', icon: CircleDollarSign, to: '/capital', signal: '风控' },
+  { label: '专题', icon: Tags, to: '/topics', signal: '追踪' },
 ];
 
-const timelineTabs = [
-  { label: '推荐', to: '/' },
-  { label: '最新', to: '/articles' },
-  { label: '国内', to: '/articles?region=cn' },
-  { label: '国际', to: '/articles?region=global' },
-  { label: '资本', to: '/capital' },
-  { label: '政策', to: '/articles?category=policy' },
-];
-
-const leftNavItems = [
-  { label: '首页', icon: Home, to: '/' },
-  { label: '最新', icon: Newspaper, to: '/articles' },
-  { label: '发射', icon: Rocket, to: '/launches' },
-  { label: '公司', icon: Building2, to: '/companies' },
-  { label: '资本', icon: CircleDollarSign, to: '/capital' },
-  { label: '政策', icon: ShieldCheck, to: '/articles?category=policy' },
-];
+const feedTabs = [
+  ['全部', '/articles'],
+  ['国内', '/articles?region=cn'],
+  ['国际', '/articles?region=global'],
+  ['政策', '/articles?category=policy'],
+  ['资本', '/capital'],
+  ['发射', '/launches'],
+] as const;
 
 type ApiArticleSummary = {
   id: number;
@@ -73,6 +58,9 @@ type ApiArticleSummary = {
   language: string;
   region: string;
   fetchStatus: string;
+  storyKey?: string;
+  relatedSourceCount?: number;
+  relatedSources?: string[];
 };
 
 type ApiArticleDetail = ApiArticleSummary & {
@@ -117,6 +105,7 @@ type ApiLaunch = {
   site: string | null;
   status: string;
   rawUrl: string | null;
+  isFallback?: boolean;
 };
 
 type ApiLaunchListResult = {
@@ -173,6 +162,54 @@ type ApiTopicDetail = ApiTopic & {
   curations: ApiTopicCuration[];
 };
 
+type DisplayArticle = FeedItem & {
+  url?: string;
+  storyKey?: string;
+  relatedSourceCount?: number;
+  relatedSources?: string[];
+};
+
+type ApiState<T> = {
+  data: T | null;
+  error: Error | null;
+  status?: number;
+  loaded: boolean;
+};
+
+function useApi<T>(path: string | null): ApiState<T> {
+  const [state, setState] = useState<ApiState<T>>({ data: null, error: null, loaded: false });
+
+  useEffect(() => {
+    if (!path) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetch(path, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw Object.assign(new Error(`HTTP ${response.status}`), { status: response.status });
+        }
+
+        return response.json() as Promise<T>;
+      })
+      .then((data) => setState({ data, error: null, loaded: true }))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        const status = typeof error === 'object' && error !== null && 'status' in error ? Number(error.status) : undefined;
+        setState({ data: null, error: error instanceof Error ? error : new Error(String(error)), status, loaded: true });
+      });
+
+    return () => controller.abort();
+  }, [path]);
+
+  return state;
+}
+
 function parsePositiveInteger(value: string | null, fallback: number): number {
   if (!value) {
     return fallback;
@@ -194,6 +231,7 @@ function displayTime(value: string): string {
   }
 
   return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -201,12 +239,116 @@ function displayTime(value: string): string {
   }).format(date);
 }
 
-function articleFromApi(row: ApiArticleSummary): FeedItem {
+function formatLaunchWindow(value: string | null): string {
+  if (!value) {
+    return '窗口待定';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const now = new Date();
+  const dateKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(date);
+  const nowKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(now);
+  const time = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+
+  if (dateKey === nowKey) {
+    return `今天 ${time}`;
+  }
+
+  return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+function launchProximity(value: string | null, fallback?: string): string {
+  if (!value) {
+    return fallback ?? '待定';
+  }
+
+  const date = new Date(value);
+  const diffDays = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
+
+  if (!Number.isFinite(diffDays)) {
+    return fallback ?? '待定';
+  }
+
+  if (diffDays <= -1) {
+    return '已完成';
+  }
+
+  if (diffDays === 0) {
+    return '今天';
+  }
+
+  if (diffDays === 1) {
+    return '明天';
+  }
+
+  return `约 T+${diffDays} 天`;
+}
+
+function displayLaunchStatus(status: string): string {
+  const normalized = status.toLowerCase();
+
+  if (normalized.includes('success')) {
+    return '发射成功';
+  }
+
+  if (normalized.includes('go')) {
+    return '准备发射';
+  }
+
+  if (normalized.includes('confirm')) {
+    return '待确认';
+  }
+
+  if (normalized.includes('review')) {
+    return '任务评审';
+  }
+
+  if (normalized.includes('hold')) {
+    return '等待窗口';
+  }
+
+  if (normalized.includes('fail')) {
+    return '发射异常';
+  }
+
+  return status || '状态待定';
+}
+
+function friendlyError(error: Error | null, status?: number, context = '数据'): string | null {
+  if (!error) {
+    return null;
+  }
+
+  if (status === 404) {
+    return `${context}已更新或不在当前缓存中。`;
+  }
+
+  return `${context}暂不可用，正在显示本地缓存。`;
+}
+
+function articleFromApi(row: ApiArticleSummary): DisplayArticle {
   const region = displayRegion(row.region);
 
   return {
     slug: String(row.id),
-    title: row.title,
+    title: row.title.trim(),
     source: row.sourceName,
     time: displayTime(row.publishedAt),
     category: region === '国内' ? '国内商业航天' : '国际商业航天',
@@ -214,7 +356,80 @@ function articleFromApi(row: ApiArticleSummary): FeedItem {
     summary: row.summary,
     companies: [],
     tags: [row.sourceKey, row.language].filter(Boolean),
+    url: row.url,
+    storyKey: row.storyKey,
+    relatedSourceCount: row.relatedSourceCount,
+    relatedSources: row.relatedSources,
   };
+}
+
+function normalizeStoryText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, '')
+    .slice(0, 34);
+}
+
+function storyKeyForArticle(item: DisplayArticle): string {
+  return item.storyKey ?? `${item.region}:${normalizeStoryText(item.title)}`;
+}
+
+function clusterArticles(items: DisplayArticle[]): DisplayArticle[] {
+  const clustered = new Map<string, DisplayArticle>();
+
+  for (const item of items) {
+    const key = storyKeyForArticle(item);
+    const current = clustered.get(key);
+
+    if (!current) {
+      clustered.set(key, {
+        ...item,
+        storyKey: key,
+        relatedSourceCount: item.relatedSourceCount ?? 1,
+        relatedSources: item.relatedSources?.length ? item.relatedSources : [item.source],
+      });
+      continue;
+    }
+
+    const relatedSources = Array.from(new Set([...(current.relatedSources ?? [current.source]), item.source]));
+    clustered.set(key, {
+      ...current,
+      relatedSourceCount: Math.max(current.relatedSourceCount ?? 1, item.relatedSourceCount ?? relatedSources.length),
+      relatedSources,
+    });
+  }
+
+  return Array.from(clustered.values());
+}
+
+function articleListApiPath(searchParams: URLSearchParams, page: number, limit: number): string {
+  const apiParams = new URLSearchParams();
+
+  for (const key of ['region', 'source', 'tag', 'company', 'query']) {
+    const value = searchParams.get(key);
+
+    if (value?.trim()) {
+      apiParams.set(key, value);
+    }
+  }
+
+  apiParams.set('page', String(page));
+  apiParams.set('limit', String(limit));
+  return `/api/articles?${apiParams.toString()}`;
+}
+
+function pageHref(searchParams: URLSearchParams, page: number): string {
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.set('page', String(page));
+  return `/articles?${nextParams.toString()}`;
+}
+
+function launchHref(launch: ApiLaunch): string | null {
+  if (launch.isFallback) {
+    return null;
+  }
+
+  return `/launches/${launch.id || launch.externalId}`;
 }
 
 function tagName(value: NonNullable<ApiArticleDetail['tags']>[number]): string {
@@ -241,73 +456,15 @@ function launchSlug(value: NonNullable<ApiArticleDetail['launches']>[number]): s
   return typeof value === 'string' ? slugify(value) : String(value.id ?? value.externalId ?? slugify(launchLabel(value)));
 }
 
-function displayLaunchWindow(value: string | null): string {
-  return value ? displayTime(value) : '窗口待定';
-}
-
-function articleListApiPath(searchParams: URLSearchParams, page: number, limit: number): string {
-  const apiParams = new URLSearchParams();
-
-  for (const key of ['region', 'source', 'tag', 'company', 'query']) {
-    const value = searchParams.get(key);
-
-    if (value?.trim()) {
-      apiParams.set(key, value);
-    }
-  }
-
-  apiParams.set('page', String(page));
-  apiParams.set('limit', String(limit));
-
-  return `/api/articles?${apiParams.toString()}`;
-}
-
-function pageHref(searchParams: URLSearchParams, page: number): string {
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set('page', String(page));
-  return `/articles?${nextParams.toString()}`;
-}
-
-function SectionTitle({ icon: Icon, title }: { icon: typeof Newspaper; title: string }) {
+function SectionTitle({ icon: Icon, title, kicker }: { icon: typeof Newspaper; title: string; kicker?: string }) {
   return (
     <div className="section-title">
-      <Icon size={18} aria-hidden="true" />
-      <h2>{title}</h2>
+      <Icon size={17} aria-hidden="true" />
+      <div>
+        {kicker ? <span>{kicker}</span> : null}
+        <h2>{title}</h2>
+      </div>
     </div>
-  );
-}
-
-function ArticleCard({ item, compact = false, feature = false }: { item: FeedItem; compact?: boolean; feature?: boolean }) {
-  return (
-    <article className={clsx('article-card', compact && 'article-card--compact', feature && 'article-card--feature')}>
-      <div className="article-card__meta">
-        <Link to={`/articles?category=${encodeURIComponent(item.category)}`}>{item.category}</Link>
-        <span>{item.source}</span>
-        <time>{item.time}</time>
-      </div>
-      <h3>
-        <Link to={`/articles/${item.slug}`}>{item.title}</Link>
-      </h3>
-      <p>{item.summary}</p>
-      <div className="article-card__footer">
-        <div className="tag-row">
-          <Link
-            to={`/articles?region=${item.region === '国内' ? 'cn' : 'global'}`}
-            className={clsx('region-tag', item.region === '国内' ? 'region-tag--cn' : 'region-tag--global')}
-          >
-            {item.region}
-          </Link>
-          {item.companies.map((company) => (
-            <Link key={company} to={`/companies/${slugify(company)}`}>
-              {company}
-            </Link>
-          ))}
-        </div>
-        <Link className="article-card__open" to={`/articles/${item.slug}`} aria-label={`打开 ${item.title} 的详情页`}>
-          <ExternalLink size={16} />
-        </Link>
-      </div>
-    </article>
   );
 }
 
@@ -315,80 +472,154 @@ function SiteHeader() {
   return (
     <header className="site-header">
       <Link to="/" className="brand" aria-label="商业航天情报站首页">
-        <Rocket size={28} aria-hidden="true" />
-        <span>商业航天情报站</span>
+        <Rocket size={25} aria-hidden="true" />
+        <span>Space Intel</span>
       </Link>
-      <nav aria-label="主导航">
-        {navItems.map((item) => (
-          <NavLink key={item.label} to={item.to}>
-            {item.label === '搜索' ? <Search size={15} aria-hidden="true" /> : null}
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
+      <form className="command-search" action="/articles">
+        <Search size={17} aria-hidden="true" />
+        <input name="query" type="search" placeholder="搜索公司、发射、政策、资本线索" />
+        <kbd>Ctrl K</kbd>
+      </form>
+      <Link to="/articles" className="command-button">
+        <ListFilter size={17} aria-hidden="true" />
+        指挥台
+      </Link>
     </header>
   );
 }
 
-function LeftRail() {
+function MissionNav() {
   return (
-    <aside className="left-rail" aria-label="频道导航">
-      <div className="rail-card">
-        {leftNavItems.map(({ label, icon: Icon, to }) => (
+    <aside className="mission-nav" aria-label="Mission Control 导航">
+      <div className="nav-card">
+        {navItems.map(({ label, icon: Icon, to, signal }) => (
           <NavLink key={label} to={to}>
-            <Icon size={18} aria-hidden="true" />
+            <Icon size={17} aria-hidden="true" />
             <span>{label}</span>
+            <em>{signal}</em>
           </NavLink>
         ))}
       </div>
-      <div className="rail-note">
-        <span>Cloudflare-first v1</span>
-        <strong>摘要、标签、公司和原文链接优先</strong>
+      <div className="signal-card">
+        <span>来源透明</span>
+        <strong>摘要、标签、实体与原文链接</strong>
+        <p>保留来源入口，便于快速回看上下文。</p>
+      </div>
+      <div className="signal-card signal-card--metrics">
+        <span>今日统计</span>
+        <div>
+          <strong>24</strong>
+          <em>重点线索</em>
+        </div>
+        <div>
+          <strong>6</strong>
+          <em>追踪专题</em>
+        </div>
       </div>
     </aside>
   );
 }
 
-function RightRail() {
+function FeedTabs() {
   return (
-    <aside className="right-rail" aria-label="侧边情报栏">
-      <form className="panel search-panel" action="/articles">
-        <label htmlFor="feed-search">搜索情报</label>
-        <div>
-          <Search size={17} aria-hidden="true" />
-          <input id="feed-search" name="query" type="search" placeholder="公司、发射、政策、关键词" />
-        </div>
-      </form>
+    <nav className="filter-row" aria-label="频道">
+      {feedTabs.map(([label, to]) => (
+        <NavLink key={label} to={to}>
+          {label}
+        </NavLink>
+      ))}
+    </nav>
+  );
+}
 
-      <section className="panel">
-        <SectionTitle icon={CalendarDays} title="即将发射" />
-        <div className="launch-list">
-          {upcomingLaunches.map((launch) => (
-            <Link key={launch.mission} to={`/launches/${launch.slug}`} className="launch-item">
-              <span className="launch-item__window">{launch.window}</span>
-              <div>
-                <strong>{launch.mission}</strong>
-                <span>{launch.provider} · {launch.site}</span>
-              </div>
+function ArticleCard({ item, feature = false }: { item: DisplayArticle; feature?: boolean }) {
+  const relatedCount = item.relatedSourceCount ?? 1;
+
+  return (
+    <article className={clsx('article-card', feature && 'article-card--feature')}>
+      <div className="article-card__meta">
+        <Link to={`/articles?region=${item.region === '国内' ? 'cn' : 'global'}`}>{item.region}</Link>
+        <span>{item.source}</span>
+        <time>{item.time}</time>
+        {relatedCount > 1 ? <span className="cluster-badge">{relatedCount} 源覆盖</span> : null}
+      </div>
+      <h3>
+        <Link to={`/articles/${item.slug}`}>{item.title}</Link>
+      </h3>
+      <p>{item.summary}</p>
+      <div className="article-card__footer">
+        <div className="tag-row">
+          {item.companies.map((company) => (
+            <Link className="entity-chip" to={`/companies/${slugify(company)}`} key={company}>
+              {company}
+            </Link>
+          ))}
+          {item.tags.slice(0, 3).map((tag) => (
+            <Link to={`/topics/${slugify(tag)}`} key={tag}>
+              {tag}
             </Link>
           ))}
         </div>
-      </section>
+        <div className="article-actions">
+          {item.url ? (
+            <a href={item.url} target="_blank" rel="noreferrer" aria-label={`打开 ${item.title} 的原文`}>
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          ) : null}
+          <Link to={`/articles/${item.slug}`}>详情</Link>
+        </div>
+      </div>
+      {relatedCount > 1 && item.relatedSources?.length ? (
+        <div className="cluster-sources">相关来源：{item.relatedSources.slice(0, 4).join(' / ')}</div>
+      ) : null}
+    </article>
+  );
+}
 
-      <section className="panel notice-panel">
-        <SectionTitle icon={CircleDollarSign} title="资本/融资快讯" />
-        <p>资本市场内容仅作信息聚合，不构成投资建议。</p>
-        <ul>
-          {marketBriefs.map((brief) => (
+function RightHud({ launches }: { launches: ApiLaunch[] }) {
+  return (
+    <aside className="live-hud" aria-label="实时情报 HUD">
+      <section className="panel launch-hud">
+        <SectionTitle icon={CalendarDays} title="发射时间线" kicker="Live HUD" />
+        <div className="launch-stack">
+          {launches.slice(0, 4).map((launch) => {
+            const href = launchHref(launch);
+            const content = (
+              <>
+                <span>{launchProximity(launch.windowStart, 'T+窗口')}</span>
+                <div>
+                  <strong>{launch.mission}</strong>
+                  <em>{launch.provider ?? '发射商待定'} / {displayLaunchStatus(launch.status)}</em>
+                </div>
+                <i />
+              </>
+            );
+
+            return href ? (
+              <Link to={href} className="launch-strip" key={launch.externalId || launch.id}>
+                {content}
+              </Link>
+            ) : (
+              <div className="launch-strip launch-strip--static" key={launch.externalId || launch.mission}>
+                {content}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <section className="panel">
+        <SectionTitle icon={CircleDollarSign} title="资本快讯" kicker="Info Only" />
+        <p className="notice-copy">资本市场内容仅作信息聚合，不构成投资建议。</p>
+        <ul className="compact-list">
+          {marketBriefs.slice(0, 4).map((brief) => (
             <li key={brief}>
               <Link to="/capital">{brief}</Link>
             </li>
           ))}
         </ul>
       </section>
-
-      <section className="panel status-panel">
-        <SectionTitle icon={Clock3} title="来源状态" />
+      <section className="panel">
+        <SectionTitle icon={Gauge} title="来源状态" kicker="Telemetry" />
         <div className="source-status">
           {sourceStatus.map((source) => (
             <Link to="/articles" key={source.label}>
@@ -399,203 +630,95 @@ function RightRail() {
           ))}
         </div>
       </section>
-
-      <section className="panel trends-panel">
-        <SectionTitle icon={Tags} title="关键词趋势" />
-        <div className="tag-row tag-row--large">
+      <section className="panel">
+        <SectionTitle icon={Tags} title="热力词" kicker="48H" />
+        <div className="tag-row">
           {trendTags.map((tag) => (
-            <Link key={tag} to={`/topics/${slugify(tag)}`}>
+            <Link to={`/topics/${slugify(tag)}`} key={tag}>
               {tag}
             </Link>
           ))}
         </div>
       </section>
-
-      <TopicWatchPanel />
     </aside>
   );
 }
 
-function TopicWatchPanel({ compact = false }: { compact?: boolean }) {
+function HomePage() {
+  const home = useApi<{ items: ApiArticleSummary[] }>('/api/home?limit=24');
+  const launchState = useApi<ApiLaunchListResult>('/api/launches?limit=8');
+  const fallbackFeed = highlights.map((item) => ({ ...item, relatedSourceCount: 1 }));
+  const feedItems = clusterArticles(home.data?.items.map(articleFromApi) ?? fallbackFeed).slice(0, 12);
+  const launches = launchState.data?.items ?? fallbackLaunches();
+  const feature = feedItems[0];
+
   return (
-    <section className={compact ? '' : 'panel topic-watch-panel'}>
-      {!compact ? <SectionTitle icon={Activity} title="专题追踪" /> : null}
-      <div className={clsx('topic-watch-list', compact && 'topic-watch-list--compact')}>
-        {topicWatch.map((topic) => (
-          <Link to={`/topics/${topic.slug}`} key={topic.title}>
-            <strong>{topic.title}</strong>
-            <span>{topic.count}</span>
-            <em>{topic.note}</em>
-          </Link>
-        ))}
-      </div>
-    </section>
+    <div className="mission-layout">
+      <MissionNav />
+      <section className="timeline-column" aria-label="情报时间线">
+        <div className="timeline-header">
+          <SectionTitle icon={Flame} title="今日重点" kicker="Mission Feed" />
+          <p>按事件聚类的商业航天新闻、发射、公司、资本和政策线索。</p>
+        </div>
+        <FeedTabs />
+        {friendlyError(home.error, home.status, '实时情报') ? (
+          <div className="inline-status">{friendlyError(home.error, home.status, '实时情报')}</div>
+        ) : null}
+        <div className="timeline-feed">
+          {feature ? <ArticleCard item={feature} feature /> : null}
+          {feedItems.slice(1).map((item) => (
+            <ArticleCard key={item.slug} item={item} />
+          ))}
+        </div>
+      </section>
+      <RightHud launches={launches} />
+    </div>
   );
 }
 
-function HomePage() {
+function fallbackLaunches(): ApiLaunch[] {
+  return upcomingLaunches.map((launch, index) => ({
+    id: index + 1,
+    externalId: `fallback-${launch.slug}`,
+    mission: launch.mission,
+    rocket: null,
+    provider: launch.provider,
+    windowStart: null,
+    site: launch.site,
+    status: launch.status,
+    rawUrl: null,
+    isFallback: true,
+  }));
+}
+
+function SourcesOptions() {
   return (
     <>
-      <div className="social-layout">
-        <LeftRail />
-        <section className="timeline-column" aria-label="情报时间线">
-          <div className="timeline-header">
-            <div>
-              <SectionTitle icon={Flame} title="今日重点" />
-              <p>商业航天新闻、发射、公司、资本与政策的聚合时间线。</p>
-            </div>
-            <Link to="/articles" aria-label="筛选信息流" className="icon-button">
-              <ListFilter size={18} />
-            </Link>
-          </div>
-
-          <div className="timeline-tabs" aria-label="时间线筛选">
-            {timelineTabs.map((tab) => (
-              <NavLink key={tab.label} to={tab.to} className={tab.label === '推荐' ? 'is-active' : undefined}>
-                {tab.label}
-              </NavLink>
-            ))}
-          </div>
-
-          <div className="timeline-feed">
-            {highlights.map((item, index) => (
-              <ArticleCard key={item.title} item={item} feature={index === 0} />
-            ))}
-          </div>
-        </section>
-        <RightRail />
-      </div>
-      <ChannelGrid />
+      <option value="snapi">Spaceflight News API</option>
+      <option value="google-news-cn-commercial-space">Google News RSS - 商业航天</option>
+      <option value="space-com-rss">Space.com</option>
     </>
   );
 }
 
-function ChannelGrid() {
+function FilterDrawer({ searchParams, region, category }: { searchParams: URLSearchParams; region?: string | null; category?: string | null }) {
   return (
-    <section className="channel-grid" aria-label="分类信息流">
-      <div className="channel-panel channel-panel--wide">
-        <SectionTitle icon={RadioTower} title="国内商业航天" />
-        {highlights.filter((item) => item.region === '国内').map((item) => (
-          <ArticleCard key={item.title} item={item} compact />
-        ))}
-      </div>
-      <div className="channel-panel">
-        <SectionTitle icon={Activity} title="国际商业航天" />
-        {highlights.filter((item) => item.region === '国际').map((item) => (
-          <ArticleCard key={item.title} item={item} compact />
-        ))}
-      </div>
-      <div className="channel-panel">
-        <SectionTitle icon={ShieldCheck} title="政策监管" />
-        <ArticleCard item={highlights[2]} compact />
-      </div>
-      <div className="channel-panel">
-        <SectionTitle icon={BarChart3} title="资本市场" />
-        <ArticleCard item={highlights[3]} compact />
-      </div>
-      <div className="channel-panel company-panel">
-        <SectionTitle icon={Building2} title="公司热度" />
-        <div className="rank-list">
-          {companies.map((company, index) => (
-            <Link to={`/companies/${slugify(company)}`} key={company}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{company}</strong>
-            </Link>
-          ))}
-        </div>
-      </div>
-      <div className="channel-panel">
-        <SectionTitle icon={Tags} title="专题追踪" />
-        <TopicWatchPanel compact />
-      </div>
-    </section>
-  );
-}
-
-function ArticlesPage() {
-  const [searchParams] = useSearchParams();
-  const region = searchParams.get('region');
-  const category = searchParams.get('category');
-  const query = searchParams.get('query')?.trim().toLowerCase();
-  const tag = searchParams.get('tag');
-  const company = searchParams.get('company');
-  const currentPage = parsePositiveInteger(searchParams.get('page'), 1);
-  const limit = parsePositiveInteger(searchParams.get('limit'), 6);
-  const apiPath = useMemo(() => articleListApiPath(searchParams, currentPage, limit), [currentPage, limit, searchParams]);
-  const [apiState, setApiState] = useState<{
-    path: string;
-    items: FeedItem[] | null;
-    hasMore: boolean;
-    error: string | null;
-  }>({
-    path: '',
-    items: null,
-    hasMore: false,
-    error: null,
-  });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(apiPath, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiArticleListResult>;
-      })
-      .then((result) => {
-        setApiState({
-          path: apiPath,
-          items: result.items.map(articleFromApi),
-          hasMore: result.hasMore,
-          error: null,
-        });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          path: apiPath,
-          items: null,
-          hasMore: false,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return () => controller.abort();
-  }, [apiPath]);
-
-  const fallbackItems = useMemo(() => {
-    return highlights.filter((item) => {
-    const regionMatch = !region || (region === 'cn' ? item.region === '国内' : item.region === '国际');
-    const categoryMatch = !category || item.category === category || item.category.includes(category);
-      const tagMatch = !tag || item.tags.some((itemTag) => slugify(itemTag) === tag || itemTag === tag);
-      const companyMatch = !company || item.companies.some((itemCompany) => slugify(itemCompany) === company);
-    const queryMatch = !query || `${item.title} ${item.summary} ${item.companies.join(' ')}`.toLowerCase().includes(query);
-      return regionMatch && categoryMatch && tagMatch && companyMatch && queryMatch;
-    });
-  }, [category, company, query, region, tag]);
-  const fallbackStart = (currentPage - 1) * limit;
-  const fallbackPageItems = fallbackItems.slice(fallbackStart, fallbackStart + limit);
-  const fallbackHasMore = fallbackItems.length > fallbackStart + limit;
-  const visibleItems = apiState.items ?? fallbackPageItems;
-  const hasMore = apiState.items ? apiState.hasMore : fallbackHasMore;
-  const isLoading = apiState.path !== apiPath && !apiState.error;
-
-  return (
-    <PageShell title="新闻列表" subtitle="按地区、来源、标签、公司和关键词筛选 D1 新闻线索。">
+    <details className="filter-drawer">
+      <summary>
+        <ListFilter size={16} aria-hidden="true" />
+        高级筛选
+      </summary>
       <form className="filter-form" action="/articles">
         <label>
           关键词
-          <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="公司、发射、政策、关键词" />
+          <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="公司、发射、政策" />
         </label>
         <label>
           来源
-          <input name="source" defaultValue={searchParams.get('source') ?? ''} placeholder="例如 snapi" />
+          <select name="source" defaultValue={searchParams.get('source') ?? ''}>
+            <option value="">全部来源</option>
+            <SourcesOptions />
+          </select>
         </label>
         <label>
           标签
@@ -609,24 +732,59 @@ function ArticlesPage() {
         {category ? <input type="hidden" name="category" value={category} /> : null}
         <button type="submit">
           <Search size={16} aria-hidden="true" />
-          筛选
+          应用
         </button>
+        <Link to="/articles">重置</Link>
       </form>
-      <div className="filter-row">
-        {[
-          ['全部', '/articles'],
-          ['国内', '/articles?region=cn'],
-          ['国际', '/articles?region=global'],
-          ['政策', '/articles?category=政策监管'],
-          ['资本', '/capital'],
-        ].map(([label, to]) => (
-          <Link key={label} to={to}>
-            {label}
-          </Link>
-        ))}
-      </div>
-      {apiState.error ? <div className="inline-status">实时数据暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {isLoading ? <div className="inline-status">正在读取文章 API...</div> : null}
+    </details>
+  );
+}
+
+function LoadingList() {
+  return (
+    <div className="page-list" aria-label="正在加载">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div className="skeleton-card" key={index}>
+          <span />
+          <strong />
+          <p />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ArticlesPage() {
+  const [searchParams] = useSearchParams();
+  const region = searchParams.get('region');
+  const category = searchParams.get('category');
+  const query = searchParams.get('query')?.trim().toLowerCase();
+  const tag = searchParams.get('tag');
+  const company = searchParams.get('company');
+  const currentPage = parsePositiveInteger(searchParams.get('page'), 1);
+  const limit = parsePositiveInteger(searchParams.get('limit'), 12);
+  const apiPath = useMemo(() => articleListApiPath(searchParams, currentPage, limit), [currentPage, limit, searchParams]);
+  const api = useApi<ApiArticleListResult>(apiPath);
+  const fallbackItems = useMemo(() => {
+    return highlights.filter((item) => {
+      const regionMatch = !region || (region === 'cn' ? item.region === '国内' : item.region === '国际');
+      const categoryMatch = !category || item.category === category || item.category.includes(category);
+      const tagMatch = !tag || item.tags.some((itemTag) => slugify(itemTag) === tag || itemTag === tag);
+      const companyMatch = !company || item.companies.some((itemCompany) => slugify(itemCompany) === company);
+      const queryMatch = !query || `${item.title} ${item.summary} ${item.companies.join(' ')}`.toLowerCase().includes(query);
+      return regionMatch && categoryMatch && tagMatch && companyMatch && queryMatch;
+    });
+  }, [category, company, query, region, tag]);
+  const fallbackStart = (currentPage - 1) * limit;
+  const visibleItems = clusterArticles(api.data?.items.map(articleFromApi) ?? fallbackItems.slice(fallbackStart, fallbackStart + limit));
+  const hasMore = api.data?.hasMore ?? fallbackItems.length > fallbackStart + limit;
+
+  return (
+    <PageShell title="情报流" subtitle="默认按事件聚类折叠重复报道，并用紧凑筛选控制信息密度。">
+      <FeedTabs />
+      <FilterDrawer searchParams={searchParams} region={region} category={category} />
+      {friendlyError(api.error, api.status, '实时数据') ? <div className="inline-status">{friendlyError(api.error, api.status, '实时数据')}</div> : null}
+      {!api.loaded && !api.data ? <LoadingList /> : null}
       <div className="page-list">
         {visibleItems.map((item) => (
           <ArticleCard key={item.slug} item={item} />
@@ -637,7 +795,6 @@ function ArticlesPage() {
         {currentPage > 1 ? <Link to={pageHref(searchParams, currentPage - 1)}>上一页</Link> : <span>上一页</span>}
         <strong>第 {currentPage} 页</strong>
         {hasMore ? <Link to={pageHref(searchParams, currentPage + 1)}>下一页</Link> : <span>下一页</span>}
-        <Link to="/articles">重置筛选</Link>
       </nav>
     </PageShell>
   );
@@ -646,164 +803,91 @@ function ArticlesPage() {
 function ArticleDetailPage() {
   const { slug } = useParams();
   const fallbackArticle = highlights.find((item) => item.slug === slug) ?? highlights[0];
-  const [apiState, setApiState] = useState<{
-    slug: string;
-    article: ApiArticleDetail | null;
-    error: string | null;
-  }>({
-    slug: '',
-    article: null,
-    error: null,
-  });
-  const apiSlug = slug ?? '';
-
-  useEffect(() => {
-    if (!apiSlug) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetch(`/api/articles/${encodeURIComponent(apiSlug)}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiArticleDetail>;
-      })
-      .then((article) => {
-        setApiState({ slug: apiSlug, article, error: null });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          slug: apiSlug,
-          article: null,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return () => controller.abort();
-  }, [apiSlug]);
-
-  const apiArticle = apiState.slug === apiSlug ? apiState.article : null;
-  const article = apiArticle ? articleFromApi(apiArticle) : fallbackArticle;
+  const api = useApi<ApiArticleDetail>(slug ? `/api/articles/${encodeURIComponent(slug)}` : null);
+  const apiArticle = api.data;
+  const article: DisplayArticle = apiArticle ? articleFromApi(apiArticle) : fallbackArticle;
   const detailTags = apiArticle?.tags ?? article.tags;
   const detailCompanies = apiArticle?.companies ?? article.companies;
   const detailLaunches = apiArticle?.launches ?? (article.relatedLaunch ? [article.relatedLaunch] : []);
-  const originalTitle = apiArticle?.originalTitle;
-  const originalUrl = apiArticle?.url;
-  const isLoading = apiState.slug !== apiSlug && !apiState.error;
+  const pageError = friendlyError(api.error, api.status, '文章详情');
 
   return (
-    <PageShell title={article.title} subtitle={`${article.source} · ${article.time} · ${article.region}`}>
-      <article className="detail-panel">
-        {apiState.error ? <div className="inline-status">实时详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-        {isLoading ? <div className="inline-status">正在读取文章详情 API...</div> : null}
-        {originalTitle ? (
+    <PageShell title={article.title} subtitle={`${article.source} / ${article.time} / ${article.region}`}>
+      {pageError ? <div className="inline-status">{pageError}</div> : null}
+      <section className="detail-panel">
+        <div className="metadata-grid">
+          <span>{article.source}</span>
+          <span>{article.time}</span>
+          <span>{article.region}</span>
+          <span>{article.relatedSourceCount && article.relatedSourceCount > 1 ? `${article.relatedSourceCount} 源覆盖` : '单来源线索'}</span>
+        </div>
+        {apiArticle?.originalTitle && apiArticle.originalTitle !== apiArticle.title ? (
           <div className="metadata-block">
             <span>原文标题</span>
-            <strong>{originalTitle}</strong>
+            <strong>{apiArticle.originalTitle}</strong>
           </div>
         ) : null}
         <p>{article.summary}</p>
-        {originalUrl ? (
-          <a href={originalUrl} target="_blank" rel="noreferrer" className="source-link">
-            <ExternalLink size={16} aria-hidden="true" />
-            打开原文链接
-          </a>
-        ) : null}
-        <div className="tag-row tag-row--large">
+        <div className="insight-list">
+          <strong>核心要点</strong>
+          <span>只展示摘要、标签、实体和来源入口。</span>
+          <span>实体、标签和发射关系用于快速判断线索价值。</span>
+          <span>需要完整上下文时跳转原文来源。</span>
+        </div>
+        <div className="tag-row">
+          {detailCompanies.map((company) => (
+            <Link className="entity-chip" key={companySlug(company)} to={`/companies/${companySlug(company)}`}>
+              {companyName(company)}
+            </Link>
+          ))}
           {detailTags.map((tag) => (
             <Link key={tagSlug(tag)} to={`/topics/${tagSlug(tag)}`}>
               {tagName(tag)}
             </Link>
           ))}
-        </div>
-        <h2>相关公司</h2>
-        <div className="link-grid">
-          {detailCompanies.length ? detailCompanies.map((company) => (
-            <Link key={companySlug(company)} to={`/companies/${companySlug(company)}`}>
-              {companyName(company)}
+          {detailLaunches.map((launch) => (
+            <Link key={launchSlug(launch)} to={`/launches/${launchSlug(launch)}`}>
+              {launchLabel(launch)}
             </Link>
-          )) : <span>暂无公司关联</span>}
+          ))}
         </div>
-        {detailLaunches.length ? (
-          <>
-            <h2>相关发射</h2>
-            <div className="link-grid">
-              {detailLaunches.map((launch) => (
-                <Link key={launchSlug(launch)} to={`/launches/${launchSlug(launch)}`}>
-                  {launchLabel(launch)}
-                </Link>
-              ))}
-            </div>
-          </>
+        {article.url ? (
+          <a href={article.url} target="_blank" rel="noreferrer" className="source-link">
+            <ExternalLink size={16} aria-hidden="true" />
+            打开原文链接
+          </a>
         ) : null}
-      </article>
+      </section>
     </PageShell>
   );
 }
 
 function CompaniesPage() {
-  const [apiState, setApiState] = useState<{
-    items: ApiCompany[] | null;
-    error: string | null;
-    loaded: boolean;
-  }>({
-    items: null,
-    error: null,
-    loaded: false,
-  });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch('/api/companies', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<{ items: ApiCompany[] }>;
-      })
-      .then((result) => {
-        setApiState({ items: result.items, error: null, loaded: true });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({ items: null, error: error instanceof Error ? error.message : String(error), loaded: true });
-      });
-
-    return () => controller.abort();
-  }, []);
-
-  const fallbackCompanies = companies.map((company) => ({
+  const api = useApi<{ items: ApiCompany[] }>('/api/companies');
+  const fallbackCompanies = companies.map((company, index) => ({
+    id: index + 1,
     slug: slugify(company),
     name: company,
+    englishName: null,
+    country: '待补充',
     sector: '商业航天',
-    country: '待完善',
-    articleCount: highlights.filter((item) => item.companies.includes(company)).length || 1,
+    website: null,
+    profile: '公司档案待从 D1 读取。',
+    stockSymbol: null,
+    logoUrl: null,
+    articleCount: 0,
   }));
-  const visibleCompanies = apiState.items ?? fallbackCompanies;
+  const visibleCompanies = api.data?.items ?? fallbackCompanies;
 
   return (
-    <PageShell title="公司库" subtitle="公司简介、赛道、新闻时间线和资本动态入口。">
-      {apiState.error ? <div className="inline-status">公司库暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {!apiState.loaded ? <div className="inline-status">正在读取公司 API...</div> : null}
+    <PageShell title="公司库" subtitle="公司档案、赛道、新闻时间线、相关发射和资本动态。">
+      {friendlyError(api.error, api.status, '公司列表') ? <div className="inline-status">{friendlyError(api.error, api.status, '公司列表')}</div> : null}
       <div className="card-grid">
         {visibleCompanies.map((company) => (
           <Link to={`/companies/${company.slug}`} className="entity-card" key={company.slug}>
             <strong>{company.name}</strong>
-            <span>{company.country} · {company.sector}</span>
-            <em>{company.articleCount} 条相关线索</em>
+            <span>{company.country} / {company.sector}</span>
+            <em>{company.articleCount} 条相关新闻</em>
           </Link>
         ))}
       </div>
@@ -814,69 +898,20 @@ function CompaniesPage() {
 function CompanyDetailPage() {
   const { slug } = useParams();
   const fallbackCompany = companies.find((item) => slugify(item) === slug) ?? companies[0];
-  const [apiState, setApiState] = useState<{
-    slug: string;
-    company: ApiCompanyDetail | null;
-    error: string | null;
-  }>({
-    slug: '',
-    company: null,
-    error: null,
-  });
-  const apiSlug = slug ?? '';
-
-  useEffect(() => {
-    if (!apiSlug) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetch(`/api/companies/${encodeURIComponent(apiSlug)}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiCompanyDetail>;
-      })
-      .then((company) => {
-        setApiState({ slug: apiSlug, company, error: null });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          slug: apiSlug,
-          company: null,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return () => controller.abort();
-  }, [apiSlug]);
-
-  const apiCompany = apiState.slug === apiSlug ? apiState.company : null;
-  const related = apiCompany ? apiCompany.articles.map(articleFromApi) : highlights.filter((item) => item.companies.includes(fallbackCompany));
-  const companyTitle = apiCompany?.name ?? fallbackCompany;
-  const subtitle = apiCompany
-    ? `${apiCompany.country} · ${apiCompany.sector}${apiCompany.stockSymbol ? ` · ${apiCompany.stockSymbol}` : ''}`
-    : '公司档案、新闻时间线、相关发射和资本动态。';
+  const api = useApi<ApiCompanyDetail>(slug ? `/api/companies/${encodeURIComponent(slug)}` : null);
+  const related = api.data ? api.data.articles.map(articleFromApi) : highlights.filter((item) => item.companies.includes(fallbackCompany));
 
   return (
-    <PageShell title={companyTitle} subtitle={subtitle}>
-      {apiState.error ? <div className="inline-status">公司详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取公司详情 API...</div> : null}
-      {apiCompany ? (
+    <PageShell title={api.data?.name ?? fallbackCompany} subtitle={api.data ? `${api.data.country} / ${api.data.sector}` : '公司档案、相关新闻和实体上下文。'}>
+      {friendlyError(api.error, api.status, '公司详情') ? <div className="inline-status">{friendlyError(api.error, api.status, '公司详情')}</div> : null}
+      {api.data ? (
         <section className="detail-panel">
-          <p>{apiCompany.profile || '暂无公开简介。'}</p>
-          <div className="entity-meta-grid">
-            <span>国家/地区：{apiCompany.country}</span>
-            <span>赛道：{apiCompany.sector}</span>
-            <span>股票代码：{apiCompany.stockSymbol ?? '未披露/未上市'}</span>
-            {apiCompany.website ? <a href={apiCompany.website} target="_blank" rel="noreferrer">官网</a> : <span>官网：未披露</span>}
+          <p>{api.data.profile || '暂无公开简介。'}</p>
+          <div className="metadata-grid">
+            <span>{api.data.country}</span>
+            <span>{api.data.sector}</span>
+            <span>{api.data.stockSymbol ?? '未披露/未上市'}</span>
+            {api.data.website ? <a href={api.data.website} target="_blank" rel="noreferrer">官网</a> : <span>官网未披露</span>}
           </div>
         </section>
       ) : null}
@@ -885,23 +920,40 @@ function CompanyDetailPage() {
           <ArticleCard key={item.slug} item={item} />
         ))}
       </div>
+      <Link className="source-link" to="/companies">返回公司库</Link>
     </PageShell>
+  );
+}
+
+function LaunchCard({ launch, index }: { launch: ApiLaunch; index: number }) {
+  const href = launchHref(launch);
+  const content = (
+    <>
+      <div className="launch-card__time">
+        <span>{launchProximity(launch.windowStart, upcomingLaunches[index]?.window)}</span>
+        <strong>{formatLaunchWindow(launch.windowStart)}</strong>
+      </div>
+      <div className="launch-card__body">
+        <strong>{launch.mission}</strong>
+        <span>{launch.provider ?? '发射商待定'} / {displayLaunchStatus(launch.status)}</span>
+        <em>{launch.rocket ?? '火箭型号未披露'} / {launch.site ?? '场站待定'}</em>
+      </div>
+    </>
+  );
+
+  return href ? (
+    <Link to={href} className="launch-card">
+      {content}
+    </Link>
+  ) : (
+    <div className="launch-card launch-card--static">
+      {content}
+    </div>
   );
 }
 
 function LaunchesPage() {
   const [searchParams] = useSearchParams();
-  const [apiState, setApiState] = useState<{
-    items: ApiLaunch[] | null;
-    error: string | null;
-    loaded: boolean;
-    hasMore: boolean;
-  }>({
-    items: null,
-    error: null,
-    loaded: false,
-    hasMore: false,
-  });
   const launchApiPath = useMemo(() => {
     const params = new URLSearchParams();
 
@@ -916,173 +968,82 @@ function LaunchesPage() {
     params.set('limit', '12');
     return `/api/launches?${params.toString()}`;
   }, [searchParams]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(launchApiPath, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiLaunchListResult>;
-      })
-      .then((result) => {
-        setApiState({ items: result.items, error: null, loaded: true, hasMore: result.hasMore });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          items: null,
-          error: error instanceof Error ? error.message : String(error),
-          loaded: true,
-          hasMore: false,
-        });
-      });
-
-    return () => controller.abort();
-  }, [launchApiPath]);
-
-  const fallbackLaunches = upcomingLaunches.map((launch, index) => ({
-    id: index + 1,
-    externalId: launch.slug,
-    mission: launch.mission,
-    rocket: null,
-    provider: launch.provider,
-    windowStart: null,
-    site: launch.site,
-    status: launch.status,
-    rawUrl: null,
-  }));
-  const visibleLaunches = apiState.items ?? fallbackLaunches;
+  const api = useApi<ApiLaunchListResult>(launchApiPath);
+  const visibleLaunches = api.data?.items ?? fallbackLaunches();
 
   return (
-    <PageShell title="发射日历" subtitle="日历视图和列表视图入口，展示任务、火箭、发射商、时间、地点和状态。">
-      <form className="filter-form" action="/launches">
-        <label>
-          关键词
-          <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="任务、火箭、场站" />
-        </label>
-        <label>
-          发射商
-          <input name="provider" defaultValue={searchParams.get('provider') ?? ''} placeholder="Rocket Lab" />
-        </label>
-        <label>
-          状态
-          <input name="status" defaultValue={searchParams.get('status') ?? ''} placeholder="待发射/Go" />
-        </label>
-        <button type="submit">
-          <Search size={16} aria-hidden="true" />
-          筛选
-        </button>
-      </form>
-      {apiState.error ? <div className="inline-status">发射数据暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {!apiState.loaded ? <div className="inline-status">正在读取发射 API...</div> : null}
-      <div className="card-grid">
-        {visibleLaunches.map((launch) => (
-          <Link to={`/launches/${launch.id || launch.externalId}`} className="entity-card" key={launch.externalId || launch.id}>
-            <strong>{launch.mission}</strong>
-            <span>{displayLaunchWindow(launch.windowStart)} · {launch.provider ?? '发射商待定'} · {launch.status}</span>
-            <em>{launch.rocket ?? '火箭型号未披露'} · {launch.site ?? '场站待定'}</em>
-          </Link>
+    <PageShell title="发射时间线" subtitle="等高时间轴和紧凑列表并行展示发射窗口、服务商和状态。">
+      <details className="filter-drawer">
+        <summary>
+          <ListFilter size={16} aria-hidden="true" />
+          发射筛选
+        </summary>
+        <form className="filter-form" action="/launches">
+          <label>
+            关键词
+            <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="任务、火箭、场站" />
+          </label>
+          <label>
+            发射商
+            <input name="provider" defaultValue={searchParams.get('provider') ?? ''} placeholder="Rocket Lab" />
+          </label>
+          <label>
+            状态
+            <input name="status" defaultValue={searchParams.get('status') ?? ''} placeholder="Go / Hold" />
+          </label>
+          <button type="submit">
+            <Search size={16} aria-hidden="true" />
+            应用
+          </button>
+        </form>
+      </details>
+      {friendlyError(api.error, api.status, '发射数据') ? <div className="inline-status">{friendlyError(api.error, api.status, '发射数据')}</div> : null}
+      <div className="launch-timeline">
+        {visibleLaunches.map((launch, index) => (
+          <LaunchCard key={launch.externalId || launch.id} launch={launch} index={index} />
         ))}
       </div>
-      {apiState.hasMore ? <div className="inline-status">当前显示首批发射记录，可用关键词、发射商或状态继续筛选。</div> : null}
+      {api.data?.hasMore ? <div className="inline-status">当前显示首批发射记录，可用关键词、发射商或状态继续筛选。</div> : null}
     </PageShell>
   );
 }
 
 function LaunchDetailPage() {
   const { slug } = useParams();
-  const fallbackLaunch = upcomingLaunches.find((item) => item.slug === slug) ?? upcomingLaunches[0];
-  const [apiState, setApiState] = useState<{
-    slug: string;
-    launch: ApiLaunch | null;
-    error: string | null;
-  }>({
-    slug: '',
-    launch: null,
-    error: null,
-  });
-  const apiSlug = slug ?? '';
-
-  useEffect(() => {
-    if (!apiSlug) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetch(`/api/launches/${encodeURIComponent(apiSlug)}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiLaunch>;
-      })
-      .then((launch) => {
-        setApiState({ slug: apiSlug, launch, error: null });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          slug: apiSlug,
-          launch: null,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return () => controller.abort();
-  }, [apiSlug]);
-
-  const apiLaunch = apiState.slug === apiSlug ? apiState.launch : null;
-  const title = apiLaunch?.mission ?? fallbackLaunch.mission;
-  const provider = apiLaunch?.provider ?? fallbackLaunch.provider;
-  const site = apiLaunch?.site ?? fallbackLaunch.site;
-  const status = apiLaunch?.status ?? fallbackLaunch.status;
-  const windowText = apiLaunch ? displayLaunchWindow(apiLaunch.windowStart) : fallbackLaunch.window;
+  const api = useApi<ApiLaunch>(slug ? `/api/launches/${encodeURIComponent(slug)}` : null);
+  const fallbackLaunch = upcomingLaunches.find((item) => slug === item.slug);
+  const title = api.data?.mission ?? fallbackLaunch?.mission ?? '发射记录';
+  const subtitle = api.data
+    ? `${api.data.provider ?? '发射商待定'} / ${api.data.site ?? '场站待定'} / ${displayLaunchStatus(api.data.status)}`
+    : fallbackLaunch
+      ? `${fallbackLaunch.provider} / ${fallbackLaunch.site} / ${displayLaunchStatus(fallbackLaunch.status)}`
+      : '缓存记录可能已更新';
+  const pageError = api.error
+    ? api.status === 404 || fallbackLaunch
+      ? '该发射记录已更新或不在当前缓存中。'
+      : friendlyError(api.error, api.status, '该发射记录')
+    : null;
 
   return (
-    <PageShell title={title} subtitle={`${provider} · ${site} · ${status}`}>
-      <div className="detail-panel">
-        {apiState.error ? <div className="inline-status">发射详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-        {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取发射详情 API...</div> : null}
-        <p>发射窗口：{windowText}</p>
-        <p>火箭型号：{apiLaunch?.rocket ?? '未披露'}</p>
-        {apiLaunch?.rawUrl ? (
-          <a href={apiLaunch.rawUrl} target="_blank" rel="noreferrer" className="source-link">
+    <PageShell title={title} subtitle={subtitle}>
+      {pageError ? <div className="inline-status inline-status--danger">{pageError}</div> : null}
+      <section className="detail-panel">
+        <p>发射窗口：{api.data ? formatLaunchWindow(api.data.windowStart) : fallbackLaunch?.window ?? '记录不在当前缓存中'}</p>
+        <p>火箭型号：{api.data?.rocket ?? '未披露'}</p>
+        {api.data?.rawUrl ? (
+          <a href={api.data.rawUrl} target="_blank" rel="noreferrer" className="source-link">
             <ExternalLink size={16} aria-hidden="true" />
             打开发射原始来源
           </a>
         ) : null}
-        <p>相关报道会通过 Launch Library 2 缓存和新闻采集结果继续自动关联。</p>
-        <Link to="/launches">返回发射列表</Link>
-      </div>
+        <Link to="/launches" className="source-link">返回发射列表</Link>
+      </section>
     </PageShell>
   );
 }
 
 function CapitalPage() {
   const [searchParams] = useSearchParams();
-  const [apiState, setApiState] = useState<{
-    items: ApiMarketItem[] | null;
-    notice: string;
-    error: string | null;
-    loaded: boolean;
-  }>({
-    items: null,
-    notice: '资本市场内容仅作信息聚合，不构成投资建议。',
-    error: null,
-    loaded: false,
-  });
   const marketApiPath = useMemo(() => {
     const params = new URLSearchParams();
 
@@ -1097,37 +1058,7 @@ function CapitalPage() {
     params.set('limit', '12');
     return `/api/market?${params.toString()}`;
   }, [searchParams]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(marketApiPath, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiMarketListResult>;
-      })
-      .then((result) => {
-        setApiState({ items: result.items, notice: result.notice, error: null, loaded: true });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          items: null,
-          notice: '资本市场内容仅作信息聚合，不构成投资建议。',
-          error: error instanceof Error ? error.message : String(error),
-          loaded: true,
-        });
-      });
-
-    return () => controller.abort();
-  }, [marketApiPath]);
-
+  const api = useApi<ApiMarketListResult>(marketApiPath);
   const fallbackMarketItems = highlights
     .filter((item) => item.category === '资本市场')
     .map((item, index) => ({
@@ -1143,35 +1074,49 @@ function CapitalPage() {
       summary: item.summary,
       publishedAt: new Date().toISOString(),
     }));
-  const visibleMarketItems = apiState.items ?? fallbackMarketItems;
+  const visibleMarketItems = api.data?.items ?? fallbackMarketItems;
 
   return (
-    <PageShell title="资本市场" subtitle="融资动态、上市公司动态、研报/公告链接和产业链公司。">
-      <div className="notice-banner">{apiState.notice}</div>
-      <form className="filter-form" action="/capital">
-        <label>
-          关键词
-          <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="融资、公告、订单" />
-        </label>
-        <label>
-          类型
-          <input name="type" defaultValue={searchParams.get('type') ?? ''} placeholder="financing/filing/report" />
-        </label>
-        <label>
-          公司
-          <input name="company" defaultValue={searchParams.get('company') ?? ''} placeholder="company slug" />
-        </label>
-        <label>
-          来源
-          <input name="source" defaultValue={searchParams.get('source') ?? ''} placeholder="source key" />
-        </label>
-        <button type="submit">
-          <Search size={16} aria-hidden="true" />
-          筛选
-        </button>
-      </form>
-      {apiState.error ? <div className="inline-status">资本线索暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {!apiState.loaded ? <div className="inline-status">正在读取资本市场 API...</div> : null}
+    <PageShell title="资本情报" subtitle="融资、公告、财报和市场线索；固定保持非投资建议提示。">
+      <div className="notice-banner">{api.data?.notice ?? '资本市场内容仅作信息聚合，不构成投资建议。'}</div>
+      <details className="filter-drawer">
+        <summary>
+          <ListFilter size={16} aria-hidden="true" />
+          资本筛选
+        </summary>
+        <form className="filter-form" action="/capital">
+          <label>
+            关键词
+            <input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="融资、公告、订单" />
+          </label>
+          <label>
+            类型
+            <select name="type" defaultValue={searchParams.get('type') ?? ''}>
+              <option value="">全部类型</option>
+              <option value="financing">融资</option>
+              <option value="filing">公告/财报</option>
+              <option value="market">市场</option>
+              <option value="ipo">IPO</option>
+            </select>
+          </label>
+          <label>
+            公司
+            <input name="company" defaultValue={searchParams.get('company') ?? ''} placeholder="company slug" />
+          </label>
+          <label>
+            来源
+            <select name="source" defaultValue={searchParams.get('source') ?? ''}>
+              <option value="">全部来源</option>
+              <SourcesOptions />
+            </select>
+          </label>
+          <button type="submit">
+            <Search size={16} aria-hidden="true" />
+            应用
+          </button>
+        </form>
+      </details>
+      {friendlyError(api.error, api.status, '资本线索') ? <div className="inline-status">{friendlyError(api.error, api.status, '资本线索')}</div> : null}
       <div className="market-list">
         {visibleMarketItems.map((item) => (
           <article className="market-item" key={item.id}>
@@ -1182,7 +1127,7 @@ function CapitalPage() {
             </div>
             <h3>{item.url && item.url !== '#' ? <a href={item.url} target="_blank" rel="noreferrer">{item.title}</a> : item.title}</h3>
             <p>{item.summary}</p>
-            {item.companyName && item.companySlug ? <Link to={`/companies/${item.companySlug}`}>{item.companyName}</Link> : null}
+            {item.companyName && item.companySlug ? <Link className="entity-chip" to={`/companies/${item.companySlug}`}>{item.companyName}</Link> : null}
           </article>
         ))}
       </div>
@@ -1191,41 +1136,7 @@ function CapitalPage() {
 }
 
 function TopicsPage() {
-  const [apiState, setApiState] = useState<{
-    items: ApiTopic[] | null;
-    error: string | null;
-    loaded: boolean;
-  }>({
-    items: null,
-    error: null,
-    loaded: false,
-  });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch('/api/topics', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<{ items: ApiTopic[] }>;
-      })
-      .then((result) => {
-        setApiState({ items: result.items, error: null, loaded: true });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({ items: null, error: error instanceof Error ? error.message : String(error), loaded: true });
-      });
-
-    return () => controller.abort();
-  }, []);
-
+  const api = useApi<{ items: ApiTopic[] }>('/api/topics');
   const fallbackTopics = topicWatch.map((topic, index) => ({
     id: index + 1,
     slug: topic.slug,
@@ -1234,18 +1145,17 @@ function TopicsPage() {
     articleCount: Number.parseInt(topic.count, 10) || 0,
     curationCount: 0,
   }));
-  const visibleTopics = apiState.items ?? fallbackTopics;
+  const visibleTopics = api.data?.items ?? fallbackTopics;
 
   return (
-    <PageShell title="专题" subtitle="自动标签聚合与人工精选入口。">
-      {apiState.error ? <div className="inline-status">专题列表暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {!apiState.loaded ? <div className="inline-status">正在读取专题 API...</div> : null}
+    <PageShell title="专题追踪" subtitle="自动标签聚合与人工精选形成持续追踪的 context。">
+      {friendlyError(api.error, api.status, '专题列表') ? <div className="inline-status">{friendlyError(api.error, api.status, '专题列表')}</div> : null}
       <div className="card-grid">
         {visibleTopics.map((topic) => (
           <Link to={`/topics/${topic.slug}`} className="entity-card" key={topic.slug}>
             <strong>{topic.name}</strong>
             <span>{topic.category}</span>
-            <em>{topic.articleCount} 篇自动聚合 · {topic.curationCount} 条人工精选</em>
+            <em>{topic.articleCount} 篇自动聚合 / {topic.curationCount} 条人工精选</em>
           </Link>
         ))}
       </div>
@@ -1256,69 +1166,25 @@ function TopicsPage() {
 function TopicDetailPage() {
   const { slug } = useParams();
   const fallbackTopic = topicWatch.find((item) => item.slug === slug) ?? topicWatch[0];
-  const [apiState, setApiState] = useState<{
-    slug: string;
-    topic: ApiTopicDetail | null;
-    error: string | null;
-  }>({
-    slug: '',
-    topic: null,
-    error: null,
-  });
-  const apiSlug = slug ?? '';
-
-  useEffect(() => {
-    if (!apiSlug) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetch(`/api/topics/${encodeURIComponent(apiSlug)}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return response.json() as Promise<ApiTopicDetail>;
-      })
-      .then((topic) => {
-        setApiState({ slug: apiSlug, topic, error: null });
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        setApiState({
-          slug: apiSlug,
-          topic: null,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return () => controller.abort();
-  }, [apiSlug]);
-
-  const apiTopic = apiState.slug === apiSlug ? apiState.topic : null;
-  const related = apiTopic
-    ? apiTopic.articles.map(articleFromApi)
-    : highlights.filter((item) => item.tags.some((tag) => slugify(tag) === slug) || item.tags.includes(fallbackTopic.title));
-  const title = apiTopic?.name ?? fallbackTopic.title;
-  const subtitle = apiTopic ? `${apiTopic.category} · ${apiTopic.articleCount} 篇自动聚合 · ${apiTopic.curationCount} 条人工精选` : `${fallbackTopic.count} · ${fallbackTopic.note}`;
+  const api = useApi<ApiTopicDetail>(slug ? `/api/topics/${encodeURIComponent(slug)}` : null);
+  const related = api.data
+    ? api.data.articles.map(articleFromApi)
+    : highlights.filter((item) => item.tags.some((itemTag) => slugify(itemTag) === slug) || item.tags.includes(fallbackTopic.title));
 
   return (
-    <PageShell title={title} subtitle={subtitle}>
-      {apiState.error ? <div className="inline-status">专题详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
-      {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取专题详情 API...</div> : null}
-      {apiTopic?.curations.length ? (
+    <PageShell
+      title={api.data?.name ?? fallbackTopic.title}
+      subtitle={api.data ? `${api.data.category} / ${api.data.articleCount} 篇自动聚合` : `${fallbackTopic.count} / ${fallbackTopic.note}`}
+    >
+      {friendlyError(api.error, api.status, '专题详情') ? <div className="inline-status">{friendlyError(api.error, api.status, '专题详情')}</div> : null}
+      {api.data?.curations.length ? (
         <section className="detail-panel">
-          <h2>人工精选</h2>
+          <SectionTitle icon={Activity} title="人工精选" />
           <div className="curation-list">
-            {apiTopic.curations.map((curation) => (
+            {api.data.curations.map((curation) => (
               <a href={curation.itemUrl} target="_blank" rel="noreferrer" key={curation.id}>
                 <strong>{curation.note ?? curation.itemUrl}</strong>
-                <span>权重 {curation.weight} · {displayTime(curation.createdAt)}</span>
+                <span>权重 {curation.weight} / {displayTime(curation.createdAt)}</span>
               </a>
             ))}
           </div>
@@ -1329,6 +1195,7 @@ function TopicDetailPage() {
           <ArticleCard key={item.slug} item={item} />
         ))}
       </div>
+      <Link className="source-link" to="/topics">返回专题列表</Link>
     </PageShell>
   );
 }
@@ -1337,6 +1204,7 @@ function PageShell({ title, subtitle, children }: { title: string; subtitle: str
   return (
     <div className="page-shell">
       <header className="page-header">
+        <span>Mission Control</span>
         <h1>{title}</h1>
         <p>{subtitle}</p>
       </header>
@@ -1345,21 +1213,16 @@ function PageShell({ title, subtitle, children }: { title: string; subtitle: str
   );
 }
 
-function SiteFooter() {
+function BottomTabs() {
   return (
-    <footer className="site-footer">
-      <div>
-        <SectionTitle icon={Tags} title="关键词趋势" />
-        <div className="tag-row tag-row--large">
-          {trendTags.map((tag) => (
-            <Link key={tag} to={`/topics/${slugify(tag)}`}>
-              {tag}
-            </Link>
-          ))}
-        </div>
-      </div>
-      <p>Cloudflare Pages Functions 已接入 D1、R2、采集日志和人工精选配置；生产库已写入文章、发射与资本市场数据。</p>
-    </footer>
+    <nav className="bottom-tabs" aria-label="移动端导航">
+      {navItems.slice(0, 5).map(({ label, icon: Icon, to }) => (
+        <NavLink key={label} to={to}>
+          <Icon size={17} aria-hidden="true" />
+          <span>{label}</span>
+        </NavLink>
+      ))}
+    </nav>
   );
 }
 
@@ -1379,7 +1242,7 @@ export function AppRoutes() {
         <Route path="/topics" element={<TopicsPage />} />
         <Route path="/topics/:slug" element={<TopicDetailPage />} />
       </Routes>
-      <SiteFooter />
+      <BottomTabs />
     </main>
   );
 }

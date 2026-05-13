@@ -17,6 +17,7 @@
 
 当前进展：
 
+- DONE：修复首页和发射页体验。已同步深色 Mission Control 前端源码，发射时间线改为等高展示并加入中文时间/状态映射，发射详情 404 改为业务文案，首页合规文案改为“来源透明”，首屏增加统计/来源/热词信息并保留事件聚类展示。
 - DONE：Frontend route shell 已完成。顶部导航、侧栏、文章详情、公司、发射、资本、专题均有真实路由路径。
 - DONE：Mock-backed page skeletons 已完成，并且主要页面已接入 D1-backed API；本地 API 不可用时保留示例数据兜底。
 - DONE：D1 persistence layer 已完成第一版，包含 source upsert、article `dedupe_hash` 去重写入、ingestion log 成功/失败记录和测试。

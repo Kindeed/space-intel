@@ -12,9 +12,12 @@ describe('App', () => {
     );
 
     expect(html).toContain('今日重点');
-    expect(html).toContain('即将发射');
+    expect(html).toContain('发射时间线');
+    expect(html).toContain('来源透明');
     expect(html).toContain('资本市场内容仅作信息聚合，不构成投资建议');
-    expect(html).toContain('国内商业航天');
-    expect(html).toContain('国际商业航天');
+    expect(html).toContain('按事件聚类');
+    expect(html).toContain('国内商业火箭企业');
+    expect(html).toContain('Launch provider updates');
+    expect(html).not.toContain('不存全文');
   });
 });
