@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getArticleById, listArticles, type ArticleDetailRow, type ArticleSummaryRow } from './articleQueries';
+import {
+  clusterArticleRows,
+  getArticleById,
+  listArticles,
+  type ArticleDetailRow,
+  type ArticleSummaryRow,
+} from './articleQueries';
 import type { DbRunResult, DbStatement, SqlDatabase } from './types';
 
 class FakeStatement implements DbStatement {
@@ -71,18 +77,55 @@ describe('article queries', () => {
       limit: 1,
     });
 
-    expect(result).toEqual({
-      items: [article],
+    expect(result).toMatchObject({
+      items: [
+        {
+          ...article,
+          relatedSourceCount: 1,
+          relatedSources: ['Spaceflight News API'],
+        },
+      ],
       page: 2,
       limit: 1,
       hasMore: true,
     });
+    expect(result.items[0].storyKey).toBe('global:2026-05-09:reusable-rocket-milestone');
     expect(db.lastQuery).toContain('a.region = ?');
     expect(db.lastQuery).toContain('s.key = ?');
     expect(db.lastQuery).toContain('LOWER(a.title) LIKE ?');
     expect(db.lastQuery).toContain('JOIN tags t');
     expect(db.lastQuery).toContain('JOIN companies c');
-    expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 2, 1]);
+    expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 5, 1]);
+  });
+
+  it('clusters repeated story coverage before returning article cards', () => {
+    const clustered = clusterArticleRows(
+      [
+        article,
+        {
+          ...article,
+          id: 2,
+          sourceKey: 'google-news-cn-commercial-space',
+          sourceName: 'Google News - 商业航天',
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T01:00:00Z',
+        },
+        {
+          ...article,
+          id: 3,
+          title: 'Satellite financing update',
+          sourceName: 'Capital Source',
+        },
+      ],
+      10,
+    );
+
+    expect(clustered).toHaveLength(2);
+    expect(clustered[0]).toMatchObject({
+      id: 2,
+      relatedSourceCount: 2,
+      relatedSources: ['Spaceflight News API', 'Google News - 商业航天'],
+    });
   });
 
   it('returns article detail by id', async () => {

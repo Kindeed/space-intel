@@ -11,6 +11,10 @@ export function normalizeDedupeText(value: string): string {
 }
 
 export function createDedupeKey(item: Pick<NormalizedItem, 'sourceKey' | 'title' | 'url' | 'rawId'>): string {
+  if (item.sourceKey.startsWith('google-news-')) {
+    return `google-news:${normalizeDedupeText(item.url)}:${normalizeDedupeText(item.title)}`;
+  }
+
   if (item.rawId) {
     return `external:${item.sourceKey}:${normalizeDedupeText(item.rawId)}`;
   }

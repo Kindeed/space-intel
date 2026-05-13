@@ -18,6 +18,23 @@ function normalizeGoogleNewsTitle(title: string): string {
   return title.replace(/\s+-\s+[^-]+$/, '').trim();
 }
 
+function canonicalGoogleNewsUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    const nestedUrl = url.searchParams.get('url') ?? url.searchParams.get('q');
+
+    if (nestedUrl?.startsWith('http')) {
+      return nestedUrl;
+    }
+
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  } catch {
+    return value;
+  }
+}
+
 export const googleNewsRssCollector: SourceCollector = {
   type: 'google_news_rss',
   async collect(source: SourceConfig, context: CollectorContext): Promise<NormalizedItem[]> {
@@ -37,6 +54,7 @@ export const googleNewsRssCollector: SourceCollector = {
       .filter((item) => item.title && item.link)
       .map((item) => {
         const title = normalizeGoogleNewsTitle(item.title ?? '');
+        const url = canonicalGoogleNewsUrl(item.link ?? '');
 
         return {
           sourceKey: source.key,
@@ -44,11 +62,11 @@ export const googleNewsRssCollector: SourceCollector = {
           title,
           originalTitle: item.title ?? '',
           summary: stripHtml(item.contentSnippet ?? item.summary ?? item.content ?? ''),
-          url: item.link ?? '',
+          url,
           publishedAt: item.isoDate ?? context.now().toISOString(),
           language: 'zh',
           region: source.region,
-          rawId: item.guid ?? item.link,
+          rawId: item.guid ?? url,
           relatedLaunchIds: [],
           companies: [],
           tags: [],
