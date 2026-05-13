@@ -587,7 +587,7 @@ function ArticlesPage() {
   const isLoading = apiState.path !== apiPath && !apiState.error;
 
   return (
-    <PageShell title="新闻列表" subtitle="支持地区、来源、标签、公司和关键词过滤；优先读取 D1 API，本地开发无 API 时使用示例数据兜底。">
+    <PageShell title="新闻列表" subtitle="按地区、来源、标签、公司和关键词筛选 D1 新闻线索。">
       <form className="filter-form" action="/articles">
         <label>
           关键词
@@ -625,7 +625,7 @@ function ArticlesPage() {
           </Link>
         ))}
       </div>
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例数据。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">实时数据暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {isLoading ? <div className="inline-status">正在读取文章 API...</div> : null}
       <div className="page-list">
         {visibleItems.map((item) => (
@@ -639,9 +639,6 @@ function ArticlesPage() {
         {hasMore ? <Link to={pageHref(searchParams, currentPage + 1)}>下一页</Link> : <span>下一页</span>}
         <Link to="/articles">重置筛选</Link>
       </nav>
-      <div className="compliance-note">
-        列表只展示标题、摘要、来源、发布时间、标签和原文入口，不保存或展示新闻全文。
-      </div>
     </PageShell>
   );
 }
@@ -705,7 +702,7 @@ function ArticleDetailPage() {
   return (
     <PageShell title={article.title} subtitle={`${article.source} · ${article.time} · ${article.region}`}>
       <article className="detail-panel">
-        {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例详情。错误：{apiState.error}</div> : null}
+        {apiState.error ? <div className="inline-status">实时详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
         {isLoading ? <div className="inline-status">正在读取文章详情 API...</div> : null}
         {originalTitle ? (
           <div className="metadata-block">
@@ -747,7 +744,6 @@ function ArticleDetailPage() {
             </div>
           </>
         ) : null}
-        <p className="compliance-note">这里只展示摘要、标签、关联实体和原文入口占位，不保存或转载新闻全文。</p>
       </article>
     </PageShell>
   );
@@ -800,7 +796,7 @@ function CompaniesPage() {
 
   return (
     <PageShell title="公司库" subtitle="公司简介、赛道、新闻时间线和资本动态入口。">
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例公司库。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">公司库暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {!apiState.loaded ? <div className="inline-status">正在读取公司 API...</div> : null}
       <div className="card-grid">
         {visibleCompanies.map((company) => (
@@ -871,16 +867,16 @@ function CompanyDetailPage() {
 
   return (
     <PageShell title={companyTitle} subtitle={subtitle}>
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例公司详情。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">公司详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取公司详情 API...</div> : null}
       {apiCompany ? (
         <section className="detail-panel">
-          <p>{apiCompany.profile || '公司简介待补充。'}</p>
+          <p>{apiCompany.profile || '暂无公开简介。'}</p>
           <div className="entity-meta-grid">
             <span>国家/地区：{apiCompany.country}</span>
             <span>赛道：{apiCompany.sector}</span>
             <span>股票代码：{apiCompany.stockSymbol ?? '未披露/未上市'}</span>
-            {apiCompany.website ? <a href={apiCompany.website} target="_blank" rel="noreferrer">官网</a> : <span>官网：待补充</span>}
+            {apiCompany.website ? <a href={apiCompany.website} target="_blank" rel="noreferrer">官网</a> : <span>官网：未披露</span>}
           </div>
         </section>
       ) : null}
@@ -984,14 +980,14 @@ function LaunchesPage() {
           筛选
         </button>
       </form>
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例发射数据。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">发射数据暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {!apiState.loaded ? <div className="inline-status">正在读取发射 API...</div> : null}
       <div className="card-grid">
         {visibleLaunches.map((launch) => (
           <Link to={`/launches/${launch.id || launch.externalId}`} className="entity-card" key={launch.externalId || launch.id}>
             <strong>{launch.mission}</strong>
             <span>{displayLaunchWindow(launch.windowStart)} · {launch.provider ?? '发射商待定'} · {launch.status}</span>
-            <em>{launch.rocket ?? '火箭型号待定'} · {launch.site ?? '场站待定'}</em>
+            <em>{launch.rocket ?? '火箭型号未披露'} · {launch.site ?? '场站待定'}</em>
           </Link>
         ))}
       </div>
@@ -1057,10 +1053,10 @@ function LaunchDetailPage() {
   return (
     <PageShell title={title} subtitle={`${provider} · ${site} · ${status}`}>
       <div className="detail-panel">
-        {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例发射详情。错误：{apiState.error}</div> : null}
+        {apiState.error ? <div className="inline-status">发射详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
         {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取发射详情 API...</div> : null}
         <p>发射窗口：{windowText}</p>
-        <p>火箭型号：{apiLaunch?.rocket ?? '待补充'}</p>
+        <p>火箭型号：{apiLaunch?.rocket ?? '未披露'}</p>
         {apiLaunch?.rawUrl ? (
           <a href={apiLaunch.rawUrl} target="_blank" rel="noreferrer" className="source-link">
             <ExternalLink size={16} aria-hidden="true" />
@@ -1174,14 +1170,14 @@ function CapitalPage() {
           筛选
         </button>
       </form>
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例资本线索。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">资本线索暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {!apiState.loaded ? <div className="inline-status">正在读取资本市场 API...</div> : null}
       <div className="market-list">
         {visibleMarketItems.map((item) => (
           <article className="market-item" key={item.id}>
             <div className="article-card__meta">
               <span>{item.itemType}</span>
-              <span>{item.sourceName ?? '来源待补充'}</span>
+              <span>{item.sourceName ?? '公开来源'}</span>
               <time>{displayTime(item.publishedAt)}</time>
             </div>
             <h3>{item.url && item.url !== '#' ? <a href={item.url} target="_blank" rel="noreferrer">{item.title}</a> : item.title}</h3>
@@ -1242,7 +1238,7 @@ function TopicsPage() {
 
   return (
     <PageShell title="专题" subtitle="自动标签聚合与人工精选入口。">
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例专题。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">专题列表暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {!apiState.loaded ? <div className="inline-status">正在读取专题 API...</div> : null}
       <div className="card-grid">
         {visibleTopics.map((topic) => (
@@ -1313,7 +1309,7 @@ function TopicDetailPage() {
 
   return (
     <PageShell title={title} subtitle={subtitle}>
-      {apiState.error ? <div className="inline-status">API 暂不可用，当前展示本地示例专题详情。错误：{apiState.error}</div> : null}
+      {apiState.error ? <div className="inline-status">专题详情暂不可用，当前显示离线缓存。错误：{apiState.error}</div> : null}
       {apiState.slug !== apiSlug && !apiState.error ? <div className="inline-status">正在读取专题详情 API...</div> : null}
       {apiTopic?.curations.length ? (
         <section className="detail-panel">

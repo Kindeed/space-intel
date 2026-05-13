@@ -617,7 +617,8 @@ a {
 }
 
 .page-header {
-  padding: 22px;
+  border-left: 4px solid #1e6a59;
+  padding: 20px 22px;
 }
 
 .page-header h1 {
@@ -651,6 +652,14 @@ a {
   padding: 14px;
   background: #ffffff;
   box-shadow: 0 10px 26px rgba(41, 62, 53, 0.055);
+}
+
+.filter-form:hover,
+.page-list:hover,
+.detail-panel:hover,
+.market-item:hover,
+.entity-card:hover {
+  border-color: #c8d7cf;
 }
 
 .filter-form label {
@@ -704,15 +713,17 @@ a {
 }
 
 .filter-row {
-  grid-template-columns: repeat(auto-fit, minmax(92px, max-content));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .filter-row a,
 .link-grid a {
   border: 1px solid #d7e1db;
-  border-radius: 8px;
-  padding: 9px 12px;
-  background: #ffffff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: #f8faf8;
   color: #244b41;
   font-weight: 780;
 }
@@ -766,7 +777,15 @@ a {
 .page-list .article-card {
   border-top: 0;
   border-bottom: 1px solid #e5ebe6;
-  padding: 18px;
+  padding: 18px 20px;
+}
+
+.page-list .article-card:hover {
+  background: #fbfcfb;
+}
+
+.page-list .article-card h3 {
+  font-size: 1.14rem;
 }
 
 .page-list .article-card:last-child {
@@ -811,7 +830,15 @@ a {
 
 .detail-panel {
   display: grid;
-  gap: 16px;
+  gap: 18px;
+}
+
+.detail-panel > p {
+  max-width: 860px;
+  margin: 0;
+  color: #374b43;
+  font-size: 1.03rem;
+  line-height: 1.75;
 }
 
 .detail-panel h2 {
@@ -853,7 +880,6 @@ a {
   font-weight: 800;
 }
 
-.compliance-note,
 .notice-banner {
   color: #4c6158;
   line-height: 1.6;
@@ -861,6 +887,7 @@ a {
 
 .notice-banner {
   border-color: #cbded5;
+  border-left: 4px solid #2c7b67;
   background: #f4faf6;
   color: #17483d;
   font-weight: 780;
@@ -965,13 +992,13 @@ a {
 
   .site-header nav {
     justify-content: flex-start;
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     padding-bottom: 2px;
   }
 
   .site-header nav a {
-    min-width: max-content;
+    min-width: 0;
+    padding: 6px 8px;
   }
 
   .social-layout {
@@ -984,13 +1011,12 @@ a {
   }
 
   .rail-card {
-    grid-template-columns: repeat(6, minmax(max-content, 1fr));
-    overflow-x: auto;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   }
 
   .rail-card a {
     justify-content: flex-start;
-    min-width: max-content;
+    min-width: 0;
   }
 
   .rail-card a span {
@@ -1029,6 +1055,18 @@ a {
 
   .brand {
     font-size: 1.1rem;
+  }
+
+  .site-header nav {
+    gap: 4px;
+  }
+
+  .site-header nav a {
+    font-size: 0.82rem;
+  }
+
+  .rail-card {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .launch-item {

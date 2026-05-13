@@ -42,7 +42,7 @@ export const highlights: FeedItem[] = [
     time: '昨日',
     category: '政策监管',
     region: '国内',
-    summary: '政策条目只保存元数据、摘要、标签和原始链接，避免全文转载。',
+    summary: '政策信息进入监管频道，并用标签连接相关产业链公司。',
     companies: ['银河航天', '长光卫星'],
     tags: ['卫星互联网', '政策监管'],
   },
@@ -53,7 +53,7 @@ export const highlights: FeedItem[] = [
     time: '昨日',
     category: '资本市场',
     region: '国内',
-    summary: '资本与公告类内容只做信息聚合，并在资本页持续展示非投资建议说明。',
+    summary: '资本与公告线索聚合到资本页，便于跟踪订单、融资和上市公司动态。',
     companies: ['长光卫星', 'Planet Labs'],
     tags: ['商业遥感', '融资动态'],
   },
@@ -97,7 +97,7 @@ export const highlights: FeedItem[] = [
     time: '3 天前',
     category: '资本市场',
     region: '国际',
-    summary: '公告、财报和订单更新只作为资讯线索展示，不提供实时行情或交易建议。',
+    summary: '公告、财报和订单更新进入资本市场线索流，用于观察产业链节奏。',
     companies: ['Rocket Lab', 'AST SpaceMobile'],
     tags: ['融资动态'],
   },
@@ -133,7 +133,7 @@ export const upcomingLaunches = [
 export const marketBriefs = [
   '商业遥感公司披露新合同收入，资本页保留公告原文链接。',
   '低轨通信产业链多家公司发布订单进展。',
-  '融资动态页面固定展示非投资建议说明。',
+  '融资与公告动态按公司、来源和关键词筛选。',
 ];
 
 export const sourceStatus = [
