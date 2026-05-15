@@ -1,0 +1,12 @@
+name = "space-intel-scheduled"
+main = "src/workers/scheduled.ts"
+compatibility_date = "2026-05-09"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["0 * * * *", "15 18 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "space_intel"
+database_id = "d42e1957-a341-4379-9b13-fddee10d8098"

@@ -89,6 +89,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
+        s.type AS sourceType,
         a.published_at AS publishedAt,
         a.language,
         a.region,

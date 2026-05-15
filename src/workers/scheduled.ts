@@ -1,0 +1,28 @@
+import sourcesConfig from '../../config/sources.generated.json';
+import curationsConfig from '../../config/curations.generated.json';
+import { parseSourcesConfig, runScheduledIngestion } from '../ingestion';
+
+type Env = {
+  DB: D1Database;
+};
+
+export async function runSpaceIntelScheduled(cron: string, env: Env): Promise<unknown> {
+  const kind = cron === '15 18 * * *' ? 'daily' : 'hourly';
+
+  return runScheduledIngestion({
+    db: env.DB,
+    sources: parseSourcesConfig(sourcesConfig),
+    curationsConfig,
+    kind,
+    context: {
+      fetch: (input, init) => fetch(input, init),
+      now: () => new Date(),
+    },
+  });
+}
+
+export default {
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(runSpaceIntelScheduled(controller.cron, env));
+  },
+};

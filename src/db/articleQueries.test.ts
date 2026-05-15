@@ -56,6 +56,7 @@ const article: ArticleSummaryRow = {
   url: 'https://example.com/article',
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
+  sourceType: 'api',
   publishedAt: '2026-05-09T00:00:00Z',
   language: 'en',
   region: 'global',
@@ -96,6 +97,16 @@ describe('article queries', () => {
     expect(db.lastQuery).toContain('JOIN tags t');
     expect(db.lastQuery).toContain('JOIN companies c');
     expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 5, 1]);
+  });
+
+  it('filters policy articles to official sources only', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [article];
+
+    await listArticles(db, { category: 'policy' });
+
+    expect(db.lastQuery).toContain('s.type = ?');
+    expect(db.lastValues).toEqual(['official_page', 50, 0]);
   });
 
   it('clusters repeated story coverage before returning article cards', () => {

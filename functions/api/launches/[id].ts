@@ -1,4 +1,5 @@
 import { getLaunchByIdOrExternalId } from '../../../src/db';
+import { logApiError, publicError } from '../_response';
 
 type Env = {
   DB: D1Database;
@@ -15,12 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
 
     return Response.json(launch);
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to load launch',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to load launch', error);
+    return publicError();
   }
 };

@@ -1,4 +1,5 @@
-import { listEnabledSources } from '../../src/db';
+import { listEnabledSources, listEnabledSourceTypeStats } from '../../src/db';
+import { logApiError, publicError } from './_response';
 
 type Env = {
   DB: D1Database;
@@ -7,14 +8,10 @@ type Env = {
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   try {
     const items = await listEnabledSources(env.DB);
-    return Response.json({ items });
+    const stats = await listEnabledSourceTypeStats(env.DB);
+    return Response.json({ items, stats });
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to list sources',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to list sources', error);
+    return publicError();
   }
 };

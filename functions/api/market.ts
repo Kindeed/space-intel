@@ -1,4 +1,5 @@
 import { listMarketItems } from '../../src/db';
+import { logApiError, publicError } from './_response';
 
 type Env = {
   DB: D1Database;
@@ -27,12 +28,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
 
     return Response.json(result);
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to list market items',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to list market items', error);
+    return publicError();
   }
 };

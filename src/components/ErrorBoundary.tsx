@@ -3,8 +3,8 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 export class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   state = { error: null };
 
-  static getDerivedStateFromError(error: Error) {
-    return { error: error.message };
+  static getDerivedStateFromError() {
+    return { error: 'render-failed' };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -15,7 +15,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: s
     if (this.state.error) {
       return (
         <div className="inline-status inline-status--danger">
-          Mission Control 视图暂不可用：{this.state.error}
+          页面暂不可用，请稍后重试。
         </div>
       );
     }

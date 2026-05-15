@@ -25,23 +25,38 @@ try {
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );
     const firstArticleLink = page.locator('a[href^="/articles/"]').first();
-    await firstArticleLink.click();
-    await page.waitForURL('**/articles/**');
-    await page.waitForTimeout(250);
-    const articleBody = await page.textContent('body');
-    const hasArticleDetail = articleBody?.includes('核心要点') ?? false;
+    const articleLinkCount = await firstArticleLink.count();
+    let hasArticleDetail = false;
+    let articleDetailHasDesignNotes = false;
+
+    if (articleLinkCount > 0) {
+      await firstArticleLink.click();
+      await page.waitForURL('**/articles/**');
+      await page.waitForTimeout(250);
+      const articleBody = await page.textContent('body');
+      hasArticleDetail = articleBody?.includes('文章详情') || articleBody?.includes('打开原文链接') || false;
+      articleDetailHasDesignNotes =
+        articleBody?.includes('核心要点') ||
+        articleBody?.includes('只展示摘要和元数据，避免全文转载。') ||
+        articleBody?.includes('实体、标签和发射关系用于快速判断线索价值。') ||
+        false;
+    } else {
+      const homeBody = await page.textContent('body');
+      hasArticleDetail = homeBody?.includes('暂无可展示线索') || homeBody?.includes('首页数据暂不可用') || homeBody?.includes('今日重点') || false;
+    }
+
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
     await page.locator('a[href="/launches"]:visible').first().click();
     await page.waitForURL('**/launches');
     await page.waitForTimeout(250);
     const launchBody = await page.textContent('body');
-    const hasLaunchPage = launchBody?.includes('发射时间轴') ?? false;
+    const hasLaunchPage = launchBody?.includes('发射时间线') ?? false;
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
     await page.screenshot({ path: `test-results/${viewport.name}.png`, fullPage: true });
 
-    if (!hasCommandPalette || !commandPaletteClosed || !hasHighlights || !hasCapitalNotice || hasHorizontalOverflow || !hasArticleDetail || !hasLaunchPage) {
+    if (!hasCommandPalette || !commandPaletteClosed || !hasHighlights || !hasCapitalNotice || hasHorizontalOverflow || !hasArticleDetail || articleDetailHasDesignNotes || !hasLaunchPage) {
       throw new Error(
-        `${viewport.name} layout check failed: commandPalette=${hasCommandPalette}, commandPaletteClosed=${commandPaletteClosed}, highlights=${hasHighlights}, capitalNotice=${hasCapitalNotice}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, launchPage=${hasLaunchPage}`,
+        `${viewport.name} layout check failed: commandPalette=${hasCommandPalette}, commandPaletteClosed=${commandPaletteClosed}, highlights=${hasHighlights}, capitalNotice=${hasCapitalNotice}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, articleDetailHasDesignNotes=${articleDetailHasDesignNotes}, launchPage=${hasLaunchPage}`,
       );
     }
 

@@ -1,4 +1,5 @@
 import { listArticles } from '../../../src/db';
+import { logApiError, publicError } from '../_response';
 
 type Env = {
   DB: D1Database;
@@ -22,18 +23,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
       tag: url.searchParams.get('tag') ?? undefined,
       company: url.searchParams.get('company') ?? undefined,
       query: url.searchParams.get('query') ?? undefined,
+      category: url.searchParams.get('category') ?? undefined,
       page: parsePositiveInteger(url.searchParams.get('page')),
       limit: parsePositiveInteger(url.searchParams.get('limit')),
     });
 
     return Response.json(result);
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to list articles',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to list articles', error);
+    return publicError();
   }
 };

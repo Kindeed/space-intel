@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { upcomingLaunches } from '../data';
 import { PageShell } from '../components/PageShell';
 import { useLaunchesQuery } from '../hooks/queries';
 import { displayLaunchStatus, formatLaunchWindow, friendlyError, launchProximity } from '../utils';
@@ -15,12 +14,12 @@ function launchHref(launch: ApiLaunch): string | null {
   return `/launches/${launch.id || launch.externalId}`;
 }
 
-function LaunchCard({ launch, index }: { launch: ApiLaunch; index: number }) {
+function LaunchCard({ launch }: { launch: ApiLaunch }) {
   const href = launchHref(launch);
   const content = (
     <>
       <div className="launch-card__time">
-        <span>{launchProximity(launch.windowStart, upcomingLaunches[index]?.window)}</span>
+        <span>{launchProximity(launch.windowStart)}</span>
         <strong>{formatLaunchWindow(launch.windowStart)}</strong>
       </div>
       <div className="launch-card__body">
@@ -56,19 +55,7 @@ export function LaunchesPage() {
     return `/api/launches?${params.toString()}`;
   }, [searchParams]);
   const state = useLaunchesQuery(apiPath);
-  const fallback = upcomingLaunches.map((launch, index) => ({
-    id: index + 1,
-    externalId: `fallback-${launch.slug}`,
-    mission: launch.mission,
-    rocket: null,
-    provider: launch.provider,
-    windowStart: null,
-    site: launch.site,
-    status: launch.status,
-    rawUrl: null,
-    isFallback: true,
-  }));
-  const items = state.data?.items ?? fallback;
+  const items = state.data?.items ?? [];
 
   return (
     <PageShell title="发射时间线" subtitle="等高时间轴和紧凑列表并行展示发射窗口、服务商和状态。">
@@ -83,9 +70,10 @@ export function LaunchesPage() {
       </details>
       {friendlyError(state.error, '发射数据') ? <div className="inline-status">{friendlyError(state.error, '发射数据')}</div> : null}
       <div className="launch-timeline">
-        {items.map((launch, index) => (
-          <LaunchCard key={launch.externalId || launch.id} launch={launch} index={index} />
+        {items.map((launch) => (
+          <LaunchCard key={launch.externalId || launch.id} launch={launch} />
         ))}
+        {!state.isLoading && !items.length ? <div className="empty-state">暂无发射记录。</div> : null}
       </div>
       {state.data?.hasMore ? <div className="inline-status">当前显示首批发射记录，可用关键词、发射商或状态继续筛选。</div> : null}
     </PageShell>

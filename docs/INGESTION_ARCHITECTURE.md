@@ -13,6 +13,15 @@ The ingestion pipeline is config-first. Source URLs, purpose, risk notes, expect
 5. Generate a dedupe hash from external ID when available, otherwise from source, canonical URL, and title.
 6. Store summaries, metadata, tags, companies, launch relations, and original links only.
 
+## Scheduled Ingestion
+
+Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not the Pages Functions project. Keep the split explicit:
+
+- `wrangler.toml` configures the Pages app, API Functions, D1 binding, and R2 binding.
+- `wrangler.scheduled.toml` configures the `space-intel-scheduled` Worker, its D1 binding, and Cron Triggers.
+- `src/workers/scheduled.ts` maps hourly cron events to source ingestion and the daily cron event to curation sync.
+- Deploy or update the scheduled Worker with `pnpm deploy:scheduled` after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
+
 ## Collector Boundary
 
 Each collector owns one source family:

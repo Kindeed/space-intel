@@ -88,6 +88,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
+        s.type AS sourceType,
         a.published_at AS publishedAt,
         a.language,
         a.region,

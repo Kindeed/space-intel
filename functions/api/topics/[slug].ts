@@ -1,4 +1,5 @@
 import { getTopicBySlug } from '../../../src/db';
+import { logApiError, publicError } from '../_response';
 
 type Env = {
   DB: D1Database;
@@ -15,12 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
 
     return Response.json(topic);
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to load topic',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to load topic', error);
+    return publicError();
   }
 };

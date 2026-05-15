@@ -8,6 +8,7 @@ export type ApiArticleSummary = {
   url: string;
   sourceKey: string;
   sourceName: string;
+  sourceType: string;
   publishedAt: string;
   language: string;
   region: string;
@@ -28,6 +29,24 @@ export type ApiArticleListResult = {
   page: number;
   limit: number;
   hasMore: boolean;
+};
+
+export type ApiHomeStats = {
+  recentArticleCount: number;
+  topicCount: number;
+  enabledSourcesByType: Array<{ type: string; count: number }>;
+};
+
+export type ApiTrendingTag = {
+  slug: string;
+  name: string;
+  count: number;
+};
+
+export type ApiHomeResult = {
+  items: ApiArticleSummary[];
+  stats: ApiHomeStats;
+  trendingTags: ApiTrendingTag[];
 };
 
 export type ApiCompany = {
@@ -111,6 +130,11 @@ export type ApiSource = {
   type: string;
   region: string;
   credibility: number;
+};
+
+export type ApiSourceListResult = {
+  items: ApiSource[];
+  stats: Array<{ type: string; count: number }>;
 };
 
 export type FeedStory = FeedItem & {

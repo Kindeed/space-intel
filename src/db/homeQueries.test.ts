@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { listRankedHomeArticles, type RankedHomeArticle } from './homeQueries';
+import { listRankedHomeArticles, listTrendingTags, type RankedHomeArticle, type TrendingTag } from './homeQueries';
 import type { DbRunResult, DbStatement, SqlDatabase } from './types';
 
 class FakeStatement implements DbStatement {
@@ -33,7 +33,7 @@ class FakeStatement implements DbStatement {
 class FakeHomeDatabase implements SqlDatabase {
   lastQuery = '';
   lastValues: unknown[] = [];
-  results: RankedHomeArticle[] = [];
+  results: Array<RankedHomeArticle | TrendingTag> = [];
 
   prepare(query: string): DbStatement {
     return new FakeStatement(this, query);
@@ -49,5 +49,21 @@ describe('home ranking queries', () => {
     expect(db.lastQuery).toContain('COALESCE(MAX(c.weight), 0) AS curationWeight');
     expect(db.lastQuery).toContain('ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC');
     expect(db.lastValues).toEqual([50]);
+  });
+
+  it('lists recent tags by article frequency with a bounded limit', async () => {
+    const db = new FakeHomeDatabase();
+    db.results = [
+      { slug: 'satellite-internet', name: '卫星互联网', count: 8 },
+      { slug: 'reusable-rockets', name: '可回收火箭', count: 5 },
+    ];
+
+    const result = await listTrendingTags(db, 100);
+
+    expect(result).toEqual(db.results);
+    expect(db.lastQuery).toContain('JOIN article_tags at ON at.tag_id = t.id');
+    expect(db.lastQuery).toContain("WHERE a.published_at >= datetime('now', '-7 days')");
+    expect(db.lastQuery).toContain('ORDER BY count DESC, t.name ASC');
+    expect(db.lastValues).toEqual([12]);
   });
 });

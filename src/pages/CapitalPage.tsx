@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { marketTypes } from '../constants';
-import { highlights, slugify } from '../data';
 import { PageShell } from '../components/PageShell';
 import { SourceOptions } from '../components/SourceOptions';
 import { useMarketQuery } from '../hooks/queries';
-import { displayTime } from '../utils';
+import { displayTime, safeLoadMessage } from '../utils';
 
 export function CapitalPage() {
   const [searchParams] = useSearchParams();
@@ -22,18 +21,7 @@ export function CapitalPage() {
     return `/api/market?${params.toString()}`;
   }, [searchParams]);
   const state = useMarketQuery(apiPath);
-  const fallback = highlights.filter((item) => item.category === '资本市场').map((item, index) => ({
-    id: index + 1,
-    title: item.title,
-    itemType: 'news',
-    companyName: item.companies[0] ?? null,
-    companySlug: item.companies[0] ? slugify(item.companies[0]) : null,
-    sourceName: item.source,
-    url: '#',
-    summary: item.summary,
-    publishedAt: new Date().toISOString(),
-  }));
-  const items = state.data?.items ?? fallback;
+  const items = state.data?.items ?? [];
 
   return (
     <PageShell title="资本情报" subtitle="融资、公告、财报和市场线索；固定保持非投资建议提示。">
@@ -48,7 +36,7 @@ export function CapitalPage() {
           <button type="submit"><Search size={16} aria-hidden="true" /> 应用</button>
         </form>
       </details>
-      {state.error ? <div className="inline-status">资本线索暂不可用，当前显示离线缓存。错误：{state.error.message}</div> : null}
+      {state.error ? <div className="inline-status">{safeLoadMessage('资本线索')}</div> : null}
       <div className="market-list">
         {items.map((item) => (
           <article className="market-item" key={item.id}>
@@ -62,6 +50,7 @@ export function CapitalPage() {
             {item.companyName && item.companySlug ? <Link className="entity-chip" to={`/companies/${item.companySlug}`}>{item.companyName}</Link> : null}
           </article>
         ))}
+        {!state.isLoading && !items.length ? <div className="empty-state">暂无资本线索。</div> : null}
       </div>
     </PageShell>
   );

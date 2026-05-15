@@ -131,7 +131,11 @@ export function friendlyError(error: Error | null, context: string): string | nu
     return `${context}已更新或不在当前缓存中。`;
   }
 
-  return `${context}暂不可用，正在显示本地缓存。`;
+  return `${context}暂不可用，请稍后重试。`;
+}
+
+export function safeLoadMessage(context: string): string {
+  return `${context}暂不可用，请稍后重试。`;
 }
 
 export function articleFromApi(row: ApiArticleSummary): FeedStory {
@@ -143,7 +147,7 @@ export function articleFromApi(row: ApiArticleSummary): FeedStory {
     source: row.sourceName,
     sourceKey: row.sourceKey,
     time: displayTime(row.publishedAt),
-    category: region === '国内' ? '国内商业航天' : '国际商业航天',
+    category: row.sourceType === 'official_page' ? '政策监管' : region === '国内' ? '国内商业航天' : '国际商业航天',
     region,
     summary: row.summary,
     companies: [],
@@ -157,7 +161,7 @@ export function articleFromApi(row: ApiArticleSummary): FeedStory {
 export function articleListApiPath(searchParams: URLSearchParams, page: number, limit: number): string {
   const apiParams = new URLSearchParams();
 
-  for (const key of ['region', 'source', 'tag', 'company', 'query']) {
+  for (const key of ['region', 'source', 'tag', 'company', 'query', 'category']) {
     const value = searchParams.get(key);
 
     if (value?.trim()) {

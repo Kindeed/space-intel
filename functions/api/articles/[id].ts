@@ -1,4 +1,5 @@
 import { getArticleById } from '../../../src/db';
+import { logApiError, publicError } from '../_response';
 
 type Env = {
   DB: D1Database;
@@ -16,12 +17,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
 
     return Response.json(article);
   } catch (error) {
-    return Response.json(
-      {
-        error: 'Failed to load article',
-        detail: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    logApiError('Failed to load article', error);
+    return publicError();
   }
 };

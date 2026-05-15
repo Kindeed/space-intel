@@ -8,6 +8,7 @@ import {
   collectSource,
   googleNewsRssCollector,
   launchLibraryCollector,
+  officialPageCollector,
   parseSourcesConfig,
   parseSourcesYaml,
   rssCollector,
@@ -371,5 +372,59 @@ describe('Google News RSS collector', () => {
       region: 'cn',
       rawId: 'google-news-1',
     });
+  });
+});
+
+describe('official page collector', () => {
+  it('extracts official policy links and filters unrelated broad-source items', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'miit-news',
+          name: '工业和信息化部新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://www.miit.gov.cn/xwdt/index.html',
+          credibility: 5,
+          enabled: true,
+          purpose: 'Official industrial policy updates.',
+          expected_content: 'Official metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="/xwdt/2026-05-08-satellite.html">关于卫星互联网产业发展的通知</a>
+              <a href="/xwdt/2026-05-08-unrelated.html">纺织行业质量提升活动</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items).toEqual([
+      {
+        sourceKey: 'miit-news',
+        sourceName: '工业和信息化部新闻',
+        title: '关于卫星互联网产业发展的通知',
+        originalTitle: '关于卫星互联网产业发展的通知',
+        summary: '官方发布：关于卫星互联网产业发展的通知',
+        url: 'https://www.miit.gov.cn/xwdt/2026-05-08-satellite.html',
+        publishedAt: '2026-05-08T00:00:00Z',
+        language: 'zh',
+        region: 'cn',
+        rawId: 'https://www.miit.gov.cn/xwdt/2026-05-08-satellite.html',
+        relatedLaunchIds: [],
+        companies: [],
+        tags: ['policy-and-regulation'],
+      },
+    ]);
   });
 });

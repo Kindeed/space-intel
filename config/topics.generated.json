@@ -34,7 +34,20 @@
       "slug": "policy-and-regulation",
       "name": "政策监管",
       "category": "policy",
-      "keywords": ["政策", "监管", "工信部", "国家航天局"]
+      "keywords": [
+        "政策",
+        "监管",
+        "工信部",
+        "国家航天局",
+        "发改委",
+        "FAA",
+        "FCC",
+        "ITU",
+        "regulation",
+        "policy",
+        "spectrum",
+        "commercial space transportation"
+      ]
     }
   ]
 }

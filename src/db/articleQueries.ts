@@ -8,6 +8,7 @@ export type ArticleSummaryRow = {
   url: string;
   sourceKey: string;
   sourceName: string;
+  sourceType: string;
   publishedAt: string;
   language: string;
   region: string;
@@ -27,6 +28,7 @@ export type ArticleListFilters = {
   tag?: string;
   company?: string;
   query?: string;
+  category?: string;
   page?: number;
   limit?: number;
 };
@@ -162,6 +164,11 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
     values.push(filters.company);
   }
 
+  if (filters.category === 'policy') {
+    conditions.push('s.type = ?');
+    values.push('official_page');
+  }
+
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const rawLimit = Math.min(limit * 4 + 1, maxLimit);
   const statement = db.prepare(
@@ -173,6 +180,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       a.url,
       s.key AS sourceKey,
       s.name AS sourceName,
+      s.type AS sourceType,
       a.published_at AS publishedAt,
       a.language,
       a.region,
@@ -215,6 +223,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
+        s.type AS sourceType,
         a.published_at AS publishedAt,
         a.language,
         a.region,

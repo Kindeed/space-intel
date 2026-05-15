@@ -9,5 +9,6 @@ export * from './types';
 export * from './collectors/placeholder';
 export * from './collectors/googleNewsRss';
 export * from './collectors/launchLibrary';
+export * from './collectors/officialPage';
 export * from './collectors/rss';
 export * from './collectors/spaceflightNews';

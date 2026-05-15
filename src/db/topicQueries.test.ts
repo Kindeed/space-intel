@@ -72,6 +72,7 @@ const article: ArticleSummaryRow = {
   url: 'https://example.com/reusable',
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
+  sourceType: 'api',
   publishedAt: '2026-05-09T00:00:00Z',
   language: 'en',
   region: 'global',

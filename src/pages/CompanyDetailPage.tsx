@@ -1,20 +1,18 @@
 import { Link, useParams } from 'react-router-dom';
-import { companies, highlights, slugify } from '../data';
 import { ArticleCard } from '../components/ArticleCard';
 import { PageShell } from '../components/PageShell';
 import { useCompanyDetailQuery } from '../hooks/queries';
-import { articleFromApi } from '../utils';
+import { articleFromApi, safeLoadMessage } from '../utils';
 
 export function CompanyDetailPage() {
   const { slug } = useParams();
   const apiSlug = slug ?? '';
   const state = useCompanyDetailQuery(apiSlug);
-  const fallbackCompany = companies.find((company) => slugify(company) === slug) ?? companies[0];
-  const related = state.data ? state.data.articles.map(articleFromApi) : highlights.filter((item) => item.companies.includes(fallbackCompany));
+  const related = state.data ? state.data.articles.map(articleFromApi) : [];
 
   return (
-    <PageShell title={state.data?.name ?? fallbackCompany} subtitle={state.data ? `${state.data.country} / ${state.data.sector}` : '公司档案、相关新闻和实体上下文。'}>
-      {state.error ? <div className="inline-status">公司详情暂不可用，当前显示离线缓存。错误：{state.error.message}</div> : null}
+    <PageShell title={state.data?.name ?? '公司详情'} subtitle={state.data ? `${state.data.country} / ${state.data.sector}` : '公司档案、相关新闻和实体上下文。'}>
+      {state.error ? <div className="inline-status">{safeLoadMessage('公司详情')}</div> : null}
       {state.data ? (
         <section className="detail-panel">
           <p>{state.data.profile || '暂无公开简介。'}</p>
@@ -27,7 +25,8 @@ export function CompanyDetailPage() {
         </section>
       ) : null}
       <div className="page-list">
-        {(related.length ? related : highlights.slice(0, 2)).map((item) => <ArticleCard key={item.slug} item={item} />)}
+        {related.map((item) => <ArticleCard key={item.slug} item={item} />)}
+        {!state.isLoading && !related.length ? <div className="empty-state">暂无相关新闻。</div> : null}
       </div>
       <Link className="source-link" to="/companies">返回公司库</Link>
     </PageShell>

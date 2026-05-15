@@ -4,13 +4,16 @@ import type {
   ApiArticleListResult,
   ApiCompany,
   ApiCompanyDetail,
+  ApiHomeResult,
   ApiLaunch,
   ApiLaunchListResult,
   ApiMarketListResult,
-  ApiSource,
+  ApiSourceListResult,
   ApiTopic,
   ApiTopicDetail,
 } from '../types';
+
+const autoRefreshInterval = 5 * 60_000;
 
 export async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(path);
@@ -29,8 +32,13 @@ export function useApiQuery<T>(key: readonly unknown[], path: string | null): Us
     enabled: Boolean(path),
     staleTime: 60_000,
     gcTime: 5 * 60_000,
+    refetchInterval: autoRefreshInterval,
     refetchOnWindowFocus: false,
   });
+}
+
+export function useHomeQuery() {
+  return useApiQuery<ApiHomeResult>(['home'], '/api/home?limit=12');
 }
 
 export function useArticlesQuery(path: string) {
@@ -62,7 +70,7 @@ export function useMarketQuery(path: string) {
 }
 
 export function useSourcesQuery() {
-  return useApiQuery<{ items: ApiSource[] }>(['sources'], '/api/sources');
+  return useApiQuery<ApiSourceListResult>(['sources'], '/api/sources');
 }
 
 export function useTopicsQuery() {

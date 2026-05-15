@@ -11,13 +11,15 @@
 
 ## Current Development Plan
 
-更新时间：2026-05-13
+更新时间：2026-05-15
 
 当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync、文章实体关联、market seed 和 launch cache 均已有 production 数据验证；剩余 Launch Library 2 endpoint 请求头修正部署后复跑验证。
 
 当前进展：
 
-- DONE：修复首页和发射页体验。已在模块化 Mission Control 前端中补入发射时间线等高展示、中文时间/状态映射、发射详情 404 业务文案、首页“来源透明”文案和左侧统计信息；资本非投资建议提示保留。
+- DONE：第二轮审查合理项已落地。文章详情移除固定“核心要点”设计说明，首页 `/api/home` 返回近期动态热力词，LiveHud 使用动态热力词并优化发射空状态；自动采集继续采用独立 `space-intel-scheduled` Worker，部署入口为 `pnpm deploy:scheduled`。
+- DONE：Claude 审查核心问题修复已完成。新增独立 Cloudflare scheduled Worker 配置和 `official_page` 采集器，前端启用 5 分钟自动刷新，公开 API 500 响应不再返回内部 `detail`，离线假新闻和硬编码侧栏统计已移除，政策频道按官方来源优先过滤。
+- DONE：修复首页和发射页体验。已在模块化 Mission Control 前端中补入发射时间线等高展示、中文时间/状态映射和发射详情 404 业务文案；资本非投资建议提示保留。
 - DONE：Mission Control 优化已完成第一版，已降低 Google News 跨关键词重复、增加查询层 story clustering、提供 `/api/sources` 筛选源接口、改造暗色高密度三栏布局与紧凑筛选抽屉；本轮仍坚持不存全文，只展示摘要、要点、元数据和原文链接。
 - DONE：Mission Control 前端工程化优化已完成，`App.tsx` 已拆成 types/hooks/components/pages，数据请求升级为 TanStack Query，Command Palette 改用 `cmdk` 并支持快捷键、ESC 和键盘选择，CSS 已抽取暗色主题 design tokens。
 - DONE：Frontend route shell 已完成。顶部导航、侧栏、文章详情、公司、发射、资本、专题均有真实路由路径。
