@@ -10,9 +10,20 @@ export type PersistArticlesResult = {
 export async function ensureSource(db: SqlDatabase, source: SourceConfig): Promise<number> {
   await db
     .prepare(
-      `INSERT OR IGNORE INTO sources (
+      `INSERT INTO sources (
         key, name, type, region, url, credibility, enabled, purpose, expected_content, risk_notes, dedupe_strategy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET
+        name = excluded.name,
+        type = excluded.type,
+        region = excluded.region,
+        url = excluded.url,
+        credibility = excluded.credibility,
+        enabled = excluded.enabled,
+        purpose = excluded.purpose,
+        expected_content = excluded.expected_content,
+        risk_notes = excluded.risk_notes,
+        dedupe_strategy = excluded.dedupe_strategy`,
     )
     .bind(
       source.key,

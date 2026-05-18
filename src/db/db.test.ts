@@ -6,6 +6,10 @@ import type { SourceConfig } from '../ingestion/types';
 type SourceRow = {
   id: number;
   key: string;
+  name: string;
+  url: string;
+  credibility: number;
+  enabled: boolean;
 };
 
 type ArticleRow = {
@@ -57,10 +61,27 @@ class MemoryDatabase implements SqlDatabase {
   run(query: string, values: unknown[]): DbRunResult {
     const normalized = query.replace(/\s+/g, ' ').trim();
 
-    if (normalized.startsWith('INSERT OR IGNORE INTO sources')) {
+    if (normalized.startsWith('INSERT INTO sources')) {
       const key = String(values[0]);
-      if (!this.sources.some((source) => source.key === key)) {
-        this.sources.push({ id: this.sources.length + 1, key });
+      const existing = this.sources.find((source) => source.key === key);
+
+      if (existing) {
+        existing.name = String(values[1]);
+        existing.url = String(values[4]);
+        existing.credibility = Number(values[5]);
+        existing.enabled = Boolean(values[6]);
+        return { meta: { changes: 1 } };
+      }
+
+      if (!existing) {
+        this.sources.push({
+          id: this.sources.length + 1,
+          key,
+          name: String(values[1]),
+          url: String(values[4]),
+          credibility: Number(values[5]),
+          enabled: Boolean(values[6]),
+        });
         return { meta: { changes: 1, last_row_id: this.sources.length } };
       }
 
@@ -172,6 +193,38 @@ describe('D1 persistence flow', () => {
     expect(db.articles).toHaveLength(1);
     expect(db.logs).toHaveLength(2);
     expect(db.logs[1]).toMatchObject({ successCount: 0, failureCount: 0 });
+  });
+
+  it('updates source catalog fields on repeat ingestion', async () => {
+    const db = new MemoryDatabase();
+    const registry = createCollectorRegistry([collector]);
+    const context = {
+      fetch,
+      now: () => new Date('2026-05-09T00:00:00Z'),
+    };
+
+    await runSourceIngestion(db, source, registry, context);
+    await runSourceIngestion(
+      db,
+      {
+        ...source,
+        name: 'Spaceflight News API Updated',
+        url: 'https://api.spaceflightnewsapi.net/v4/articles/?ordering=-published_at',
+        credibility: 4,
+        enabled: false,
+      },
+      registry,
+      context,
+    );
+
+    expect(db.sources).toHaveLength(1);
+    expect(db.sources[0]).toMatchObject({
+      key: 'snapi',
+      name: 'Spaceflight News API Updated',
+      url: 'https://api.spaceflightnewsapi.net/v4/articles/?ordering=-published_at',
+      credibility: 4,
+      enabled: false,
+    });
   });
 
   it('records ingestion failures before rethrowing', async () => {
