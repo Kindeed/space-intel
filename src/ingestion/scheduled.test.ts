@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { runScheduledIngestion } from './scheduled';
 import type { SourceConfig } from './types';
 import type { DbRunResult, DbStatement, SqlDatabase } from '../db/types';
+import type { MarketSeedArticle } from '../market';
 
 class MemoryStatement implements DbStatement {
   private values: unknown[] = [];
@@ -23,13 +24,19 @@ class MemoryStatement implements DbStatement {
   async first<T = unknown>(): Promise<T | null> {
     return this.database.first(this.query, this.values) as T | null;
   }
+
+  async all<T = unknown>(): Promise<{ results: T[] }> {
+    return this.database.all(this.query) as { results: T[] };
+  }
 }
 
 class MemoryScheduledDatabase implements SqlDatabase {
   readonly sources: Array<{ id: number; key: string }> = [];
   readonly articleHashes = new Set<string>();
   readonly launches = new Map<string, string>();
+  readonly marketRows = new Map<string, string>();
   readonly logs: Array<{ id: number; sourceKey: string; successCount: number; failureCount: number }> = [];
+  marketArticles: MarketSeedArticle[] = [];
   curationsInserted = 0;
 
   prepare(query: string): DbStatement {
@@ -39,7 +46,7 @@ class MemoryScheduledDatabase implements SqlDatabase {
   run(query: string, values: unknown[]): DbRunResult {
     const normalized = query.replace(/\s+/g, ' ').trim();
 
-    if (normalized.startsWith('INSERT OR IGNORE INTO sources')) {
+    if (normalized.startsWith('INSERT INTO sources')) {
       const key = String(values[0]);
 
       if (!this.sources.some((source) => source.key === key)) {
@@ -48,6 +55,17 @@ class MemoryScheduledDatabase implements SqlDatabase {
       }
 
       return { meta: { changes: 0 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO market_items')) {
+      const url = String(values[4]);
+
+      if (this.marketRows.has(url)) {
+        return { meta: { changes: 0 } };
+      }
+
+      this.marketRows.set(url, String(values[1]));
+      return { meta: { changes: 1 } };
     }
 
     if (normalized.startsWith('INSERT OR IGNORE INTO articles')) {
@@ -103,6 +121,16 @@ class MemoryScheduledDatabase implements SqlDatabase {
     }
 
     return null;
+  }
+
+  all(query: string): { results: unknown[] } {
+    const normalized = query.replace(/\s+/g, ' ').trim();
+
+    if (normalized.includes('FROM articles a') && normalized.includes('ORDER BY a.published_at DESC')) {
+      return { results: this.marketArticles };
+    }
+
+    throw new Error(`Unsupported all query: ${query}`);
   }
 }
 
@@ -181,6 +209,107 @@ describe('scheduled ingestion', () => {
     expect(db.articleHashes.size).toBe(1);
     expect(db.launches.get('launch-1')).toBe('Demo launch');
     expect(db.logs).toHaveLength(4);
+  });
+
+  it('continues hourly ingestion when one source fails', async () => {
+    const db = new MemoryScheduledDatabase();
+    const rssSource: SourceConfig = {
+      key: 'demo-rss',
+      name: 'Demo RSS',
+      type: 'rss',
+      region: 'global',
+      url: 'https://example.com/feed.xml',
+      credibility: 3,
+      enabled: true,
+      purpose: 'Demo RSS.',
+      expected_content: 'Metadata.',
+      risk_notes: 'Public feed.',
+      dedupe_strategy: 'url_title_source',
+    };
+    const launchSource = sources.find((source) => source.key === 'launch-library-2');
+
+    if (!launchSource) {
+      throw new Error('Missing launch source fixture');
+    }
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [launchSource, rssSource],
+      context: {
+        now: () => new Date('2026-05-09T00:00:00Z'),
+        fetch: async (input: RequestInfo | URL) => {
+          const url = String(input);
+
+          if (url.includes('thespacedevs')) {
+            return new Response('temporarily unavailable', { status: 503 });
+          }
+
+          return new Response(`<?xml version="1.0"?>
+            <rss version="2.0">
+              <channel>
+                <title>Demo RSS</title>
+                <item>
+                  <title>Commercial space funding update</title>
+                  <link>https://example.com/funding</link>
+                  <description>Funding summary.</description>
+                  <guid>funding-1</guid>
+                  <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
+                </item>
+              </channel>
+            </rss>`);
+        },
+      },
+      kind: 'hourly',
+    });
+
+    expect(result.sourceRuns).toEqual([
+      expect.objectContaining({
+        sourceKey: 'launch-library-2',
+        failures: 1,
+        upserted: 0,
+        error: 'Launch Library 2 request failed with HTTP 503',
+      }),
+      expect.objectContaining({
+        sourceKey: 'demo-rss',
+        failures: 0,
+        inserted: 1,
+      }),
+    ]);
+    expect(db.articleHashes.size).toBe(1);
+    expect(db.logs).toHaveLength(2);
+    expect(db.logs[0]).toMatchObject({ sourceKey: 'launch-library-2', failureCount: 1 });
+    expect(db.logs[1]).toMatchObject({ sourceKey: 'demo-rss', successCount: 1 });
+  });
+
+  it('seeds market items during hourly runs idempotently', async () => {
+    const db = new MemoryScheduledDatabase();
+    db.marketArticles = [
+      {
+        id: 1,
+        title: 'Commercial space company closes funding round',
+        summary: 'Funding summary.',
+        url: 'https://example.com/funding',
+        publishedAt: '2026-05-09T00:00:00Z',
+        sourceId: 1,
+        companyId: null,
+      },
+    ];
+    const input = {
+      db,
+      sources: [],
+      context: {
+        now: () => new Date('2026-05-09T00:00:00Z'),
+        fetch,
+      },
+      kind: 'hourly' as const,
+    };
+
+    const first = await runScheduledIngestion(input);
+    const second = await runScheduledIngestion(input);
+
+    expect(first.marketSeed).toEqual({ candidates: 1, inserted: 1, skipped: 0, failures: 0 });
+    expect(second.marketSeed).toEqual({ candidates: 1, inserted: 0, skipped: 1, failures: 0 });
+    expect(db.marketRows).toEqual(new Map([['https://example.com/funding', 'financing']]));
   });
 
   it('syncs configured curations on daily runs', async () => {

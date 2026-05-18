@@ -20,7 +20,10 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 - `wrangler.toml` configures the Pages app, API Functions, D1 binding, and R2 binding.
 - `wrangler.scheduled.toml` configures the `space-intel-scheduled` Worker, its D1 binding, and Cron Triggers.
 - `src/workers/scheduled.ts` maps hourly cron events to source ingestion and the daily cron event to curation sync.
-- Deploy or update the scheduled Worker with `pnpm deploy:scheduled` after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
+- GitHub Actions deploys the scheduled Worker after `main` branch verification succeeds. This requires the `CLOUDFLARE_API_TOKEN` GitHub Secret.
+- Use `pnpm deploy:scheduled` as the manual fallback after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
+- Hourly runs isolate failures per source. One failed feed or API records a failed source result but does not stop the remaining sources.
+- Hourly runs seed `market_items` from the updated article metadata so the capital page can refresh without a separate manual admin call.
 
 ## Collector Boundary
 
