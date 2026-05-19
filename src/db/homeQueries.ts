@@ -1,7 +1,12 @@
-import type { ArticleSummaryRow } from './articleQueries';
+import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type RankedHomeArticle = ArticleSummaryRow & {
+  curationWeight: number;
+  sourceCredibility: number;
+};
+
+type RankedHomeArticleDbRow = ArticleSummaryDbRow & {
   curationWeight: number;
   sourceCredibility: number;
 };
@@ -34,6 +39,7 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
+        ${articleRelationSelectFields},
         COALESCE(MAX(c.weight), 0) AS curationWeight,
         s.credibility AS sourceCredibility
       FROM articles a
@@ -44,13 +50,17 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
       LIMIT ?`,
     )
     .bind(Math.max(1, Math.min(Math.floor(limit), 50)))
-    .all?.<RankedHomeArticle>();
+    .all?.<RankedHomeArticleDbRow>();
 
   if (!result) {
     throw new Error('Database statement does not support all()');
   }
 
-  return result.results;
+  return result.results.map((row) => ({
+    ...toArticleSummary(row),
+    curationWeight: row.curationWeight,
+    sourceCredibility: row.sourceCredibility,
+  }));
 }
 
 export async function listTrendingTags(db: SqlDatabase, limit = 6): Promise<TrendingTag[]> {

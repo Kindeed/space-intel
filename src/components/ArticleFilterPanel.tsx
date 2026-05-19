@@ -32,11 +32,11 @@ export function ArticleFilterPanel({
         </label>
         <label>
           标签
-          <input name="tag" list="topic-options" defaultValue={searchParams.get('tag') ?? ''} placeholder="选择或输入 topic slug" />
+          <input name="tag" list="topic-options" defaultValue={searchParams.get('tag') ?? ''} placeholder="选择或输入专题" />
         </label>
         <label>
           公司
-          <input name="company" list="company-options" defaultValue={searchParams.get('company') ?? ''} placeholder="选择或输入 company slug" />
+          <input name="company" list="company-options" defaultValue={searchParams.get('company') ?? ''} placeholder="选择或输入公司" />
         </label>
         {region ? <input type="hidden" name="region" value={region} /> : null}
         {category ? <input type="hidden" name="category" value={category} /> : null}

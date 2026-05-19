@@ -4,7 +4,7 @@ import type { ApiHomeStats } from '../types';
 
 export function MissionNav({ stats }: { stats?: ApiHomeStats }) {
   return (
-    <aside className="mission-nav" aria-label="Mission Control 导航">
+    <aside className="mission-nav" aria-label="站点导航">
       <div className="nav-card">
         {missionNav.map(({ label, to, icon: Icon, signal }) => (
           <NavLink key={label} to={to}>

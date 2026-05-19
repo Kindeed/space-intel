@@ -1,5 +1,17 @@
 import type { SqlDatabase } from './types';
 
+export type ArticleEntityRef = {
+  slug: string;
+  name: string;
+};
+
+export type ArticleLaunchRef = {
+  id: number;
+  externalId: string;
+  missionName: string;
+  name: string;
+};
+
 export type ArticleSummaryRow = {
   id: number;
   title: string;
@@ -13,13 +25,27 @@ export type ArticleSummaryRow = {
   language: string;
   region: string;
   fetchStatus: string;
+  tags: ArticleEntityRef[];
+  companies: ArticleEntityRef[];
   storyKey?: string;
   relatedSourceCount?: number;
   relatedSources?: string[];
 };
 
 export type ArticleDetailRow = ArticleSummaryRow & {
-  dedupeHash: string;
+  launches: ArticleLaunchRef[];
+};
+
+export type ArticleSummaryDbRow = Omit<ArticleSummaryRow, 'tags' | 'companies'> & {
+  tags?: ArticleEntityRef[];
+  companies?: ArticleEntityRef[];
+  tagsJson?: string | null;
+  companiesJson?: string | null;
+};
+
+export type ArticleDetailDbRow = ArticleSummaryDbRow & {
+  launches?: ArticleLaunchRef[];
+  launchesJson?: string | null;
 };
 
 export type ArticleListFilters = {
@@ -42,6 +68,93 @@ export type ArticleListResult = {
 
 const maxLimit = 50;
 const defaultLimit = 20;
+
+export const articleRelationSelectFields = `
+      COALESCE((
+        SELECT json_group_array(json_object('slug', t.slug, 'name', t.name))
+        FROM article_tags at
+        JOIN tags t ON t.id = at.tag_id
+        WHERE at.article_id = a.id
+      ), '[]') AS tagsJson,
+      COALESCE((
+        SELECT json_group_array(json_object('slug', c.slug, 'name', c.name))
+        FROM article_companies ac
+        JOIN companies c ON c.id = ac.company_id
+        WHERE ac.article_id = a.id
+      ), '[]') AS companiesJson`;
+
+export const articleDetailRelationSelectFields = `${articleRelationSelectFields},
+      COALESCE((
+        SELECT json_group_array(json_object(
+          'id', l.id,
+          'externalId', l.external_id,
+          'missionName', l.mission,
+          'name', l.mission
+        ))
+        FROM article_launches al
+        JOIN launches l ON l.external_id = al.launch_external_id
+        WHERE al.article_id = a.id
+      ), '[]') AS launchesJson`;
+
+function isEntityRef(value: unknown): value is ArticleEntityRef {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as ArticleEntityRef).slug === 'string' &&
+    typeof (value as ArticleEntityRef).name === 'string'
+  );
+}
+
+function isLaunchRef(value: unknown): value is ArticleLaunchRef {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as ArticleLaunchRef).id === 'number' &&
+    typeof (value as ArticleLaunchRef).externalId === 'string' &&
+    typeof (value as ArticleLaunchRef).missionName === 'string' &&
+    typeof (value as ArticleLaunchRef).name === 'string'
+  );
+}
+
+function parseJsonArray<T>(value: T[] | string | null | undefined, predicate: (item: unknown) => item is T): T[] {
+  if (Array.isArray(value)) {
+    return value.filter(predicate);
+  }
+
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter(predicate) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function toArticleSummary(row: ArticleSummaryDbRow): ArticleSummaryRow {
+  const { tagsJson, companiesJson, ...base } = row;
+
+  return {
+    ...base,
+    tags: parseJsonArray(row.tags ?? tagsJson, isEntityRef),
+    companies: parseJsonArray(row.companies ?? companiesJson, isEntityRef),
+  };
+}
+
+export function toArticleDetail(row: ArticleDetailDbRow | null): ArticleDetailRow | null {
+  if (!row) {
+    return null;
+  }
+
+  const { launchesJson, launches, ...summaryRow } = row;
+
+  return {
+    ...toArticleSummary(summaryRow),
+    launches: parseJsonArray(launches ?? launchesJson, isLaunchRef),
+  };
+}
 
 function normalizePage(value: number | undefined): number {
   if (!value || !Number.isFinite(value) || value < 1) {
@@ -184,20 +297,21 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       a.published_at AS publishedAt,
       a.language,
       a.region,
-      a.fetch_status AS fetchStatus
+      a.fetch_status AS fetchStatus,
+      ${articleRelationSelectFields}
     FROM articles a
     JOIN sources s ON s.id = a.source_id
     ${whereClause}
     ORDER BY a.published_at DESC, a.id DESC
     LIMIT ? OFFSET ?`,
   );
-  const queryResult = await statement.bind(...values, rawLimit, offset).all?.<ArticleSummaryRow>();
+  const queryResult = await statement.bind(...values, rawLimit, offset).all?.<ArticleSummaryDbRow>();
 
   if (!queryResult) {
     throw new Error('Database statement does not support all()');
   }
 
-  const rows = queryResult.results;
+  const rows = queryResult.results.map(toArticleSummary);
   const clusteredRows = clusterArticleRows(rows, limit);
 
   return {
@@ -213,7 +327,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
     return null;
   }
 
-  return db
+  const row = await db
     .prepare(
       `SELECT
         a.id,
@@ -228,11 +342,13 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
-        a.dedupe_hash AS dedupeHash
+        ${articleDetailRelationSelectFields}
       FROM articles a
       JOIN sources s ON s.id = a.source_id
       WHERE a.id = ?`,
     )
     .bind(id)
-    .first<ArticleDetailRow>();
+    .first<ArticleDetailDbRow>();
+
+  return toArticleDetail(row);
 }

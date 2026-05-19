@@ -8,7 +8,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: s
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('Mission Control render failed', error, info.componentStack);
+    console.error('Application render failed', error, info.componentStack);
   }
 
   render() {

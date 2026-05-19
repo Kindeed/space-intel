@@ -64,7 +64,7 @@ export function LaunchesPage() {
         <form className="filter-form" action="/launches">
           <label>关键词<input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="任务、火箭、场站" /></label>
           <label>发射商<input name="provider" defaultValue={searchParams.get('provider') ?? ''} placeholder="Rocket Lab" /></label>
-          <label>状态<input name="status" defaultValue={searchParams.get('status') ?? ''} placeholder="Go / Hold" /></label>
+          <label>状态<input name="status" defaultValue={searchParams.get('status') ?? ''} placeholder="准备发射、等待窗口" /></label>
           <button type="submit"><Search size={16} aria-hidden="true" /> 应用</button>
         </form>
       </details>

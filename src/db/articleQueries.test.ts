@@ -3,7 +3,8 @@ import {
   clusterArticleRows,
   getArticleById,
   listArticles,
-  type ArticleDetailRow,
+  type ArticleDetailDbRow,
+  type ArticleSummaryDbRow,
   type ArticleSummaryRow,
 } from './articleQueries';
 import type { DbRunResult, DbStatement, SqlDatabase } from './types';
@@ -26,6 +27,7 @@ class FakeStatement implements DbStatement {
   }
 
   async first<T = unknown>(): Promise<T | null> {
+    this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
     return this.database.firstResult as T | null;
   }
@@ -40,8 +42,8 @@ class FakeStatement implements DbStatement {
 class FakeDatabase implements SqlDatabase {
   lastQuery = '';
   lastValues: unknown[] = [];
-  allResults: ArticleSummaryRow[] = [];
-  firstResult: ArticleDetailRow | null = null;
+  allResults: ArticleSummaryDbRow[] = [];
+  firstResult: ArticleDetailDbRow | null = null;
 
   prepare(query: string): DbStatement {
     return new FakeStatement(this, query);
@@ -61,6 +63,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+  companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };
 
 describe('article queries', () => {
@@ -91,11 +95,15 @@ describe('article queries', () => {
       hasMore: true,
     });
     expect(result.items[0].storyKey).toBe('global:2026-05-09:reusable-rocket-milestone');
+    expect(result.items[0].tags).toEqual([{ slug: 'reusable-rockets', name: '可回收火箭' }]);
+    expect(result.items[0].companies).toEqual([{ slug: 'rocket-lab', name: 'Rocket Lab' }]);
     expect(db.lastQuery).toContain('a.region = ?');
     expect(db.lastQuery).toContain('s.key = ?');
     expect(db.lastQuery).toContain('LOWER(a.title) LIKE ?');
     expect(db.lastQuery).toContain('JOIN tags t');
     expect(db.lastQuery).toContain('JOIN companies c');
+    expect(db.lastQuery).toContain('AS tagsJson');
+    expect(db.lastQuery).toContain('AS companiesJson');
     expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 5, 1]);
   });
 
@@ -143,12 +151,19 @@ describe('article queries', () => {
     const db = new FakeDatabase();
     db.firstResult = {
       ...article,
-      dedupeHash: 'abc123',
+      launches: [{ id: 9, externalId: 'launch-9', missionName: 'Demo Launch', name: 'Demo Launch' }],
     };
 
     const result = await getArticleById(db, 1);
 
-    expect(result?.id).toBe(1);
+    expect(result).toMatchObject({
+      id: 1,
+      tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+      companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
+      launches: [{ id: 9, externalId: 'launch-9', missionName: 'Demo Launch', name: 'Demo Launch' }],
+    });
+    expect(result && 'dedupeHash' in result).toBe(false);
+    expect(db.lastQuery).toContain('FROM article_launches al');
     expect(db.lastValues).toEqual([1]);
   });
 

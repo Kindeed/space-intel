@@ -77,6 +77,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+  companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };
 
 describe('company queries', () => {
@@ -102,6 +104,8 @@ describe('company queries', () => {
       ...company,
       articles: [article],
     });
+    expect(db.lastQuery).toContain('AS tagsJson');
+    expect(db.lastQuery).toContain('AS companiesJson');
     expect(db.lastValues).toEqual([company.id]);
   });
 

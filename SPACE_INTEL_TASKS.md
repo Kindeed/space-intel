@@ -11,12 +11,13 @@
 
 ## Current Development Plan
 
-更新时间：2026-05-18
+更新时间：2026-05-19
 
 当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync、文章实体关联、market seed 和 launch cache 均已有 production 数据验证；自动更新链路已完成代码加固，待确认 GitHub Secret `CLOUDFLARE_API_TOKEN` 后由 `main` 推送自动部署 scheduled Worker。
 
 当前进展：
 
+- DONE：Round 4 同类 UI/API 清理已完成。文章卡片改用真实标签/公司关系，文章详情返回真实标签、公司和可匹配发射关联；sourceKey/language 伪标签、用户可见内部术语和中英文混用文案已清理；本地 typecheck、lint、test、build 和布局验证均通过。
 - DONE：自动更新链路代码修复已完成。GitHub Actions 新增 `deploy-scheduled` job；hourly scheduled ingestion 改为单源失败隔离；`sources` catalog 改为 upsert；hourly run 末尾自动执行 market seed；`/api/health` 返回最新文章发布时间和最近采集日志摘要。
 - BLOCKED：scheduled Worker 的 GitHub 自动部署依赖仓库 secret `CLOUDFLARE_API_TOKEN`。该 secret 不进入仓库；未配置时 `deploy-scheduled` job 会失败，需要在 GitHub 仓库设置中补齐。
 - DONE：第二轮审查合理项已落地。文章详情移除固定“核心要点”设计说明，首页 `/api/home` 返回近期动态热力词，LiveHud 使用动态热力词并优化发射空状态；自动采集继续采用独立 `space-intel-scheduled` Worker，部署入口为 `pnpm deploy:scheduled`。

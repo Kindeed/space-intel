@@ -77,6 +77,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+  companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };
 
 const curation: TopicCurationRow = {
@@ -84,7 +86,6 @@ const curation: TopicCurationRow = {
   targetType: 'topic',
   targetKey: 'reusable-rockets',
   itemUrl: 'https://example.com/curated',
-  weight: 90,
   note: 'Manual topic highlight.',
   enabled: 1,
   createdAt: '2026-05-09T00:00:00Z',
@@ -116,6 +117,9 @@ describe('topic queries', () => {
       articles: [article],
       curations: [curation],
     });
+    expect(db.queries[1]).toContain('AS tagsJson');
+    expect(db.queries[1]).toContain('AS companiesJson');
+    expect(db.queries[2]).not.toContain('weight,');
     expect(db.values).toEqual([['reusable-rockets'], [topic.id], [topic.slug]]);
   });
 

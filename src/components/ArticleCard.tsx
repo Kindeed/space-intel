@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { slugify } from '../data';
 import type { FeedStory } from '../types';
 
 export function ArticleCard({ item, feature = false }: { item: FeedStory; feature?: boolean }) {
@@ -22,12 +21,12 @@ export function ArticleCard({ item, feature = false }: { item: FeedStory; featur
       <div className="article-card__footer">
         <div className="tag-row">
           {item.companies.map((company) => (
-            <Link className="entity-chip" key={company} to={`/companies/${slugify(company)}`} data-profile={company}>
-              {company}
+            <Link className="entity-chip" key={company.slug} to={`/companies/${company.slug}`} data-profile={company.name}>
+              {company.name}
             </Link>
           ))}
           {item.tags.slice(0, 3).map((tag) => (
-            <Link key={tag} to={`/topics/${slugify(tag)}`}>{tag}</Link>
+            <Link key={tag.slug} to={`/topics/${tag.slug}`}>{tag.name}</Link>
           ))}
         </div>
         <div className="article-actions">
