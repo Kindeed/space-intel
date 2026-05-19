@@ -1,3 +1,8 @@
+export type FeedLink = {
+  slug: string;
+  name: string;
+};
+
 export type FeedItem = {
   slug: string;
   title: string;
@@ -6,8 +11,8 @@ export type FeedItem = {
   category: string;
   region: '国内' | '国际';
   summary: string;
-  companies: string[];
-  tags: string[];
+  companies: FeedLink[];
+  tags: FeedLink[];
   relatedLaunch?: string;
 };
 

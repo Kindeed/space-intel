@@ -39,7 +39,7 @@ export function SiteHeader() {
     <header className="site-header">
       <Link to="/" className="brand" aria-label="商业航天情报站首页">
         <Rocket size={26} aria-hidden="true" />
-        <span>Space Intel</span>
+        <span>商业航天情报</span>
       </Link>
       <form action="/articles" className="command-search" role="search">
         <Search size={16} aria-hidden="true" />

@@ -11,7 +11,7 @@ export function CompanyDetailPage() {
   const related = state.data ? state.data.articles.map(articleFromApi) : [];
 
   return (
-    <PageShell title={state.data?.name ?? '公司详情'} subtitle={state.data ? `${state.data.country} / ${state.data.sector}` : '公司档案、相关新闻和实体上下文。'}>
+    <PageShell title={state.data?.name ?? '公司详情'} subtitle={state.data ? `${state.data.country} / ${state.data.sector}` : '公司档案、相关新闻和公司背景。'}>
       {state.error ? <div className="inline-status">{safeLoadMessage('公司详情')}</div> : null}
       {state.data ? (
         <section className="detail-panel">

@@ -33,6 +33,7 @@ class MemoryStatement implements DbStatement {
 class MemoryScheduledDatabase implements SqlDatabase {
   readonly sources: Array<{ id: number; key: string }> = [];
   readonly articleHashes = new Set<string>();
+  readonly articles: Array<{ id: number; dedupeHash: string; url: string }> = [];
   readonly launches = new Map<string, string>();
   readonly marketRows = new Map<string, string>();
   readonly logs: Array<{ id: number; sourceKey: string; successCount: number; failureCount: number }> = [];
@@ -76,6 +77,19 @@ class MemoryScheduledDatabase implements SqlDatabase {
       }
 
       this.articleHashes.add(dedupeHash);
+      this.articles.push({ id: this.articles.length + 1, dedupeHash, url: String(values[4]) });
+      return { meta: { changes: 1 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_tags')) {
+      return { meta: { changes: 1 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_companies')) {
+      return { meta: { changes: 1 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_launches')) {
       return { meta: { changes: 1 } };
     }
 
@@ -116,8 +130,14 @@ class MemoryScheduledDatabase implements SqlDatabase {
   }
 
   first(query: string, values: unknown[]): unknown | null {
-    if (query.trim() === 'SELECT id FROM sources WHERE key = ?') {
+    const normalized = query.replace(/\s+/g, ' ').trim();
+
+    if (normalized === 'SELECT id FROM sources WHERE key = ?') {
       return this.sources.find((source) => source.key === values[0]) ?? null;
+    }
+
+    if (normalized === 'SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1') {
+      return this.articles.find((article) => article.dedupeHash === values[0] || article.url === values[1]) ?? null;
     }
 
     return null;

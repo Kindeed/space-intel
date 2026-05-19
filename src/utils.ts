@@ -1,5 +1,5 @@
-import { slugify, type FeedItem } from './data';
-import type { ApiArticleDetail, ApiArticleSummary, FeedStory } from './types';
+import { slugify, type FeedItem, type FeedLink } from './data';
+import type { ApiArticleDetail, ApiArticleEntity, ApiArticleSummary, FeedStory } from './types';
 
 export function parsePositiveInteger(value: string | null, fallback: number): number {
   if (!value) {
@@ -128,7 +128,7 @@ export function friendlyError(error: Error | null, context: string): string | nu
   }
 
   if (error.message.includes('404')) {
-    return `${context}已更新或不在当前缓存中。`;
+    return `${context}已更新或暂时不可访问。`;
   }
 
   return `${context}暂不可用，请稍后重试。`;
@@ -136,6 +136,10 @@ export function friendlyError(error: Error | null, context: string): string | nu
 
 export function safeLoadMessage(context: string): string {
   return `${context}暂不可用，请稍后重试。`;
+}
+
+function articleLinks(values: ApiArticleEntity[] | undefined): FeedLink[] {
+  return values?.map((value) => ({ slug: value.slug, name: value.name })) ?? [];
 }
 
 export function articleFromApi(row: ApiArticleSummary): FeedStory {
@@ -150,8 +154,8 @@ export function articleFromApi(row: ApiArticleSummary): FeedStory {
     category: row.sourceType === 'official_page' ? '政策监管' : region === '国内' ? '国内商业航天' : '国际商业航天',
     region,
     summary: row.summary,
-    companies: [],
-    tags: [row.sourceKey, row.language].filter(Boolean),
+    companies: articleLinks(row.companies),
+    tags: articleLinks(row.tags),
     url: row.url,
     relatedSourceCount: row.relatedSourceCount,
     relatedSources: row.relatedSources,
@@ -181,25 +185,25 @@ export function pageHref(searchParams: URLSearchParams, page: number): string {
 }
 
 export function tagName(value: NonNullable<ApiArticleDetail['tags']>[number]): string {
-  return typeof value === 'string' ? value : value.name;
+  return value.name;
 }
 
 export function tagSlug(value: NonNullable<ApiArticleDetail['tags']>[number]): string {
-  return typeof value === 'string' ? slugify(value) : value.slug;
+  return value.slug;
 }
 
 export function companyName(value: NonNullable<ApiArticleDetail['companies']>[number]): string {
-  return typeof value === 'string' ? value : value.name;
+  return value.name;
 }
 
 export function companySlug(value: NonNullable<ApiArticleDetail['companies']>[number]): string {
-  return typeof value === 'string' ? slugify(value) : value.slug;
+  return value.slug;
 }
 
 export function launchLabel(value: NonNullable<ApiArticleDetail['launches']>[number]): string {
-  return typeof value === 'string' ? value : (value.missionName ?? value.name ?? value.externalId ?? String(value.id ?? 'launch'));
+  return value.missionName || value.name || value.externalId || String(value.id);
 }
 
 export function launchSlug(value: NonNullable<ApiArticleDetail['launches']>[number]): string {
-  return typeof value === 'string' ? slugify(value) : String(value.id ?? value.externalId ?? slugify(launchLabel(value)));
+  return String(value.id || value.externalId || slugify(launchLabel(value)));
 }

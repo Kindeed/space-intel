@@ -4,7 +4,7 @@ export function PageShell({ title, subtitle, children }: { title: string; subtit
   return (
     <div className="page-shell">
       <header className="page-header">
-        <span>Mission Control</span>
+        <span>商业航天情报站</span>
         <h1>{title}</h1>
         <p>{subtitle}</p>
       </header>

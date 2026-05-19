@@ -1,5 +1,17 @@
 import type { FeedItem } from './data';
 
+export type ApiArticleEntity = {
+  slug: string;
+  name: string;
+};
+
+export type ApiArticleLaunch = {
+  id: number;
+  externalId: string;
+  missionName: string;
+  name: string;
+};
+
 export type ApiArticleSummary = {
   id: number;
   title: string;
@@ -13,15 +25,14 @@ export type ApiArticleSummary = {
   language: string;
   region: string;
   fetchStatus: string;
+  tags: ApiArticleEntity[];
+  companies: ApiArticleEntity[];
   relatedSourceCount?: number;
   relatedSources?: string[];
 };
 
 export type ApiArticleDetail = ApiArticleSummary & {
-  dedupeHash?: string;
-  tags?: Array<{ slug: string; name: string } | string>;
-  companies?: Array<{ slug: string; name: string } | string>;
-  launches?: Array<{ id?: number; externalId?: string; missionName?: string; name?: string } | string>;
+  launches: ApiArticleLaunch[];
 };
 
 export type ApiArticleListResult = {
@@ -114,7 +125,6 @@ export type ApiTopic = {
 export type ApiTopicCuration = {
   id: number;
   itemUrl: string;
-  weight: number;
   note: string | null;
   createdAt: string;
 };

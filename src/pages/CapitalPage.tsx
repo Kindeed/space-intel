@@ -24,14 +24,14 @@ export function CapitalPage() {
   const items = state.data?.items ?? [];
 
   return (
-    <PageShell title="资本情报" subtitle="融资、公告、财报和市场线索；固定保持非投资建议提示。">
+    <PageShell title="资本情报" subtitle="汇总融资、公告、财报和市场相关资讯。">
       <div className="notice-banner">{state.data?.notice ?? '资本市场内容仅作信息聚合，不构成投资建议。'}</div>
       <details className="filter-drawer">
         <summary><Filter size={16} aria-hidden="true" /> 资本筛选</summary>
         <form className="filter-form" action="/capital">
           <label>关键词<input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="融资、公告、订单" /></label>
           <label>类型<select name="type" defaultValue={searchParams.get('type') ?? ''}>{marketTypes.map(([label, value]) => <option key={value || 'all'} value={value}>{label}</option>)}</select></label>
-          <label>公司<input name="company" list="company-options" defaultValue={searchParams.get('company') ?? ''} placeholder="company slug" /></label>
+          <label>公司<input name="company" list="company-options" defaultValue={searchParams.get('company') ?? ''} placeholder="选择或输入公司" /></label>
           <label>来源<select name="source" defaultValue={searchParams.get('source') ?? ''}><option value="">全部来源</option><SourceOptions /></select></label>
           <button type="submit"><Search size={16} aria-hidden="true" /> 应用</button>
         </form>

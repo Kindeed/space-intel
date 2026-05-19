@@ -1,11 +1,11 @@
 import { Building2, CircleDollarSign, Home, Newspaper, Rocket, Tags, type LucideIcon } from 'lucide-react';
 
 export const missionNav: Array<{ label: string; to: string; icon: LucideIcon; signal: string }> = [
-  { label: '总览', to: '/', icon: Home, signal: '+24h' },
-  { label: '情报流', to: '/articles', icon: Newspaper, signal: '聚类' },
-  { label: '发射', to: '/launches', icon: Rocket, signal: 'T-窗口' },
-  { label: '公司', to: '/companies', icon: Building2, signal: '实体' },
-  { label: '资本', to: '/capital', icon: CircleDollarSign, signal: '风控' },
+  { label: '总览', to: '/', icon: Home, signal: '最新' },
+  { label: '情报流', to: '/articles', icon: Newspaper, signal: '合并' },
+  { label: '发射', to: '/launches', icon: Rocket, signal: '窗口' },
+  { label: '公司', to: '/companies', icon: Building2, signal: '档案' },
+  { label: '资本', to: '/capital', icon: CircleDollarSign, signal: '提示' },
   { label: '专题', to: '/topics', icon: Tags, signal: '追踪' },
 ];
 

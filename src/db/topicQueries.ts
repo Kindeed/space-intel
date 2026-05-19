@@ -1,4 +1,4 @@
-import type { ArticleSummaryRow } from './articleQueries';
+import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type TopicRow = {
@@ -15,7 +15,6 @@ export type TopicCurationRow = {
   targetType: string;
   targetKey: string;
   itemUrl: string;
-  weight: number;
   note: string | null;
   enabled: number;
   createdAt: string;
@@ -92,7 +91,8 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
         a.published_at AS publishedAt,
         a.language,
         a.region,
-        a.fetch_status AS fetchStatus
+        a.fetch_status AS fetchStatus,
+        ${articleRelationSelectFields}
       FROM articles a
       JOIN article_tags at ON at.article_id = a.id
       JOIN sources s ON s.id = a.source_id
@@ -101,7 +101,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       LIMIT 20`,
     )
     .bind(topic.id)
-    .all?.<ArticleSummaryRow>();
+    .all?.<ArticleSummaryDbRow>();
 
   if (!articleResult) {
     throw new Error('Database statement does not support all()');
@@ -114,7 +114,6 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
         target_type AS targetType,
         target_key AS targetKey,
         item_url AS itemUrl,
-        weight,
         note,
         enabled,
         created_at AS createdAt
@@ -131,7 +130,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
 
   return {
     ...topic,
-    articles: articleResult.results,
+    articles: articleResult.results.map(toArticleSummary),
     curations: curationResult.results,
   };
 }

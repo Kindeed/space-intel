@@ -1,4 +1,4 @@
-import type { ArticleSummaryRow } from './articleQueries';
+import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type CompanyRow = {
@@ -93,7 +93,8 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         a.published_at AS publishedAt,
         a.language,
         a.region,
-        a.fetch_status AS fetchStatus
+        a.fetch_status AS fetchStatus,
+        ${articleRelationSelectFields}
       FROM articles a
       JOIN article_companies ac ON ac.article_id = a.id
       JOIN sources s ON s.id = a.source_id
@@ -102,7 +103,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
       LIMIT 20`,
     )
     .bind(company.id)
-    .all?.<ArticleSummaryRow>();
+    .all?.<ArticleSummaryDbRow>();
 
   if (!articleResult) {
     throw new Error('Database statement does not support all()');
@@ -110,6 +111,6 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
 
   return {
     ...company,
-    articles: articleResult.results,
+    articles: articleResult.results.map(toArticleSummary),
   };
 }

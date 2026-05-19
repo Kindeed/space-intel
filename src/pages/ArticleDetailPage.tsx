@@ -16,7 +16,7 @@ export function ArticleDetailPage() {
   const detailLaunches = article?.launches ?? [];
 
   return (
-    <PageShell title={title} subtitle="摘要、要点、实体关系和原文链接；不存储或展示受版权限制全文。">
+    <PageShell title={title} subtitle="文章详情、相关公司、专题和发射信息。">
       {apiState.error ? <div className="inline-status">{safeLoadMessage('文章详情')}</div> : null}
       <section className="detail-panel">
         <div className="metadata-grid">
@@ -42,7 +42,7 @@ export function ArticleDetailPage() {
         {article?.url ? (
           <a href={article.url} target="_blank" rel="noreferrer" className="source-link">
             <ExternalLink size={16} aria-hidden="true" />
-            打开原文链接
+            阅读原文
           </a>
         ) : null}
       </section>

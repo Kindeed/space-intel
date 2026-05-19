@@ -13,8 +13,10 @@ type SourceRow = {
 };
 
 type ArticleRow = {
+  id: number;
   dedupeHash: string;
   title: string;
+  url: string;
 };
 
 type LogRow = {
@@ -52,6 +54,9 @@ class MemoryStatement implements DbStatement {
 class MemoryDatabase implements SqlDatabase {
   readonly sources: SourceRow[] = [];
   readonly articles: ArticleRow[] = [];
+  readonly articleTags: Array<{ articleId: number; tag: string }> = [];
+  readonly articleCompanies: Array<{ articleId: number; company: string }> = [];
+  readonly articleLaunches: Array<{ articleId: number; launchExternalId: string }> = [];
   readonly logs: LogRow[] = [];
 
   prepare(query: string): DbStatement {
@@ -91,8 +96,49 @@ class MemoryDatabase implements SqlDatabase {
     if (normalized.startsWith('INSERT OR IGNORE INTO articles')) {
       const dedupeHash = String(values[8]);
       if (!this.articles.some((article) => article.dedupeHash === dedupeHash)) {
-        this.articles.push({ dedupeHash, title: String(values[1]) });
+        this.articles.push({
+          id: this.articles.length + 1,
+          dedupeHash,
+          title: String(values[1]),
+          url: String(values[4]),
+        });
         return { meta: { changes: 1, last_row_id: this.articles.length } };
+      }
+
+      return { meta: { changes: 0 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_tags')) {
+      const articleId = Number(values[0]);
+      const tag = String(values[1]);
+
+      if (!this.articleTags.some((item) => item.articleId === articleId && item.tag === tag)) {
+        this.articleTags.push({ articleId, tag });
+        return { meta: { changes: 1 } };
+      }
+
+      return { meta: { changes: 0 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_companies')) {
+      const articleId = Number(values[0]);
+      const company = String(values[1]);
+
+      if (!this.articleCompanies.some((item) => item.articleId === articleId && item.company === company)) {
+        this.articleCompanies.push({ articleId, company });
+        return { meta: { changes: 1 } };
+      }
+
+      return { meta: { changes: 0 } };
+    }
+
+    if (normalized.startsWith('INSERT OR IGNORE INTO article_launches')) {
+      const articleId = Number(values[0]);
+      const launchExternalId = String(values[1]);
+
+      if (!this.articleLaunches.some((item) => item.articleId === articleId && item.launchExternalId === launchExternalId)) {
+        this.articleLaunches.push({ articleId, launchExternalId });
+        return { meta: { changes: 1 } };
       }
 
       return { meta: { changes: 0 } };
@@ -134,6 +180,10 @@ class MemoryDatabase implements SqlDatabase {
       return this.sources.find((source) => source.key === values[0]) ?? null;
     }
 
+    if (normalized === 'SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1') {
+      return this.articles.find((article) => article.dedupeHash === values[0] || article.url === values[1]) ?? null;
+    }
+
     throw new Error(`Unsupported first query: ${query}`);
   }
 }
@@ -167,9 +217,9 @@ const collector: SourceCollector = {
         language: 'en',
         region: 'global',
         rawId: 'article-1',
-        relatedLaunchIds: [],
-        companies: [],
-        tags: [],
+        relatedLaunchIds: ['launch-1'],
+        companies: ['rocket-lab'],
+        tags: ['reusable-rockets'],
       },
     ];
   },
@@ -191,6 +241,9 @@ describe('D1 persistence flow', () => {
     expect(second).toMatchObject({ collected: 1, inserted: 0, skipped: 1, failures: 0 });
     expect(db.sources).toHaveLength(1);
     expect(db.articles).toHaveLength(1);
+    expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
+    expect(db.articleCompanies).toEqual([{ articleId: 1, company: 'rocket-lab' }]);
+    expect(db.articleLaunches).toEqual([{ articleId: 1, launchExternalId: 'launch-1' }]);
     expect(db.logs).toHaveLength(2);
     expect(db.logs[1]).toMatchObject({ successCount: 0, failureCount: 0 });
   });

@@ -49,6 +49,51 @@ export async function ensureSource(db: SqlDatabase, source: SourceConfig): Promi
   return row.id;
 }
 
+async function resolveArticleId(db: SqlDatabase, record: IngestionRecord): Promise<number | null> {
+  const row = await db
+    .prepare('SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1')
+    .bind(record.dedupeHash, record.item.url)
+    .first<{ id: number }>();
+
+  return row?.id ?? null;
+}
+
+async function linkArticleTags(db: SqlDatabase, articleId: number, tags: string[]): Promise<void> {
+  for (const tag of new Set(tags.map((value) => value.trim()).filter(Boolean))) {
+    await db
+      .prepare(
+        `INSERT OR IGNORE INTO article_tags (article_id, tag_id)
+         SELECT ?, id FROM tags WHERE slug = ?`,
+      )
+      .bind(articleId, tag)
+      .run();
+  }
+}
+
+async function linkArticleCompanies(db: SqlDatabase, articleId: number, companies: string[]): Promise<void> {
+  for (const company of new Set(companies.map((value) => value.trim()).filter(Boolean))) {
+    await db
+      .prepare(
+        `INSERT OR IGNORE INTO article_companies (article_id, company_id)
+         SELECT ?, id FROM companies WHERE slug = ? OR name = ? OR english_name = ?`,
+      )
+      .bind(articleId, company, company, company)
+      .run();
+  }
+}
+
+async function linkArticleLaunches(db: SqlDatabase, articleId: number, launchExternalIds: string[]): Promise<void> {
+  for (const launchExternalId of new Set(launchExternalIds.map((value) => value.trim()).filter(Boolean))) {
+    await db
+      .prepare(
+        `INSERT OR IGNORE INTO article_launches (article_id, launch_external_id)
+         VALUES (?, ?)`,
+      )
+      .bind(articleId, launchExternalId)
+      .run();
+  }
+}
+
 export async function persistArticleRecords(
   db: SqlDatabase,
   source: SourceConfig,
@@ -79,6 +124,14 @@ export async function persistArticleRecords(
       .run();
 
     inserted += result.meta?.changes ?? 0;
+
+    const articleId = await resolveArticleId(db, record);
+
+    if (articleId) {
+      await linkArticleTags(db, articleId, record.item.tags);
+      await linkArticleCompanies(db, articleId, record.item.companies);
+      await linkArticleLaunches(db, articleId, record.item.relatedLaunchIds);
+    }
   }
 
   return {
