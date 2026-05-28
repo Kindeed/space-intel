@@ -53,7 +53,13 @@ describe('App', () => {
       '/launches/missing',
     ].map(renderAt).join('\n');
 
-    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重']) {
+    const rejectedChineseCopy = [
+      ['按事件', '聚类'].join(''),
+      ['合并', '重复', '报道'].join(''),
+      ['等高', '时间轴'].join(''),
+    ];
+
+    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重', ...rejectedChineseCopy]) {
       expect(html).not.toContain(text);
     }
   });

@@ -15,6 +15,8 @@ import type { LaunchIngestionResult } from './launchIngestion';
 import type { PersistedIngestionResult } from './persistedRun';
 import type { CollectorContext, SourceConfig } from './types';
 
+export const sourceIngestionTimeoutMs = 25_000;
+
 export type ScheduledIngestionInput = {
   db: SqlDatabase;
   sources: SourceConfig[];
@@ -22,6 +24,7 @@ export type ScheduledIngestionInput = {
   curationsYaml?: string;
   context: CollectorContext;
   kind: 'hourly' | 'daily';
+  sourceTimeoutMs?: number;
 };
 
 export type ScheduledIngestionResult = {
@@ -66,6 +69,10 @@ export type ScheduledMarketSeedRunResult =
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function shouldRunLaunchIngestion(now: Date): boolean {
+  return now.getUTCHours() % 6 === 0;
 }
 
 async function runArticleSourceSafely(
@@ -123,6 +130,7 @@ async function seedMarketSafely(db: SqlDatabase): Promise<ScheduledMarketSeedRun
 export async function runScheduledIngestion(input: ScheduledIngestionInput): Promise<ScheduledIngestionResult> {
   const sourceRuns: ScheduledSourceRunResult[] = [];
   let marketSeed: ScheduledMarketSeedRunResult | null = null;
+  const timeoutMs = input.sourceTimeoutMs ?? sourceIngestionTimeoutMs;
 
   if (input.kind === 'hourly') {
     const snapiSource = input.sources.find((source) => source.key === 'snapi');
@@ -130,17 +138,21 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
     if (snapiSource) {
       sourceRuns.push(
         await runArticleSourceSafely(snapiSource, () =>
-          runSourceIngestion(input.db, snapiSource, createCollectorRegistry([spaceflightNewsCollector]), input.context),
+          runSourceIngestion(input.db, snapiSource, createCollectorRegistry([spaceflightNewsCollector]), input.context, {
+            timeoutMs,
+          }),
         ),
       );
     }
 
     const launchSource = input.sources.find((source) => source.key === 'launch-library-2');
 
-    if (launchSource) {
+    if (launchSource && shouldRunLaunchIngestion(input.context.now())) {
       sourceRuns.push(
         await runLaunchSourceSafely(launchSource, () =>
-          runLaunchIngestion(input.db, launchSource, launchLibraryCollector, input.context),
+          runLaunchIngestion(input.db, launchSource, launchLibraryCollector, input.context, {
+            timeoutMs,
+          }),
         ),
       );
     }
@@ -149,7 +161,9 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
 
     for (const source of input.sources.filter((item) => item.type === 'rss' && item.enabled)) {
       sourceRuns.push(
-        await runArticleSourceSafely(source, () => runSourceIngestion(input.db, source, rssRegistry, input.context)),
+        await runArticleSourceSafely(source, () =>
+          runSourceIngestion(input.db, source, rssRegistry, input.context, { timeoutMs }),
+        ),
       );
     }
 
@@ -157,7 +171,9 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
 
     for (const source of input.sources.filter((item) => item.type === 'google_news_rss' && item.enabled)) {
       sourceRuns.push(
-        await runArticleSourceSafely(source, () => runSourceIngestion(input.db, source, googleNewsRegistry, input.context)),
+        await runArticleSourceSafely(source, () =>
+          runSourceIngestion(input.db, source, googleNewsRegistry, input.context, { timeoutMs }),
+        ),
       );
     }
 
@@ -165,7 +181,9 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
 
     for (const source of input.sources.filter((item) => item.type === 'official_page' && item.enabled)) {
       sourceRuns.push(
-        await runArticleSourceSafely(source, () => runSourceIngestion(input.db, source, officialPageRegistry, input.context)),
+        await runArticleSourceSafely(source, () =>
+          runSourceIngestion(input.db, source, officialPageRegistry, input.context, { timeoutMs }),
+        ),
       );
     }
 

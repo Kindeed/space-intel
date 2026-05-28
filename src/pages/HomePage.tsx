@@ -19,7 +19,7 @@ export function HomePage() {
       <section className="timeline-column" aria-label="情报时间线">
         <div className="timeline-header">
           <SectionTitle icon={RadioTower} title="今日重点" kicker="实时聚合" />
-          <p>按事件聚类的商业航天新闻、发射、公司、资本和政策线索。</p>
+          <p>聚合商业航天新闻、发射、公司、资本和政策线索。</p>
         </div>
         <ChannelChips />
         {home.error ? <div className="inline-status">{safeLoadMessage('首页数据')}</div> : null}

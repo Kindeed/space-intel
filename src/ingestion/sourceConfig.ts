@@ -14,6 +14,8 @@ const sourceSchema = z.object({
   expected_content: z.string().min(1),
   risk_notes: z.string(),
   dedupe_strategy: z.string().min(1),
+  default_tags: z.array(z.string().min(1)).optional(),
+  default_companies: z.array(z.string().min(1)).optional(),
 });
 
 const sourcesFileSchema = z.object({

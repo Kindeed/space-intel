@@ -12,6 +12,7 @@ async function loadDiagnostics(db: D1Database | undefined) {
     return {
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
+      openIngestionLogCount: 0,
     };
   }
 
@@ -19,6 +20,9 @@ async function loadDiagnostics(db: D1Database | undefined) {
     const latestArticle = await db
       .prepare('SELECT MAX(published_at) AS latestArticlePublishedAt FROM articles')
       .first<{ latestArticlePublishedAt: string | null }>();
+    const openIngestionLogs = await db
+      .prepare('SELECT COUNT(*) AS openIngestionLogCount FROM ingestion_logs WHERE finished_at IS NULL')
+      .first<{ openIngestionLogCount: number }>();
     const latestIngestionLog = await db
       .prepare(
         `SELECT
@@ -29,13 +33,15 @@ async function loadDiagnostics(db: D1Database | undefined) {
           failure_count AS failureCount,
           CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError
         FROM ingestion_logs
-        ORDER BY started_at DESC, id DESC
+        WHERE finished_at IS NOT NULL
+        ORDER BY finished_at DESC, id DESC
         LIMIT 1`,
       )
       .first<LatestIngestionLogRow>();
 
     return {
       latestArticlePublishedAt: latestArticle?.latestArticlePublishedAt ?? null,
+      openIngestionLogCount: openIngestionLogs?.openIngestionLogCount ?? 0,
       latestIngestionLog: latestIngestionLog
         ? {
             sourceKey: latestIngestionLog.sourceKey,
@@ -52,6 +58,7 @@ async function loadDiagnostics(db: D1Database | undefined) {
     return {
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
+      openIngestionLogCount: 0,
       diagnosticsAvailable: false,
     };
   }

@@ -20,6 +20,8 @@ export type SourceConfig = {
   expected_content: string;
   risk_notes: string;
   dedupe_strategy: string;
+  default_tags?: string[];
+  default_companies?: string[];
 };
 
 export type NormalizedItem = {
