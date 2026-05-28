@@ -39,6 +39,7 @@ class MemoryScheduledDatabase implements SqlDatabase {
   readonly launches = new Map<string, string>();
   readonly marketRows = new Map<string, string>();
   readonly logs: Array<{ id: number; sourceKey: string; startedAt: string; finishedAt: string | null; successCount: number; failureCount: number; error: string | null }> = [];
+  readonly retentionDeletes: string[] = [];
   marketArticles: MarketSeedArticle[] = [];
   curationsInserted = 0;
 
@@ -172,6 +173,19 @@ class MemoryScheduledDatabase implements SqlDatabase {
       log.failureCount = Number(values[2]);
       log.error = values[3] ? String(values[3]) : null;
       return { meta: { changes: 1 } };
+    }
+
+    if (
+      normalized.startsWith('DELETE FROM article_tags') ||
+      normalized.startsWith('DELETE FROM article_companies') ||
+      normalized.startsWith('DELETE FROM article_launches') ||
+      normalized.startsWith('DELETE FROM articles') ||
+      normalized.startsWith('DELETE FROM ingestion_logs') ||
+      normalized.startsWith('DELETE FROM market_items') ||
+      normalized.startsWith('DELETE FROM launches')
+    ) {
+      this.retentionDeletes.push(normalized.match(/^DELETE FROM ([a-z_]+)/)?.[1] ?? normalized);
+      return { meta: { changes: 0 } };
     }
 
     throw new Error(`Unsupported query: ${query}`);
@@ -587,8 +601,29 @@ home_highlights:
       companies: { configured: 1 },
       topics: { configured: 1 },
     });
-    expect(result.maintenance).toEqual({ staleIngestionLogsClosed: 1, failures: 0 });
+    expect(result.maintenance).toEqual({
+      staleIngestionLogsClosed: 1,
+      retention: {
+        articleTagsDeleted: 0,
+        articleCompaniesDeleted: 0,
+        articleLaunchesDeleted: 0,
+        articlesDeleted: 0,
+        ingestionLogsDeleted: 0,
+        marketItemsDeleted: 0,
+        launchesDeleted: 0,
+      },
+      failures: 0,
+    });
     expect(db.curationsInserted).toBe(1);
     expect(db.logs[0]).toMatchObject({ failureCount: 1, finishedAt: '2026-05-09T00:00:00.000Z' });
+    expect(db.retentionDeletes).toEqual([
+      'article_tags',
+      'article_companies',
+      'article_launches',
+      'articles',
+      'ingestion_logs',
+      'market_items',
+      'launches',
+    ]);
   });
 });
