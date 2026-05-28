@@ -30,6 +30,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Check generated config
+        run: pnpm check:config
+
       - name: Lint
         run: pnpm lint
 

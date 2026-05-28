@@ -14,4 +14,5 @@ export type DbStatement = {
 
 export type SqlDatabase = {
   prepare: (query: string) => DbStatement;
+  batch?: unknown;
 };

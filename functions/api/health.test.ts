@@ -21,7 +21,11 @@ class FakeHealthStatement {
       return { openIngestionLogCount: 2 } as T;
     }
 
-    if (this.query.includes('FROM ingestion_logs')) {
+    if (this.query.includes('MAX(finished_at)')) {
+      return { latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z' } as T;
+    }
+
+    if (this.query.includes('FROM ingestion_logs') && this.query.includes('ORDER BY finished_at DESC')) {
       expect(this.query).toContain('finished_at IS NOT NULL');
       return {
         sourceKey: 'google-news-cn-commercial-space',
@@ -34,6 +38,25 @@ class FakeHealthStatement {
     }
 
     return null;
+  }
+
+  async all<T = unknown>(): Promise<{ results: T[] }> {
+    if (this.query.includes('failure_count > 0')) {
+      return {
+        results: [
+          {
+            sourceKey: 'demo-rss',
+            startedAt: '2026-05-18T07:00:00Z',
+            finishedAt: '2026-05-18T07:00:02Z',
+            successCount: 0,
+            failureCount: 1,
+            hasError: 1,
+          } as T,
+        ],
+      };
+    }
+
+    return { results: [] };
   }
 }
 
@@ -62,6 +85,17 @@ describe('health API', () => {
       diagnostics: {
         latestArticlePublishedAt: '2026-05-18T08:00:00Z',
         openIngestionLogCount: 2,
+        latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z',
+        recentFailedIngestionLogs: [
+          {
+            sourceKey: 'demo-rss',
+            startedAt: '2026-05-18T07:00:00Z',
+            finishedAt: '2026-05-18T07:00:02Z',
+            successCount: 0,
+            failureCount: 1,
+            hasError: true,
+          },
+        ],
         latestIngestionLog: {
           sourceKey: 'google-news-cn-commercial-space',
           startedAt: '2026-05-18T08:00:00Z',

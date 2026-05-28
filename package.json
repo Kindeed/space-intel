@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "deploy:scheduled": "wrangler deploy --config wrangler.scheduled.toml",
+    "generate:config": "node scripts/generate-config.mjs",
+    "check:config": "node scripts/generate-config.mjs --check",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "test": "vitest run",

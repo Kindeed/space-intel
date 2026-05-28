@@ -6,6 +6,12 @@ export type CatalogSyncResult = {
   upserted: number;
 };
 
+export type FullCatalogSyncResult = {
+  sources: CatalogSyncResult & { configured: number };
+  companies: CatalogSyncResult & { configured: number };
+  topics: CatalogSyncResult & { configured: number };
+};
+
 export async function upsertConfiguredCompanies(
   db: SqlDatabase,
   companies: CompanyConfigRecord[],
@@ -126,4 +132,32 @@ export async function upsertConfiguredSources(db: SqlDatabase, sources: SourceCo
   }
 
   return { upserted };
+}
+
+export async function syncConfiguredCatalog(
+  db: SqlDatabase,
+  input: {
+    sources: SourceConfig[];
+    companies: CompanyConfigRecord[];
+    topics: TopicConfigRecord[];
+  },
+): Promise<FullCatalogSyncResult> {
+  const sourceResult = await upsertConfiguredSources(db, input.sources);
+  const companyResult = await upsertConfiguredCompanies(db, input.companies);
+  const topicResult = await upsertConfiguredTags(db, input.topics);
+
+  return {
+    sources: {
+      configured: input.sources.length,
+      upserted: sourceResult.upserted,
+    },
+    companies: {
+      configured: input.companies.length,
+      upserted: companyResult.upserted,
+    },
+    topics: {
+      configured: input.topics.length,
+      upserted: topicResult.upserted,
+    },
+  };
 }

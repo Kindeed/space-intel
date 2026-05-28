@@ -4,6 +4,8 @@
 
 The ingestion pipeline is config-first. Source URLs, purpose, risk notes, expected content, and dedupe strategy live in `config/sources.yaml`. UI components must not hardcode source-specific behavior.
 
+YAML config files are canonical. Generated JSON files are build artifacts kept in Git for Workers/Pages imports. Run `pnpm generate:config` after changing config YAML, and CI runs `pnpm check:config` to prevent YAML/JSON drift.
+
 ## Source Flow
 
 1. Parse and validate source config.
@@ -23,7 +25,14 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 - GitHub Actions deploys the scheduled Worker after `main` branch verification succeeds. This requires the `CLOUDFLARE_API_TOKEN` GitHub Secret.
 - Use `pnpm deploy:scheduled` as the manual fallback after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
 - Hourly runs isolate failures per source. One failed feed or API records a failed source result but does not stop the remaining sources.
+- Hourly RSS and official-page sources run with bounded concurrency. API-style sources stay serial unless explicitly changed.
 - Hourly runs seed `market_items` from the updated article metadata so the capital page can refresh without a separate manual admin call.
+- Daily runs synchronize configured sources, companies, and topics into D1, then sync curations.
+- Daily maintenance closes ingestion logs that have stayed open for more than two hours.
+
+## D1 Write Path
+
+Article writes remain dedupe-first through `dedupe_hash`. Article-to-tag, article-to-company, and article-to-launch relation writes use D1 `batch` when available and fall back to sequential statement execution for tests or D1-compatible mocks.
 
 ## Collector Boundary
 

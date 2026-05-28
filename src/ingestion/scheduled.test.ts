@@ -32,11 +32,13 @@ class MemoryStatement implements DbStatement {
 
 class MemoryScheduledDatabase implements SqlDatabase {
   readonly sources: Array<{ id: number; key: string }> = [];
+  readonly companies: string[] = [];
+  readonly tags: string[] = [];
   readonly articleHashes = new Set<string>();
   readonly articles: Array<{ id: number; dedupeHash: string; url: string }> = [];
   readonly launches = new Map<string, string>();
   readonly marketRows = new Map<string, string>();
-  readonly logs: Array<{ id: number; sourceKey: string; finishedAt: string | null; successCount: number; failureCount: number; error: string | null }> = [];
+  readonly logs: Array<{ id: number; sourceKey: string; startedAt: string; finishedAt: string | null; successCount: number; failureCount: number; error: string | null }> = [];
   marketArticles: MarketSeedArticle[] = [];
   curationsInserted = 0;
 
@@ -55,7 +57,27 @@ class MemoryScheduledDatabase implements SqlDatabase {
         return { meta: { changes: 1 } };
       }
 
-      return { meta: { changes: 0 } };
+      return { meta: { changes: 1 } };
+    }
+
+    if (normalized.startsWith('INSERT INTO companies')) {
+      const slug = String(values[0]);
+
+      if (!this.companies.includes(slug)) {
+        this.companies.push(slug);
+      }
+
+      return { meta: { changes: 1 } };
+    }
+
+    if (normalized.startsWith('INSERT INTO tags')) {
+      const slug = String(values[0]);
+
+      if (!this.tags.includes(slug)) {
+        this.tags.push(slug);
+      }
+
+      return { meta: { changes: 1 } };
     }
 
     if (normalized.startsWith('INSERT OR IGNORE INTO market_items')) {
@@ -110,8 +132,32 @@ class MemoryScheduledDatabase implements SqlDatabase {
 
     if (normalized.startsWith('INSERT INTO ingestion_logs')) {
       const id = this.logs.length + 1;
-      this.logs.push({ id, sourceKey: String(values[0]), finishedAt: null, successCount: 0, failureCount: 0, error: null });
+      this.logs.push({
+        id,
+        sourceKey: String(values[0]),
+        startedAt: String(values[1]),
+        finishedAt: null,
+        successCount: 0,
+        failureCount: 0,
+        error: null,
+      });
       return { meta: { changes: 1, last_row_id: id } };
+    }
+
+    if (normalized.startsWith('UPDATE ingestion_logs SET finished_at = ?, failure_count = 1')) {
+      let changes = 0;
+      const staleBefore = String(values[2]);
+
+      for (const log of this.logs) {
+        if (!log.finishedAt && log.startedAt <= staleBefore) {
+          log.finishedAt = String(values[0]);
+          log.failureCount = 1;
+          log.error = String(values[1]);
+          changes += 1;
+        }
+      }
+
+      return { meta: { changes } };
     }
 
     if (normalized.startsWith('UPDATE ingestion_logs')) {
@@ -379,6 +425,58 @@ describe('scheduled ingestion', () => {
     expect(db.logs[1]).toMatchObject({ sourceKey: 'healthy-rss', successCount: 1, failureCount: 0 });
   });
 
+  it('runs RSS sources with bounded concurrency', async () => {
+    const db = new MemoryScheduledDatabase();
+    let activeFetches = 0;
+    let maxActiveFetches = 0;
+    const rssSources: SourceConfig[] = Array.from({ length: 3 }, (_, index) => ({
+      key: `rss-${index}`,
+      name: `RSS ${index}`,
+      type: 'rss',
+      region: 'global',
+      url: `https://example.com/feed-${index}.xml`,
+      credibility: 3,
+      enabled: true,
+      purpose: 'Concurrency fixture.',
+      expected_content: 'Metadata.',
+      risk_notes: 'Fixture only.',
+      dedupe_strategy: 'url_title_source',
+    }));
+
+    await runScheduledIngestion({
+      db,
+      sources: rssSources,
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async (input: RequestInfo | URL) => {
+          activeFetches += 1;
+          maxActiveFetches = Math.max(maxActiveFetches, activeFetches);
+          await new Promise((resolve) => setTimeout(resolve, 5));
+          activeFetches -= 1;
+
+          return new Response(`<?xml version="1.0"?>
+            <rss version="2.0">
+              <channel>
+                <title>RSS</title>
+                <item>
+                  <title>${String(input)} update</title>
+                  <link>${String(input).replace('.xml', '/article')}</link>
+                  <description>Summary.</description>
+                  <guid>${String(input)}</guid>
+                  <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
+                </item>
+              </channel>
+            </rss>`);
+        },
+      },
+      kind: 'hourly',
+    });
+
+    expect(maxActiveFetches).toBeGreaterThan(1);
+    expect(maxActiveFetches).toBeLessThanOrEqual(4);
+    expect(db.articleHashes.size).toBe(3);
+  });
+
   it('skips Launch Library ingestion outside the six-hour cadence', async () => {
     const db = new MemoryScheduledDatabase();
     let fetchCount = 0;
@@ -439,10 +537,38 @@ describe('scheduled ingestion', () => {
 
   it('syncs configured curations on daily runs', async () => {
     const db = new MemoryScheduledDatabase();
+    db.logs.push({
+      id: 1,
+      sourceKey: 'old-rss',
+      finishedAt: null,
+      startedAt: '2026-05-08T20:00:00.000Z',
+      successCount: 0,
+      failureCount: 0,
+      error: null,
+    });
 
     const result = await runScheduledIngestion({
       db,
-      sources: [],
+      sources,
+      companiesConfig: {
+        companies: [
+          {
+            slug: 'rocket-lab',
+            name: 'Rocket Lab',
+            country: 'global',
+            sector: 'launch',
+          },
+        ],
+      },
+      topicsConfig: {
+        topics: [
+          {
+            slug: 'reusable-rockets',
+            name: 'Reusable Rockets',
+            category: 'technology',
+          },
+        ],
+      },
       context: {
         now: () => new Date('2026-05-09T00:00:00Z'),
         fetch,
@@ -456,6 +582,13 @@ home_highlights:
     });
 
     expect(result.curationsInserted).toBe(1);
+    expect(result.catalogSync).toMatchObject({
+      sources: { configured: 2 },
+      companies: { configured: 1 },
+      topics: { configured: 1 },
+    });
+    expect(result.maintenance).toEqual({ staleIngestionLogsClosed: 1, failures: 0 });
     expect(db.curationsInserted).toBe(1);
+    expect(db.logs[0]).toMatchObject({ failureCount: 1, finishedAt: '2026-05-09T00:00:00.000Z' });
   });
 });
