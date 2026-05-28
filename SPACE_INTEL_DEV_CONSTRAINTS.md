@@ -54,8 +54,9 @@
   - Cloudflare Pages 绑定 GitHub 仓库，`main` 分支自动部署生产环境。
 - 不允许提交：
   - Cloudflare API Token、SSH 私钥、数据库密钥、LLM API Key。
-  - X-UI、Vaultwarden、Nezha、订阅链接、UUID、私有服务路径。
+  - X-UI、Vaultwarden、Nezha、订阅链接、私有 UUID、私有服务路径。
   - 任何付费新闻全文或受版权限制的全文内容。
+- 允许提交 Wrangler 绑定所需的非敏感 Cloudflare 资源标识，例如 D1 `database_id`；这类 ID 不是凭据，不能替代 API Token，也不得与 secret 混放。
 
 ## Tech Stack
 
@@ -380,7 +381,7 @@ pnpm build
 
 ## Security And Compliance
 
-- 不提交任何 secrets、私有订阅链接、私有服务路径或凭据。
+- 不提交任何 secrets、私有订阅链接、私有服务路径、私有 UUID 或凭据。
 - 不影响现有 `pass.bytebaud.com`、`nezha.bytebaud.com`、`xui.bytebaud.com`、`blog.bytebaud.com`、`tle.bytebaud.com`。
 - RSSHub/TrendRadar 如需自托管，部署在现有 VPS 的 Docker 中，但必须隔离端口和配置，不影响现有服务。
 - 资本市场内容只做资讯聚合，页面必须明确“非投资建议”。

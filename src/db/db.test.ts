@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { upsertConfiguredSources } from './catalog';
 import type { SqlDatabase, DbRunResult, DbStatement } from './types';
 import { createCollectorRegistry, runSourceIngestion, type SourceCollector } from '../ingestion';
 import type { SourceConfig } from '../ingestion/types';
@@ -276,6 +277,24 @@ describe('D1 persistence flow', () => {
       name: 'Spaceflight News API Updated',
       url: 'https://api.spaceflightnewsapi.net/v4/articles/?ordering=-published_at',
       credibility: 4,
+      enabled: false,
+    });
+  });
+
+  it('syncs disabled source config into the catalog', async () => {
+    const db = new MemoryDatabase();
+
+    await upsertConfiguredSources(db, [source]);
+    await upsertConfiguredSources(db, [
+      {
+        ...source,
+        enabled: false,
+      },
+    ]);
+
+    expect(db.sources).toHaveLength(1);
+    expect(db.sources[0]).toMatchObject({
+      key: 'snapi',
       enabled: false,
     });
   });

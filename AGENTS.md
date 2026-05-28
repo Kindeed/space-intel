@@ -12,7 +12,8 @@ Before planning or changing this project, agents and contributors must read:
 
 ## Non-Negotiable Constraints
 
-- Do not commit secrets, API tokens, SSH keys, private service paths, subscription links, UUIDs, or credentials.
+- Do not commit secrets, API tokens, SSH keys, private service paths, subscription links, private UUIDs, or credentials.
+- Public Cloudflare resource identifiers required by Wrangler bindings, such as D1 `database_id`, may remain in `wrangler*.toml`; they are not credentials and must not be confused with API tokens or secrets.
 - Do not affect existing services under `pass.bytebaud.com`, `nezha.bytebaud.com`, `xui.bytebaud.com`, `blog.bytebaud.com`, or `tle.bytebaud.com`.
 - Use Cloudflare-first architecture unless `SPACE_INTEL_DEV_CONSTRAINTS.md` is explicitly revised.
 - Use GitHub as the source of truth for code, configuration, CI, PR review, and deployment triggers.

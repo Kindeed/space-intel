@@ -16,6 +16,8 @@ export type LaunchListFilters = {
   status?: string;
   provider?: string;
   query?: string;
+  includePast?: boolean;
+  nowIso?: string;
   page?: number;
   limit?: number;
 };
@@ -56,6 +58,11 @@ export async function listLaunches(db: SqlDatabase, filters: LaunchListFilters =
   const offset = (page - 1) * limit;
   const conditions: string[] = [];
   const values: unknown[] = [];
+
+  if (!filters.includePast) {
+    conditions.push('window_start >= ?');
+    values.push(filters.nowIso ?? new Date().toISOString());
+  }
 
   if (filters.status) {
     conditions.push('status = ?');

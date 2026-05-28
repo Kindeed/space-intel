@@ -64,6 +64,7 @@ describe('launch queries', () => {
       status: 'Go',
       provider: 'Rocket Lab',
       query: 'electron',
+      nowIso: '2026-05-28T00:00:00.000Z',
       page: 2,
       limit: 1,
     });
@@ -77,7 +78,32 @@ describe('launch queries', () => {
     expect(db.lastQuery).toContain('status = ?');
     expect(db.lastQuery).toContain('provider = ?');
     expect(db.lastQuery).toContain('LOWER(mission) LIKE ?');
-    expect(db.lastValues).toEqual(['Go', 'Rocket Lab', '%electron%', '%electron%', '%electron%', '%electron%', 2, 1]);
+    expect(db.lastQuery).toContain('window_start >= ?');
+    expect(db.lastValues).toEqual([
+      '2026-05-28T00:00:00.000Z',
+      'Go',
+      'Rocket Lab',
+      '%electron%',
+      '%electron%',
+      '%electron%',
+      '%electron%',
+      2,
+      1,
+    ]);
+  });
+
+  it('omits the future launch filter when explicitly including past launches', async () => {
+    const db = new FakeLaunchDatabase();
+    db.allResults = [launch];
+
+    const result = await listLaunches(db, {
+      includePast: true,
+      limit: 1,
+    });
+
+    expect(result.items).toEqual([launch]);
+    expect(db.lastQuery).not.toContain('window_start >= ?');
+    expect(db.lastValues).toEqual([2, 0]);
   });
 
   it('loads launch detail by numeric id', async () => {
