@@ -1,6 +1,6 @@
 import type { IngestionRecord } from '../ingestion/run';
 import type { SourceConfig } from '../ingestion/types';
-import type { SqlDatabase } from './types';
+import type { DbStatement, SqlDatabase } from './types';
 
 export type PersistArticlesResult = {
   inserted: number;
@@ -49,6 +49,21 @@ export async function ensureSource(db: SqlDatabase, source: SourceConfig): Promi
   return row.id;
 }
 
+async function runStatements(db: SqlDatabase, statements: DbStatement[]): Promise<void> {
+  if (!statements.length) {
+    return;
+  }
+
+  if (typeof db.batch === 'function') {
+    await (db.batch as (items: DbStatement[]) => Promise<unknown[]>)(statements);
+    return;
+  }
+
+  for (const statement of statements) {
+    await statement.run();
+  }
+}
+
 async function resolveArticleId(db: SqlDatabase, record: IngestionRecord): Promise<number | null> {
   const row = await db
     .prepare('SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1')
@@ -59,39 +74,42 @@ async function resolveArticleId(db: SqlDatabase, record: IngestionRecord): Promi
 }
 
 async function linkArticleTags(db: SqlDatabase, articleId: number, tags: string[]): Promise<void> {
-  for (const tag of new Set(tags.map((value) => value.trim()).filter(Boolean))) {
-    await db
+  const statements = [...new Set(tags.map((value) => value.trim()).filter(Boolean))].map((tag) =>
+    db
       .prepare(
         `INSERT OR IGNORE INTO article_tags (article_id, tag_id)
          SELECT ?, id FROM tags WHERE slug = ?`,
       )
-      .bind(articleId, tag)
-      .run();
-  }
+      .bind(articleId, tag),
+  );
+
+  await runStatements(db, statements);
 }
 
 async function linkArticleCompanies(db: SqlDatabase, articleId: number, companies: string[]): Promise<void> {
-  for (const company of new Set(companies.map((value) => value.trim()).filter(Boolean))) {
-    await db
+  const statements = [...new Set(companies.map((value) => value.trim()).filter(Boolean))].map((company) =>
+    db
       .prepare(
         `INSERT OR IGNORE INTO article_companies (article_id, company_id)
          SELECT ?, id FROM companies WHERE slug = ? OR name = ? OR english_name = ?`,
       )
-      .bind(articleId, company, company, company)
-      .run();
-  }
+      .bind(articleId, company, company, company),
+  );
+
+  await runStatements(db, statements);
 }
 
 async function linkArticleLaunches(db: SqlDatabase, articleId: number, launchExternalIds: string[]): Promise<void> {
-  for (const launchExternalId of new Set(launchExternalIds.map((value) => value.trim()).filter(Boolean))) {
-    await db
+  const statements = [...new Set(launchExternalIds.map((value) => value.trim()).filter(Boolean))].map((launchExternalId) =>
+    db
       .prepare(
         `INSERT OR IGNORE INTO article_launches (article_id, launch_external_id)
          VALUES (?, ?)`,
       )
-      .bind(articleId, launchExternalId)
-      .run();
-  }
+      .bind(articleId, launchExternalId),
+  );
+
+  await runStatements(db, statements);
 }
 
 export async function persistArticleRecords(

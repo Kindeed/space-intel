@@ -1,4 +1,6 @@
 import sourcesConfig from '../../config/sources.generated.json';
+import companiesConfig from '../../config/companies.generated.json';
+import topicsConfig from '../../config/topics.generated.json';
 import curationsConfig from '../../config/curations.generated.json';
 import { parseSourcesConfig, runScheduledIngestion } from '../ingestion';
 
@@ -12,6 +14,8 @@ export async function runSpaceIntelScheduled(cron: string, env: Env): Promise<un
   return runScheduledIngestion({
     db: env.DB,
     sources: parseSourcesConfig(sourcesConfig),
+    companiesConfig,
+    topicsConfig,
     curationsConfig,
     kind,
     context: {
