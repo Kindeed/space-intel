@@ -31,6 +31,7 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
         a.title,
         a.original_title AS originalTitle,
         a.summary,
+        a.original_summary AS originalSummary,
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -39,6 +40,8 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
+        a.translation_status AS translationStatus,
+        a.translation_provider AS translationProvider,
         ${articleRelationSelectFields},
         COALESCE(MAX(c.weight), 0) AS curationWeight,
         s.credibility AS sourceCredibility

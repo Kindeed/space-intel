@@ -20,6 +20,7 @@ import {
   type SqlDatabase,
 } from '../db';
 import { seedMarketItemsFromArticles, type MarketSeedResult } from '../market';
+import type { TranslationEnv } from '../translation';
 import type { LaunchIngestionResult } from './launchIngestion';
 import type { PersistedIngestionResult } from './persistedRun';
 import type { CollectorContext, SourceConfig } from './types';
@@ -36,6 +37,7 @@ export type ScheduledIngestionInput = {
   context: CollectorContext;
   kind: 'hourly' | 'daily';
   sourceTimeoutMs?: number;
+  translationEnv?: TranslationEnv;
 };
 
 export type ScheduledIngestionResult = {
@@ -233,6 +235,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
         await runArticleSourceSafely(snapiSource, () =>
           runSourceIngestion(input.db, snapiSource, createCollectorRegistry([spaceflightNewsCollector]), input.context, {
             timeoutMs,
+            translationEnv: input.translationEnv,
           }),
         ),
       );
@@ -256,7 +259,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
         input.sources.filter((item) => item.type === 'rss' && item.enabled),
         (source) => () =>
           runArticleSourceSafely(source, () =>
-            runSourceIngestion(input.db, source, rssRegistry, input.context, { timeoutMs }),
+            runSourceIngestion(input.db, source, rssRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
           ),
       )),
     );
@@ -267,7 +270,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
         input.sources.filter((item) => item.type === 'google_news_rss' && item.enabled),
         (source) => () =>
           runArticleSourceSafely(source, () =>
-            runSourceIngestion(input.db, source, googleNewsRegistry, input.context, { timeoutMs }),
+            runSourceIngestion(input.db, source, googleNewsRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
           ),
       )),
     );
@@ -278,7 +281,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
         input.sources.filter((item) => item.type === 'official_page' && item.enabled),
         (source) => () =>
           runArticleSourceSafely(source, () =>
-            runSourceIngestion(input.db, source, officialPageRegistry, input.context, { timeoutMs }),
+            runSourceIngestion(input.db, source, officialPageRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
           ),
       )),
     );

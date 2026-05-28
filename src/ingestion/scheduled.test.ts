@@ -93,14 +93,14 @@ class MemoryScheduledDatabase implements SqlDatabase {
     }
 
     if (normalized.startsWith('INSERT OR IGNORE INTO articles')) {
-      const dedupeHash = String(values[8]);
+      const dedupeHash = String(values[9]);
 
       if (this.articleHashes.has(dedupeHash)) {
         return { meta: { changes: 0 } };
       }
 
       this.articleHashes.add(dedupeHash);
-      this.articles.push({ id: this.articles.length + 1, dedupeHash, url: String(values[4]) });
+      this.articles.push({ id: this.articles.length + 1, dedupeHash, url: String(values[5]) });
       return { meta: { changes: 1 } };
     }
 

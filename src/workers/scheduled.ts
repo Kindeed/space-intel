@@ -6,6 +6,13 @@ import { parseSourcesConfig, runScheduledIngestion } from '../ingestion';
 
 type Env = {
   DB: D1Database;
+  TRANSLATION_PROVIDER?: string;
+  TRANSLATION_API_URL?: string;
+  TRANSLATION_API_TOKEN?: string;
+  TRANSLATION_MODEL?: string;
+  TRANSLATION_ENABLED?: string;
+  TRANSLATION_TIMEOUT_MS?: string;
+  TRANSLATION_MAX_ITEMS_PER_SOURCE?: string;
 };
 
 export async function runSpaceIntelScheduled(cron: string, env: Env): Promise<unknown> {
@@ -17,6 +24,7 @@ export async function runSpaceIntelScheduled(cron: string, env: Env): Promise<un
     companiesConfig,
     topicsConfig,
     curationsConfig,
+    translationEnv: env,
     kind,
     context: {
       fetch: (input, init) => fetch(input, init),

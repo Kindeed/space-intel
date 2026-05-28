@@ -124,20 +124,26 @@ export async function persistArticleRecords(
     const result = await db
       .prepare(
         `INSERT OR IGNORE INTO articles (
-          source_id, title, original_title, summary, url, published_at, language, region, dedupe_hash, fetch_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          source_id, title, original_title, summary, original_summary, url, published_at, language, region, dedupe_hash,
+          fetch_status, translation_status, translation_provider, translated_at, translation_error
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         sourceId,
         record.item.title,
         record.item.originalTitle ?? null,
         record.item.summary,
+        record.item.originalSummary ?? null,
         record.item.url,
         record.item.publishedAt,
         record.item.language,
         record.item.region,
         record.dedupeHash,
         'fetched',
+        record.item.translationStatus ?? 'skipped',
+        record.item.translationProvider ?? null,
+        record.item.translatedAt ?? null,
+        record.item.translationError ?? null,
       )
       .run();
 

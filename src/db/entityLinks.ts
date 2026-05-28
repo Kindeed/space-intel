@@ -14,7 +14,8 @@ export async function listArticlesForEntityMatching(db: SqlDatabase): Promise<En
         id,
         title,
         original_title AS originalTitle,
-        summary
+        summary,
+        original_summary AS originalSummary
       FROM articles
       ORDER BY id ASC`,
     )
