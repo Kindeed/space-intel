@@ -86,6 +86,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         a.title,
         a.original_title AS originalTitle,
         a.summary,
+        a.original_summary AS originalSummary,
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -94,6 +95,8 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
+        a.translation_status AS translationStatus,
+        a.translation_provider AS translationProvider,
         ${articleRelationSelectFields}
       FROM articles a
       JOIN article_companies ac ON ac.article_id = a.id

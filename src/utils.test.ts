@@ -7,6 +7,7 @@ const article: ApiArticleSummary = {
   title: 'Reusable rocket milestone',
   originalTitle: 'Reusable rocket milestone',
   summary: 'Short summary only.',
+  originalSummary: 'Short summary only.',
   url: 'https://example.com/article',
   sourceKey: 'google-news-cn-commercial-space',
   sourceName: 'Google News - 商业航天',
@@ -15,6 +16,8 @@ const article: ApiArticleSummary = {
   language: 'zh',
   region: 'cn',
   fetchStatus: 'fetched',
+  translationStatus: 'skipped',
+  translationProvider: null,
   tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
   companies: [{ slug: 'landspace', name: '蓝箭航天' }],
 };

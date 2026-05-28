@@ -1,7 +1,8 @@
 import sourcesConfig from '../../../../config/sources.generated.json';
 import { createCollectorRegistry, googleNewsRssCollector, parseSourcesConfig, runSourceIngestion } from '../../../../src/ingestion';
+import type { TranslationEnv } from '../../../../src/translation';
 
-type Env = {
+type Env = TranslationEnv & {
   DB: D1Database;
   ADMIN_TOKEN?: string;
 };
@@ -21,10 +22,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   for (const source of sources) {
     try {
       results.push(
-        await runSourceIngestion(env.DB, source, registry, {
-          fetch: (input, init) => fetch(input, init),
-          now: () => new Date(),
-        }),
+        await runSourceIngestion(
+          env.DB,
+          source,
+          registry,
+          {
+            fetch: (input, init) => fetch(input, init),
+            now: () => new Date(),
+          },
+          {
+            translationEnv: env,
+          },
+        ),
       );
     } catch (error) {
       results.push({

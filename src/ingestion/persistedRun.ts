@@ -1,4 +1,5 @@
 import { finishIngestionLog, persistArticleRecords, startIngestionLog, type SqlDatabase } from '../db';
+import { translateIngestionRecords, type TranslationEnv } from '../translation';
 import { collectSource } from './run';
 import type { CollectorContext, SourceConfig } from './types';
 import type { CollectorRegistry } from './registry';
@@ -49,7 +50,7 @@ export async function runSourceIngestion(
   source: SourceConfig,
   registry: CollectorRegistry,
   context: CollectorContext,
-  options: { timeoutMs?: number } = {},
+  options: { timeoutMs?: number; translationEnv?: TranslationEnv } = {},
 ): Promise<PersistedIngestionResult> {
   const startedAt = context.now().toISOString();
   const logId = await startIngestionLog(db, {
@@ -61,7 +62,11 @@ export async function runSourceIngestion(
   const boundedContext = timeoutContext(context, controller.signal);
 
   try {
-    const records = await runWithTimeout(() => collectSource(source, registry, boundedContext), timeoutMs, controller);
+    const records = await runWithTimeout(
+      async () => translateIngestionRecords(await collectSource(source, registry, boundedContext), options.translationEnv, boundedContext),
+      timeoutMs,
+      controller,
+    );
     const persistence = await persistArticleRecords(db, source, records);
 
     await finishIngestionLog(db, {

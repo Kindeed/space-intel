@@ -283,10 +283,11 @@ space-intel/
 
 ## Optional VPS Enrichment Worker
 
-- Python/FastAPI/PostgreSQL 不是 v1 默认路线，只作为后续增强路径。
+- Python/FastAPI/PostgreSQL 不是 v1 默认路线，只作为后续增强路径；Hy-MT 1.8B 标题/摘要翻译服务允许作为独立 VPS 微服务接入。
 - 只有当 Cloudflare Worker 无法稳定完成复杂正文抽取、长链路 AI 处理或高风险页面解析时，才评估 VPS enrichment worker。
 - 可选 worker 可使用 `newspaper3k`、`Trafilatura`、`Scrapling`、Celery、PostgreSQL 等工具，但必须与现有 VPS 服务隔离。
-- enrichment worker 的输出只能回写摘要、标签、实体、抓取状态和原文链接，不得保存受版权限制的全文。
+- enrichment worker 的输出只能回写标题、摘要、标签、实体、抓取状态和原文链接，不得保存受版权限制的全文。
+- Hy-MT 1.8B 翻译服务只能接收标题和摘要，必须隔离部署并使用 token 鉴权，不得影响 `pass/nezha/xui/blog/tle` 现有服务。
 - 引入 VPS worker 前必须更新本约束文档、任务文件和安全说明。
 
 ## Public APIs

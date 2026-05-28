@@ -17,6 +17,8 @@ type ArticleRow = {
   id: number;
   dedupeHash: string;
   title: string;
+  originalSummary: string | null;
+  translationStatus: string;
   url: string;
 };
 
@@ -95,13 +97,15 @@ class MemoryDatabase implements SqlDatabase {
     }
 
     if (normalized.startsWith('INSERT OR IGNORE INTO articles')) {
-      const dedupeHash = String(values[8]);
+      const dedupeHash = String(values[9]);
       if (!this.articles.some((article) => article.dedupeHash === dedupeHash)) {
         this.articles.push({
           id: this.articles.length + 1,
           dedupeHash,
           title: String(values[1]),
-          url: String(values[4]),
+          originalSummary: values[4] ? String(values[4]) : null,
+          url: String(values[5]),
+          translationStatus: String(values[11]),
         });
         return { meta: { changes: 1, last_row_id: this.articles.length } };
       }
@@ -242,6 +246,10 @@ describe('D1 persistence flow', () => {
     expect(second).toMatchObject({ collected: 1, inserted: 0, skipped: 1, failures: 0 });
     expect(db.sources).toHaveLength(1);
     expect(db.articles).toHaveLength(1);
+    expect(db.articles[0]).toMatchObject({
+      originalSummary: 'Short summary only.',
+      translationStatus: 'skipped',
+    });
     expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
     expect(db.articleCompanies).toEqual([{ articleId: 1, company: 'rocket-lab' }]);
     expect(db.articleLaunches).toEqual([{ articleId: 1, launchExternalId: 'launch-1' }]);

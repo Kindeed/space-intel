@@ -55,6 +55,7 @@ const article: ArticleSummaryRow = {
   title: 'Reusable rocket milestone',
   originalTitle: 'Reusable rocket milestone',
   summary: 'Short summary only.',
+  originalSummary: 'Short summary only.',
   url: 'https://example.com/article',
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
@@ -63,6 +64,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  translationStatus: 'skipped',
+  translationProvider: null,
   tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
   companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };
@@ -104,7 +107,18 @@ describe('article queries', () => {
     expect(db.lastQuery).toContain('JOIN companies c');
     expect(db.lastQuery).toContain('AS tagsJson');
     expect(db.lastQuery).toContain('AS companiesJson');
-    expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 5, 1]);
+    expect(db.lastValues).toEqual([
+      'global',
+      'snapi',
+      '%rocket%',
+      '%rocket%',
+      '%rocket%',
+      '%rocket%',
+      'reusable-rockets',
+      'rocket-lab',
+      5,
+      1,
+    ]);
   });
 
   it('keeps pagination available when clustering leaves more visible stories in the fetched window', async () => {
