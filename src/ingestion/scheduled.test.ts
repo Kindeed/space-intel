@@ -36,7 +36,7 @@ class MemoryScheduledDatabase implements SqlDatabase {
   readonly articles: Array<{ id: number; dedupeHash: string; url: string }> = [];
   readonly launches = new Map<string, string>();
   readonly marketRows = new Map<string, string>();
-  readonly logs: Array<{ id: number; sourceKey: string; successCount: number; failureCount: number }> = [];
+  readonly logs: Array<{ id: number; sourceKey: string; finishedAt: string | null; successCount: number; failureCount: number; error: string | null }> = [];
   marketArticles: MarketSeedArticle[] = [];
   curationsInserted = 0;
 
@@ -110,7 +110,7 @@ class MemoryScheduledDatabase implements SqlDatabase {
 
     if (normalized.startsWith('INSERT INTO ingestion_logs')) {
       const id = this.logs.length + 1;
-      this.logs.push({ id, sourceKey: String(values[0]), successCount: 0, failureCount: 0 });
+      this.logs.push({ id, sourceKey: String(values[0]), finishedAt: null, successCount: 0, failureCount: 0, error: null });
       return { meta: { changes: 1, last_row_id: id } };
     }
 
@@ -121,8 +121,10 @@ class MemoryScheduledDatabase implements SqlDatabase {
         return { meta: { changes: 0 } };
       }
 
+      log.finishedAt = String(values[0]);
       log.successCount = Number(values[1]);
       log.failureCount = Number(values[2]);
+      log.error = values[3] ? String(values[3]) : null;
       return { meta: { changes: 1 } };
     }
 
@@ -299,6 +301,109 @@ describe('scheduled ingestion', () => {
     expect(db.logs).toHaveLength(2);
     expect(db.logs[0]).toMatchObject({ sourceKey: 'launch-library-2', failureCount: 1 });
     expect(db.logs[1]).toMatchObject({ sourceKey: 'demo-rss', successCount: 1 });
+  });
+
+  it('closes a timed-out source log and continues with later sources', async () => {
+    const db = new MemoryScheduledDatabase();
+    const hangingSource: SourceConfig = {
+      key: 'hanging-rss',
+      name: 'Hanging RSS',
+      type: 'rss',
+      region: 'global',
+      url: 'https://example.com/hanging.xml',
+      credibility: 3,
+      enabled: true,
+      purpose: 'Timeout fixture.',
+      expected_content: 'Metadata.',
+      risk_notes: 'Fixture only.',
+      dedupe_strategy: 'url_title_source',
+    };
+    const healthySource: SourceConfig = {
+      ...hangingSource,
+      key: 'healthy-rss',
+      name: 'Healthy RSS',
+      url: 'https://example.com/healthy.xml',
+    };
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [hangingSource, healthySource],
+      sourceTimeoutMs: 10,
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+          const url = String(input);
+
+          if (url.includes('hanging')) {
+            return new Promise<Response>((_, reject) => {
+              init?.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+            });
+          }
+
+          return new Response(`<?xml version="1.0"?>
+            <rss version="2.0">
+              <channel>
+                <title>Healthy RSS</title>
+                <item>
+                  <title>Reusable rocket update</title>
+                  <link>https://example.com/reusable</link>
+                  <description>Reusable summary.</description>
+                  <guid>reusable-1</guid>
+                  <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
+                </item>
+              </channel>
+            </rss>`);
+        },
+      },
+      kind: 'hourly',
+    });
+
+    expect(result.sourceRuns).toEqual([
+      expect.objectContaining({
+        sourceKey: 'hanging-rss',
+        failures: 1,
+        error: 'Source ingestion timed out after 10ms',
+      }),
+      expect.objectContaining({
+        sourceKey: 'healthy-rss',
+        failures: 0,
+        inserted: 1,
+      }),
+    ]);
+    expect(db.logs[0]).toMatchObject({
+      sourceKey: 'hanging-rss',
+      finishedAt: '2026-05-09T01:00:00.000Z',
+      failureCount: 1,
+      error: 'Source ingestion timed out after 10ms',
+    });
+    expect(db.logs[1]).toMatchObject({ sourceKey: 'healthy-rss', successCount: 1, failureCount: 0 });
+  });
+
+  it('skips Launch Library ingestion outside the six-hour cadence', async () => {
+    const db = new MemoryScheduledDatabase();
+    let fetchCount = 0;
+    const launchSource = sources.find((source) => source.key === 'launch-library-2');
+
+    if (!launchSource) {
+      throw new Error('Missing launch source fixture');
+    }
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [launchSource],
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async () => {
+          fetchCount += 1;
+          return new Response('{}');
+        },
+      },
+      kind: 'hourly',
+    });
+
+    expect(fetchCount).toBe(0);
+    expect(result.sourceRuns).toEqual([]);
+    expect(db.logs).toEqual([]);
   });
 
   it('seeds market items during hourly runs idempotently', async () => {

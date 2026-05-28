@@ -27,10 +27,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese-language commercial space coverage.
     expected_content: Aggregated article metadata and original links.
-    risk_notes: Aggregator feed; follow original links and do not store full article text.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: nasa-spaceflight-rss
     name: NASASpaceflight
@@ -197,16 +197,71 @@ sources:
     expected_content: Article metadata, excerpts, publication time, original link.
     risk_notes: Broad science source; filter by commercial-space relevance in downstream views.
     dedupe_strategy: url_title_source
+  - key: ars-technica-space-rss
+    name: Ars Technica Space
+    type: rss
+    region: global
+    url: https://arstechnica.com/space/feed/
+    credibility: 4
+    enabled: true
+    purpose: Direct RSS source for launch, commercial space, and space policy reporting.
+    expected_content: Article metadata, excerpts, publication time, original link.
+    risk_notes: Store metadata and summaries only; do not reproduce full articles.
+    dedupe_strategy: url_title_source
+  - key: spacepolicyonline-rss
+    name: SpacePolicyOnline
+    type: rss
+    region: global
+    url: https://spacepolicyonline.com/feed/
+    credibility: 4
+    enabled: true
+    purpose: Direct RSS source for civil, commercial, and regulatory space policy updates.
+    expected_content: Article metadata, excerpts, publication time, original link.
+    risk_notes: Store metadata and summaries only; policy interpretation should link to originals.
+    dedupe_strategy: url_title_source
+  - key: commercial-space-federation-rss
+    name: Commercial Space Federation
+    type: rss
+    region: global
+    url: https://commercialspace.org/feed/
+    credibility: 4
+    enabled: true
+    purpose: Industry association updates on commercial space policy, safety, and market activity.
+    expected_content: Organization posts, publication time, summaries, and original links.
+    risk_notes: Advocacy source; label as organization material and store summaries/links only.
+    dedupe_strategy: url_title_source
+  - key: china-in-space-rss
+    name: China in Space
+    type: rss
+    region: global
+    url: https://www.china-in-space.com/feed
+    credibility: 3
+    enabled: true
+    purpose: Direct feed tracking China's state-owned and commercial space industry developments.
+    expected_content: China space news metadata, excerpts, publication time, original link.
+    risk_notes: Independent newsletter source; store summaries and links only and verify sensitive claims against originals.
+    dedupe_strategy: url_title_source
+  - key: china-space-monitor-rss
+    name: China Space Monitor
+    type: rss
+    region: global
+    url: https://chinaspacemonitor.substack.com/feed
+    credibility: 3
+    enabled: true
+    purpose: Direct feed for Chinese commercial space market, policy, and company analysis.
+    expected_content: Newsletter metadata, excerpts, publication time, original link.
+    risk_notes: Newsletter analysis source; store summaries and links only and avoid paywalled/full-text reproduction.
+    dedupe_strategy: url_title_source
   - key: google-news-cn-private-launch
     name: Google News RSS - 民营火箭
     type: google_news_rss
     region: cn
     url: https://news.google.com/rss/search?q=%E6%B0%91%E8%90%A5%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese private launch company coverage.
     expected_content: Aggregated article metadata and original links.
-    risk_notes: Aggregator feed; follow original links and do not store full article text.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-satellite-internet
     name: Google News RSS - 卫星互联网
@@ -214,10 +269,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E4%BA%92%E8%81%94%E7%BD%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese satellite internet industry coverage.
     expected_content: Aggregated article metadata and original links.
-    risk_notes: Aggregator feed; follow original links and do not store full article text.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-space-financing
     name: Google News RSS - 航天融资
@@ -225,10 +280,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E8%88%AA%E5%A4%A9%20%E8%9E%8D%E8%B5%84&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track financing news for commercial space companies.
     expected_content: Financing article metadata, summaries, timestamps, original links.
-    risk_notes: Information aggregation only; no investment advice or trading signals.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers. Capital-market content remains information aggregation only.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-space-policy
     name: Google News RSS - 航天政策
@@ -236,10 +291,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E8%88%AA%E5%A4%A9%20%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese space policy and industrial policy coverage.
     expected_content: Policy article metadata, summaries, timestamps, original links.
-    risk_notes: Prefer official policy pages when available; store summaries and links.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers; prefer official policy pages.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-reusable-rocket
     name: Google News RSS - 可回收火箭
@@ -247,10 +302,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E5%8F%AF%E5%9B%9E%E6%94%B6%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese reusable launch vehicle technology and company milestones.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Aggregator feed; follow original links and do not store full article text.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-commercial-remote-sensing
     name: Google News RSS - 商业遥感
@@ -258,10 +313,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E5%95%86%E4%B8%9A%E9%81%A5%E6%84%9F&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese commercial remote-sensing companies, satellites, and applications.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Aggregator feed; store summaries and source links only.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-low-altitude-economy
     name: Google News RSS - 低空经济
@@ -269,10 +324,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E4%BD%8E%E7%A9%BA%E7%BB%8F%E6%B5%8E%20%E8%88%AA%E5%A4%A9&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track policy and industrial overlap between low-altitude economy and aerospace manufacturing.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Broad keyword source; downstream filtering should keep only aerospace-relevant records.
+    risk_notes: Backup-only broad keyword feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-satellite-launch
     name: Google News RSS - 卫星发射
@@ -280,10 +335,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E5%8F%91%E5%B0%84%20%E5%95%86%E4%B8%9A&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese commercial satellite launch missions and provider activity.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Aggregator feed; store metadata and summaries only.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-space-internet-constellation
     name: Google News RSS - 星座建设
@@ -291,10 +346,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E6%98%9F%E5%BA%A7%E5%BB%BA%E8%AE%BE%20%E5%8D%AB%E6%98%9F%E4%BA%92%E8%81%94%E7%BD%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track satellite internet constellation buildout, tenders, launches, and industrial policy.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Aggregator feed; store summaries and original links only.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: google-news-cn-lunar-commercial
     name: Google News RSS - 月球商业
@@ -302,10 +357,10 @@ sources:
     region: cn
     url: https://news.google.com/rss/search?q=%E6%9C%88%E7%90%83%20%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
     credibility: 3
-    enabled: true
+    enabled: false
     purpose: Track Chinese-language coverage of commercial lunar services, payloads, and international missions.
     expected_content: Aggregated article metadata, summaries, timestamps, original links.
-    risk_notes: Aggregator feed; store metadata and summaries only.
+    risk_notes: Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.
     dedupe_strategy: canonical_url_title
   - key: cnsa-news
     name: 国家航天局新闻
@@ -340,6 +395,108 @@ sources:
     expected_content: Official policy metadata and original links.
     risk_notes: Broad source; filter by relevant keywords.
     dedupe_strategy: url_title_source
+  - key: spacechina-news
+    name: 中国航天科技集团新闻
+    type: official_page
+    region: cn
+    url: https://www.spacechina.com/n25/n2014789/index.html
+    credibility: 5
+    enabled: true
+    purpose: Direct official source for CASC launch, satellite, and commercial-space industry updates.
+    expected_content: Official news metadata, publication dates when available, and original links.
+    risk_notes: State-owned enterprise source; store summaries and original links only.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch, satellite-internet]
+  - key: casic-news
+    name: 中国航天科工集团新闻
+    type: official_page
+    region: cn
+    url: http://www.casic.com.cn/
+    credibility: 5
+    enabled: true
+    purpose: Direct official source for CASIC launch, satellite, and aerospace industry updates.
+    expected_content: Official news metadata and original links.
+    risk_notes: State-owned enterprise source; store summaries and original links only.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch, satellite-internet]
+  - key: landspace-news
+    name: 蓝箭航天新闻
+    type: official_page
+    region: cn
+    url: https://www.landspace.com/site/
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for LandSpace launch vehicles, engine tests, missions, and financing updates.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; label as official company material and avoid marketing-copy overuse.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch, reusable-rockets]
+    default_companies: [蓝箭航天]
+  - key: orienspace-news
+    name: 东方空间新闻
+    type: official_page
+    region: cn
+    url: https://www.orienspace.com/newsPage
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for Orienspace launch vehicles, sea-launch milestones, and company activity.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; label as official company material and verify major claims with independent reporting.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch]
+    default_companies: [东方空间]
+  - key: spacepioneer-news
+    name: 天兵科技新闻
+    type: official_page
+    region: cn
+    url: https://www.spacepioneer.cc/news
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for Space Pioneer rocket development, test progress, missions, and financing updates.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; label as official company material and verify launch safety or failure claims with original notices.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch, reusable-rockets]
+    default_companies: [天兵科技]
+  - key: cas-space-news
+    name: 中科宇航新闻
+    type: official_page
+    region: cn
+    url: https://www.cas-space.com/
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for CAS Space launch vehicles, factories, missions, and commercial cargo activity.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; store summaries and links only and verify launch records against launch data sources.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch]
+    default_companies: [中科宇航]
+  - key: deepblueaerospace-news
+    name: 深蓝航天新闻
+    type: official_page
+    region: cn
+    url: https://www.dbaspace.com/indexs.html
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for Deep Blue Aerospace reusable rocket tests, launch plans, and company updates.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; label as official company material and verify commercial spaceflight claims independently.
+    dedupe_strategy: url_title_source
+    default_tags: [domestic-private-launch, reusable-rockets]
+    default_companies: [深蓝航天]
+  - key: changguang-satellite-news
+    name: 长光卫星新闻
+    type: official_page
+    region: cn
+    url: https://www.jl1.cn/index.aspx
+    credibility: 4
+    enabled: true
+    purpose: Direct company source for Jilin-1 constellation, commercial remote sensing, satellite launches, and data services.
+    expected_content: Company announcement metadata, summaries generated from titles, and original links.
+    risk_notes: Company source; store summaries and links only and avoid reproducing image or article content.
+    dedupe_strategy: url_title_source
+    default_tags: [commercial-remote-sensing]
+    default_companies: [长光卫星]
   - key: sec-rocket-lab
     name: SEC Filings - Rocket Lab
     type: capital_filing

@@ -10,8 +10,8 @@ function sourceTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     api: 'API 源',
     rss: 'RSS 源',
-    google_news_rss: '中文聚合',
-    official_page: '官方政策',
+    google_news_rss: '备用聚合',
+    official_page: '官网发布',
     capital_filing: '资本披露',
     rsshub: 'RSSHub',
   };

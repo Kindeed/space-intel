@@ -4,11 +4,30 @@ const relevantPolicyTerms = [
   '航天',
   '卫星',
   '火箭',
+  '发射',
+  '运载',
+  '入轨',
+  '试车',
+  '试验',
+  '飞船',
+  '载荷',
+  '低轨',
+  '组网',
+  '星座',
   '低空经济',
   '商业航天',
+  '商业火箭',
   '空间信息',
   '通信卫星',
+  '卫星互联网',
   '遥感',
+  '朱雀',
+  '天龙',
+  '谷神星',
+  '引力',
+  '力箭',
+  '星云',
+  '吉林一号',
   'space',
   'satellite',
   'launch',
@@ -62,6 +81,38 @@ function extractDate(value: string): string | null {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00Z`;
 }
 
+function topicTagsForTitle(title: string): string[] {
+  const text = title.toLowerCase();
+  const tags: string[] = [];
+
+  if (/(可回收|垂直回收|重复使用|reusable|booster recovery)/i.test(title)) {
+    tags.push('reusable-rockets');
+  }
+
+  if (text.includes('卫星互联网') || text.includes('低轨') || text.includes('星座') || text.includes('leo broadband')) {
+    tags.push('satellite-internet');
+  }
+
+  if (text.includes('遥感') || text.includes('earth observation') || text.includes('吉林一号')) {
+    tags.push('commercial-remote-sensing');
+  }
+
+  if (text.includes('民营火箭') || text.includes('商业火箭') || text.includes('朱雀') || text.includes('天龙') || text.includes('谷神星') || text.includes('力箭') || text.includes('引力')) {
+    tags.push('domestic-private-launch');
+  }
+
+  if (text.includes('政策') || text.includes('监管') || text.includes('regulation') || text.includes('policy') || text.includes('spectrum')) {
+    tags.push('policy-and-regulation');
+  }
+
+  return tags;
+}
+
+function itemTags(source: SourceConfig, title: string): string[] {
+  const defaults = source.default_tags ?? ['policy-and-regulation'];
+  return [...new Set([...defaults, ...topicTagsForTitle(title)])];
+}
+
 export const officialPageCollector: SourceCollector = {
   type: 'official_page',
   async collect(source: SourceConfig, context: CollectorContext): Promise<NormalizedItem[]> {
@@ -102,8 +153,8 @@ export const officialPageCollector: SourceCollector = {
         region: source.region,
         rawId: url,
         relatedLaunchIds: [],
-        companies: [],
-        tags: ['policy-and-regulation'],
+        companies: source.default_companies ?? [],
+        tags: itemTags(source, title),
       });
 
       if (items.length >= 20) {

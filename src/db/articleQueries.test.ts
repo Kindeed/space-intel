@@ -92,7 +92,7 @@ describe('article queries', () => {
       ],
       page: 2,
       limit: 1,
-      hasMore: true,
+      hasMore: false,
     });
     expect(result.items[0].storyKey).toBe('global:2026-05-09:reusable-rocket-milestone');
     expect(result.items[0].tags).toEqual([{ slug: 'reusable-rockets', name: '可回收火箭' }]);
@@ -107,6 +107,20 @@ describe('article queries', () => {
     expect(db.lastValues).toEqual(['global', 'snapi', '%rocket%', '%rocket%', '%rocket%', 'reusable-rockets', 'rocket-lab', 5, 1]);
   });
 
+  it('keeps pagination available when clustering leaves more visible stories in the fetched window', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [
+      article,
+      { ...article, id: 2, title: 'Satellite financing update' },
+      { ...article, id: 3, title: 'Launch provider contract' },
+    ];
+
+    const result = await listArticles(db, { limit: 2 });
+
+    expect(result.items.map((item) => item.id)).toEqual([1, 2]);
+    expect(result.hasMore).toBe(true);
+  });
+
   it('filters policy articles to official sources only', async () => {
     const db = new FakeDatabase();
     db.allResults = [article];
@@ -114,7 +128,7 @@ describe('article queries', () => {
     await listArticles(db, { category: 'policy' });
 
     expect(db.lastQuery).toContain('s.type = ?');
-    expect(db.lastValues).toEqual(['official_page', 50, 0]);
+    expect(db.lastValues).toEqual(['official_page', 81, 0]);
   });
 
   it('clusters repeated story coverage before returning article cards', () => {

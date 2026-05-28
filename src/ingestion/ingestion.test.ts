@@ -59,6 +59,8 @@ describe('source config', () => {
     expect(sources.some((source) => source.type === 'rss')).toBe(true);
     expect(sources.some((source) => source.type === 'google_news_rss')).toBe(true);
     expect(sources.some((source) => source.type === 'capital_filing')).toBe(true);
+    expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(0);
+    expect(sources.filter((source) => source.enabled && ['rss', 'official_page'].includes(source.type)).length).toBeGreaterThanOrEqual(25);
   });
 });
 
@@ -423,8 +425,49 @@ describe('official page collector', () => {
         rawId: 'https://www.miit.gov.cn/xwdt/2026-05-08-satellite.html',
         relatedLaunchIds: [],
         companies: [],
-        tags: ['policy-and-regulation'],
+        tags: ['policy-and-regulation', 'satellite-internet'],
       },
     ]);
+  });
+
+  it('uses configured defaults for company official pages', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'orienspace-news',
+          name: '东方空间新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://www.orienspace.com/newsPage',
+          credibility: 4,
+          enabled: true,
+          purpose: 'Company announcements.',
+          expected_content: 'Company news metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['domestic-private-launch'],
+          default_companies: ['东方空间'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="/news/demo">引力一号完成海上发射任务</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items[0]).toMatchObject({
+      sourceKey: 'orienspace-news',
+      companies: ['东方空间'],
+      tags: ['domestic-private-launch'],
+    });
   });
 });

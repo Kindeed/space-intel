@@ -34,11 +34,13 @@ try {
       await page.waitForURL('**/articles/**');
       await page.waitForTimeout(250);
       const articleBody = await page.textContent('body');
-      hasArticleDetail = articleBody?.includes('文章详情') || articleBody?.includes('打开原文链接') || false;
+      hasArticleDetail = articleBody?.includes('文章详情') || articleBody?.includes('阅读原文') || false;
       articleDetailHasDesignNotes =
         articleBody?.includes('核心要点') ||
         articleBody?.includes('只展示摘要和元数据，避免全文转载。') ||
         articleBody?.includes('实体、标签和发射关系用于快速判断线索价值。') ||
+        articleBody?.includes('摘要、要点、实体关系和原文链接') ||
+        articleBody?.includes('打开原文链接') ||
         false;
     } else {
       const homeBody = await page.textContent('body');

@@ -17,13 +17,16 @@
 
 当前进展：
 
+- DONE：Cloudflare 重建与线上采集问题修复已完成本地实现。scheduled ingestion 增加 25 秒单源超时并闭合失败日志；Launch Library 2 改为每 6 小时运行一次以降低 429；`/api/health` 改为返回最近已闭合日志和 `openIngestionLogCount`；typecheck、lint、test、build、layout 均通过。部署后需确认 Pages production source 变化并清理历史未闭合 ingestion logs。
+- DONE：第五轮回归审查已完成。确认 Round 4 用户可见文案、真实标签/公司关系和来源配置修复有效；新增修复文章列表聚合分页 `hasMore` 误判、布局验证旧文案断言和 `.claude/` 本地配置忽略；同主版本依赖已更新并通过验证，剩余大版本升级留待单独评估；审查记录见 `docs/REVIEW_REPORT_ROUND5.md`。
+- DONE：第五轮中文文案和来源可用性复查已完成。用户可见页面已清理本轮指出的三处内部表述；中文 Google News RSS 已改为默认禁用备用源；来源配置扩充到 50 个总源 / 37 个启用源，启用源以直接 RSS 和官方网页为主；typecheck、lint、test、build 和 desktop/tablet/mobile 布局检查均通过。
 - DONE：Round 4 同类 UI/API 清理已完成。文章卡片改用真实标签/公司关系，文章详情返回真实标签、公司和可匹配发射关联；sourceKey/language 伪标签、用户可见内部术语和中英文混用文案已清理；本地 typecheck、lint、test、build 和布局验证均通过。
 - DONE：自动更新链路代码修复已完成。GitHub Actions 新增 `deploy-scheduled` job；hourly scheduled ingestion 改为单源失败隔离；`sources` catalog 改为 upsert；hourly run 末尾自动执行 market seed；`/api/health` 返回最新文章发布时间和最近采集日志摘要。
 - BLOCKED：scheduled Worker 的 GitHub 自动部署依赖仓库 secret `CLOUDFLARE_API_TOKEN`。该 secret 不进入仓库；未配置时 `deploy-scheduled` job 会失败，需要在 GitHub 仓库设置中补齐。
 - DONE：第二轮审查合理项已落地。文章详情移除固定“核心要点”设计说明，首页 `/api/home` 返回近期动态热力词，LiveHud 使用动态热力词并优化发射空状态；自动采集继续采用独立 `space-intel-scheduled` Worker，部署入口为 `pnpm deploy:scheduled`。
 - DONE：Claude 审查核心问题修复已完成。新增独立 Cloudflare scheduled Worker 配置和 `official_page` 采集器，前端启用 5 分钟自动刷新，公开 API 500 响应不再返回内部 `detail`，离线假新闻和硬编码侧栏统计已移除，政策频道按官方来源优先过滤。
 - DONE：修复首页和发射页体验。已在模块化 Mission Control 前端中补入发射时间线等高展示、中文时间/状态映射和发射详情 404 业务文案；资本非投资建议提示保留。
-- DONE：Mission Control 优化已完成第一版，已降低 Google News 跨关键词重复、增加查询层 story clustering、提供 `/api/sources` 筛选源接口、改造暗色高密度三栏布局与紧凑筛选抽屉；本轮仍坚持不存全文，只展示摘要、要点、元数据和原文链接。
+- DONE：前端信息流优化已完成第一版，已降低 Google News 跨关键词重复、增加查询层同题材归并、提供 `/api/sources` 筛选源接口、改造暗色高密度三栏布局与紧凑筛选抽屉；本轮仍坚持不存全文，只展示摘要、要点、元数据和原文链接。
 - DONE：Mission Control 前端工程化优化已完成，`App.tsx` 已拆成 types/hooks/components/pages，数据请求升级为 TanStack Query，Command Palette 改用 `cmdk` 并支持快捷键、ESC 和键盘选择，CSS 已抽取暗色主题 design tokens。
 - DONE：Frontend route shell 已完成。顶部导航、侧栏、文章详情、公司、发射、资本、专题均有真实路由路径。
 - DONE：Mock-backed page skeletons 已完成，并且主要页面已接入 D1-backed API；本地 API 不可用时保留示例数据兜底。
@@ -66,7 +69,7 @@
 - DONE：Market item seed 已在 production 执行并验证，`market_items` 当前 234 条，其中 financing 100、filing 58、market 51、ipo 25。
 - DONE：Launch cache 已用 Launch Library 2 upcoming 数据写入 production D1，`launches` 当前 25 条。
 - IN_PROGRESS：Launch Library 2 endpoint 已定位到默认请求头触发 HTTP 429 的风险，采集器已加入明确 User-Agent；待部署后通过 `/api/admin/ingest/launches` 复跑验证。
-- DONE：Source configuration expanded to 37 total sources / 35 enabled sources, including additional verified RSS sources and Chinese Google News topic feeds.
+- DONE：Source configuration expanded to 50 total sources / 37 enabled sources. Google News RSS feeds are retained only as disabled backup sources; enabled sources now favor direct RSS and official pages.
 - DONE：Existing service safety 已确认，本轮开发只改项目仓库文件，没有改动 VPS、DNS、nginx 或 `pass/nezha/xui/blog/tle` 现有服务配置。
 
 计划顺序：

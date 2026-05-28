@@ -283,7 +283,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const rawLimit = Math.min(limit * 4 + 1, maxLimit);
+  const rawFetchLimit = Math.min(limit * 4 + 1, maxLimit * 4 + 1);
   const statement = db.prepare(
     `SELECT
       a.id,
@@ -305,20 +305,20 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
     ORDER BY a.published_at DESC, a.id DESC
     LIMIT ? OFFSET ?`,
   );
-  const queryResult = await statement.bind(...values, rawLimit, offset).all?.<ArticleSummaryDbRow>();
+  const queryResult = await statement.bind(...values, rawFetchLimit, offset).all?.<ArticleSummaryDbRow>();
 
   if (!queryResult) {
     throw new Error('Database statement does not support all()');
   }
 
   const rows = queryResult.results.map(toArticleSummary);
-  const clusteredRows = clusterArticleRows(rows, limit);
+  const clusteredRows = clusterArticleRows(rows, rawFetchLimit);
 
   return {
-    items: clusteredRows,
+    items: clusteredRows.slice(0, limit),
     page,
     limit,
-    hasMore: rows.length > clusteredRows.length,
+    hasMore: rows.length === rawFetchLimit || clusteredRows.length > limit,
   };
 }
 

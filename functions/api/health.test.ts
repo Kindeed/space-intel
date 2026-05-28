@@ -17,7 +17,12 @@ class FakeHealthStatement {
       return { latestArticlePublishedAt: '2026-05-18T08:00:00Z' } as T;
     }
 
+    if (this.query.includes('COUNT(*) AS openIngestionLogCount')) {
+      return { openIngestionLogCount: 2 } as T;
+    }
+
     if (this.query.includes('FROM ingestion_logs')) {
+      expect(this.query).toContain('finished_at IS NOT NULL');
       return {
         sourceKey: 'google-news-cn-commercial-space',
         startedAt: '2026-05-18T08:00:00Z',
@@ -56,6 +61,7 @@ describe('health API', () => {
       },
       diagnostics: {
         latestArticlePublishedAt: '2026-05-18T08:00:00Z',
+        openIngestionLogCount: 2,
         latestIngestionLog: {
           sourceKey: 'google-news-cn-commercial-space',
           startedAt: '2026-05-18T08:00:00Z',

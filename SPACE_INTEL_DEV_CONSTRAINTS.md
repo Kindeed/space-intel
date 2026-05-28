@@ -18,17 +18,17 @@
 - v1 核心开发已基本完成：React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序和主要业务页面均已有第一版实现。
 - 已完成页面：首页、文章列表、文章详情、公司页、发射页、资本页、专题页，均保留本地 API 不可用时的示例数据兜底。
 - 已完成 API：`/api/home`、`/api/articles`、`/api/articles/:id`、`/api/companies`、`/api/companies/:slug`、`/api/launches`、`/api/launches/:id`、`/api/market`、`/api/topics`、`/api/topics/:slug`。
-- 已完成采集能力：Spaceflight News API、Launch Library 2、标准 RSS、Google News RSS、去重写入、ingestion logs、scheduled ingestion 测试。
+- 已完成采集能力：Spaceflight News API、Launch Library 2、标准 RSS、官方网页源、Google News RSS 备用源、去重写入、ingestion logs、scheduled ingestion 测试。
 - 已完成配置能力：`config/sources.yaml`、`config/companies.yaml`、`config/topics.yaml`、`config/curations.yaml`，以及人工精选同步到 D1。
 - 已完成工程化：GitHub repository、`main`/`dev` 分支、branch protection、GitHub Actions CI、Wrangler 配置、D1 migration、本地 typecheck/lint/test/build 流程。
 - 已完成部署验证：Cloudflare Pages 项目、Git-backed production 部署、`space.bytebaud.com` Pages custom domain、`/api/health` 可访问。
 - 已完成 R2 bucket 创建：`space-intel-assets` 已存在，仓库 `wrangler.toml` 绑定名为 `R2_ASSETS`。
 - 已完成 production runtime 验证：`/api/health` 返回 `d1: true`、`r2: true`；`ADMIN_TOKEN` 已配置到 Pages production，secret 值未进入仓库。
-- 已完成首批 production ingestion：SNAPI、Google News RSS、RSS 源已写入 D1；截至 2026-05-13，`articles` 表有 1185 条。
+- 已完成首批 production ingestion：SNAPI、Google News RSS、RSS 源已写入 D1；截至 2026-05-13，`articles` 表有 1185 条。当前配置已将 Google News RSS 调整为默认禁用的备用源。
 - 已完成 production catalog/enrichment：`companies` 表 23 条、`tags` 表 6 条；文章实体关联已重建，当前 `article_companies` 44 条、`article_tags` 25 条。
 - 已完成 production market seed：`market_items` 表当前 234 条，其中 financing 100、filing 58、market 51、ipo 25。
 - 已完成 production launch cache seed：`launches` 表当前 25 条。
-- 已扩充来源配置：`config/sources.yaml` 当前 37 个来源，其中 35 个启用；包含 15 个 RSS 源和 11 个中文 Google News RSS 聚合源。
+- 已扩充来源配置：`config/sources.yaml` 当前 50 个来源，其中 37 个启用；启用源包含 20 个 RSS 源、11 个官方网页源、2 个 API 源和 4 个资本披露源；11 个 Google News RSS 源保留为默认禁用备用源。
 
 当前待处理：
 
@@ -37,7 +37,7 @@
 下一步：
 
 - 合并并部署 Launch Library 2 User-Agent 修正后，复跑 `/api/admin/ingest/launches`。
-- 继续观察新增 RSS 和 Google News RSS 来源的采集质量、重复率和相关性。
+- 继续观察新增 RSS 和官方网页来源的采集质量、重复率和相关性；Google News RSS 仅作为必要时手动启用的备用聚合源。
 - 保持 `SPACE_INTEL_TASKS.md` 为日常开发进度的唯一详细记录；重大状态变化同步更新本快照。
 
 ## Platform And Repository
@@ -169,7 +169,7 @@ space-intel/
 ## Plugin-Style Source Architecture
 
 - 新增来源必须通过 `config/sources.yaml` 声明，不允许把来源 URL、关键词、地区规则散落硬编码在页面或 API 中。
-- 每类来源应有独立采集器：SNAPI、Launch Library 2、标准 RSS、Google News RSS、RSSHub、资本市场资讯。
+- 每类来源应有独立采集器：SNAPI、Launch Library 2、标准 RSS、官方网页源、Google News RSS 备用源、RSSHub、资本市场资讯。
 - 采集器输出统一的 normalized item，再进入去重、标签识别、公司匹配和写入流程。
 - 新增采集器必须记录来源用途、预期内容类型、失败行为、合规风险和去重策略。
 - 资本市场来源优先使用公开 RSS、公告页、新闻源和原文链接；不得把逆向接口作为 v1 依赖。
@@ -187,7 +187,7 @@ space-intel/
 
 ### China News And Policy
 
-- Google News RSS 中文关键词：商业航天、民营火箭、卫星互联网、低空经济、航天融资。
+- Google News RSS 中文关键词：商业航天、民营火箭、卫星互联网、低空经济、航天融资；默认禁用，只作为国内直连源不足时的备用聚合入口。
 - RSSHub 路由：微博、B站、微信公众号、机构官网。
 - 政策源：国家航天局、工信部、发改委、地方政府产业政策页面。
 
@@ -258,7 +258,7 @@ space-intel/
 
 ### Hourly Job
 
-- 拉取 SNAPI、Launch Library 2、RSS、Google News RSS。
+- 拉取 SNAPI、Launch Library 2、RSS 和官方网页源；仅在来源配置显式启用时拉取 Google News RSS。
 - 标准化标题、时间、来源、URL。
 - 基于 URL、标题相似度、来源生成去重 hash。
 - 自动识别地区、语言、公司和主题标签。
@@ -334,7 +334,7 @@ pnpm build
 1. 建立 GitHub 仓库和项目骨架。
 2. 配置 Cloudflare Pages、D1、R2、Wrangler。
 3. 实现 D1 schema、迁移、基础 API。
-4. 实现 SNAPI、Launch Library 2、RSS、Google News RSS 采集器。
+4. 实现 SNAPI、Launch Library 2、RSS、官方网页源和 Google News RSS 备用采集器。
 5. 实现首页、新闻列表、详情页、公司页、发射页、资本页、专题页。
 6. 加入人工精选配置和首页排序。
 7. 加入 GitHub Actions CI 和 Cloudflare 自动部署。
