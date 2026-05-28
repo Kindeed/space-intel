@@ -21,6 +21,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
       status: url.searchParams.get('status') ?? undefined,
       provider: url.searchParams.get('provider') ?? undefined,
       query: url.searchParams.get('query') ?? undefined,
+      includePast: url.searchParams.get('includePast') === '1',
       page: parsePositiveInteger(url.searchParams.get('page')),
       limit: parsePositiveInteger(url.searchParams.get('limit')),
     });

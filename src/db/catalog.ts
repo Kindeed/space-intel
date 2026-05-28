@@ -1,4 +1,5 @@
 import type { CompanyConfigRecord, TopicConfigRecord } from '../catalog';
+import type { SourceConfig } from '../ingestion';
 import type { SqlDatabase } from './types';
 
 export type CatalogSyncResult = {
@@ -67,6 +68,58 @@ export async function upsertConfiguredTags(db: SqlDatabase, topics: TopicConfigR
           category = excluded.category`,
       )
       .bind(topic.slug, topic.name, topic.category)
+      .run();
+
+    upserted += result.meta?.changes ?? 0;
+  }
+
+  return { upserted };
+}
+
+export async function upsertConfiguredSources(db: SqlDatabase, sources: SourceConfig[]): Promise<CatalogSyncResult> {
+  let upserted = 0;
+
+  for (const source of sources) {
+    const result = await db
+      .prepare(
+        `INSERT INTO sources (
+          key,
+          name,
+          type,
+          region,
+          url,
+          credibility,
+          enabled,
+          purpose,
+          expected_content,
+          risk_notes,
+          dedupe_strategy
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(key) DO UPDATE SET
+          name = excluded.name,
+          type = excluded.type,
+          region = excluded.region,
+          url = excluded.url,
+          credibility = excluded.credibility,
+          enabled = excluded.enabled,
+          purpose = excluded.purpose,
+          expected_content = excluded.expected_content,
+          risk_notes = excluded.risk_notes,
+          dedupe_strategy = excluded.dedupe_strategy`,
+      )
+      .bind(
+        source.key,
+        source.name,
+        source.type,
+        source.region,
+        source.url,
+        source.credibility,
+        source.enabled ? 1 : 0,
+        source.purpose,
+        source.expected_content,
+        source.risk_notes,
+        source.dedupe_strategy,
+      )
       .run();
 
     upserted += result.meta?.changes ?? 0;
