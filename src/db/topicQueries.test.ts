@@ -69,6 +69,7 @@ const article: ArticleSummaryRow = {
   title: 'Reusable booster completes another landing',
   originalTitle: 'Reusable booster completes another landing',
   summary: 'Short metadata summary only.',
+  originalSummary: 'Short metadata summary only.',
   url: 'https://example.com/reusable',
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
@@ -77,6 +78,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  translationStatus: 'skipped',
+  translationProvider: null,
   tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
   companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };

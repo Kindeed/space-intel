@@ -32,6 +32,12 @@ export function ArticleDetailPage() {
           </div>
         ) : null}
         <p>{summary}</p>
+        {article?.originalSummary && article.originalSummary !== article.summary ? (
+          <div className="metadata-block">
+            <span>原文摘要</span>
+            <strong>{article.originalSummary}</strong>
+          </div>
+        ) : null}
         <div className="tag-row">
           {detailCompanies.map((company) => (
             <Link className="entity-chip" key={companyName(company)} to={`/companies/${companySlug(company)}`}>{companyName(company)}</Link>

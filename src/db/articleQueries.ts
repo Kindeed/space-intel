@@ -17,6 +17,7 @@ export type ArticleSummaryRow = {
   title: string;
   originalTitle: string | null;
   summary: string;
+  originalSummary: string | null;
   url: string;
   sourceKey: string;
   sourceName: string;
@@ -25,6 +26,8 @@ export type ArticleSummaryRow = {
   language: string;
   region: string;
   fetchStatus: string;
+  translationStatus: 'translated' | 'skipped' | 'failed';
+  translationProvider: string | null;
   tags: ArticleEntityRef[];
   companies: ArticleEntityRef[];
   storyKey?: string;
@@ -250,9 +253,11 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   }
 
   if (filters.query?.trim()) {
-    conditions.push('(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ?)');
+    conditions.push(
+      '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ? OR LOWER(a.original_summary) LIKE ?)',
+    );
     const query = likeValue(filters.query);
-    values.push(query, query, query);
+    values.push(query, query, query, query);
   }
 
   if (filters.tag) {
@@ -290,6 +295,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       a.title,
       a.original_title AS originalTitle,
       a.summary,
+      a.original_summary AS originalSummary,
       a.url,
       s.key AS sourceKey,
       s.name AS sourceName,
@@ -298,6 +304,8 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       a.language,
       a.region,
       a.fetch_status AS fetchStatus,
+      a.translation_status AS translationStatus,
+      a.translation_provider AS translationProvider,
       ${articleRelationSelectFields}
     FROM articles a
     JOIN sources s ON s.id = a.source_id
@@ -334,6 +342,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         a.title,
         a.original_title AS originalTitle,
         a.summary,
+        a.original_summary AS originalSummary,
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -342,6 +351,8 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
+        a.translation_status AS translationStatus,
+        a.translation_provider AS translationProvider,
         ${articleDetailRelationSelectFields}
       FROM articles a
       JOIN sources s ON s.id = a.source_id

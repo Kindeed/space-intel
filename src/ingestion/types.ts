@@ -30,6 +30,7 @@ export type NormalizedItem = {
   title: string;
   originalTitle?: string;
   summary: string;
+  originalSummary?: string;
   url: string;
   publishedAt: string;
   language: 'zh' | 'en' | 'unknown';
@@ -38,6 +39,10 @@ export type NormalizedItem = {
   relatedLaunchIds: string[];
   companies: string[];
   tags: string[];
+  translationStatus?: 'translated' | 'skipped' | 'failed';
+  translationProvider?: string;
+  translatedAt?: string;
+  translationError?: string;
 };
 
 export type CollectorContext = {

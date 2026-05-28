@@ -17,6 +17,7 @@ export type ApiArticleSummary = {
   title: string;
   originalTitle: string | null;
   summary: string;
+  originalSummary: string | null;
   url: string;
   sourceKey: string;
   sourceName: string;
@@ -25,6 +26,8 @@ export type ApiArticleSummary = {
   language: string;
   region: string;
   fetchStatus: string;
+  translationStatus: 'translated' | 'skipped' | 'failed';
+  translationProvider: string | null;
   tags: ApiArticleEntity[];
   companies: ApiArticleEntity[];
   relatedSourceCount?: number;

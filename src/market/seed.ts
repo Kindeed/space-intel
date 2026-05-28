@@ -58,8 +58,13 @@ function classifyMarketItem(title: string, summary: string): string {
 }
 
 export async function listMarketSeedArticles(db: SqlDatabase): Promise<MarketSeedArticle[]> {
-  const conditions = marketTerms.map(() => '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ?)').join(' OR ');
-  const values = marketTerms.flatMap((term) => [`%${term.toLowerCase()}%`, `%${term.toLowerCase()}%`]);
+  const conditions = marketTerms
+    .map(() => '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ? OR LOWER(a.original_summary) LIKE ?)')
+    .join(' OR ');
+  const values = marketTerms.flatMap((term) => {
+    const value = `%${term.toLowerCase()}%`;
+    return [value, value, value, value];
+  });
   const result = await db
     .prepare(
       `SELECT

@@ -69,6 +69,7 @@ const article: ArticleSummaryRow = {
   title: 'Reusable rocket milestone',
   originalTitle: 'Reusable rocket milestone',
   summary: 'Short summary only.',
+  originalSummary: 'Short summary only.',
   url: 'https://example.com/article',
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
@@ -77,6 +78,8 @@ const article: ArticleSummaryRow = {
   language: 'en',
   region: 'global',
   fetchStatus: 'fetched',
+  translationStatus: 'skipped',
+  translationProvider: null,
   tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
   companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
 };

@@ -5,6 +5,7 @@ export type EnrichmentArticle = {
   title: string;
   originalTitle: string | null;
   summary: string;
+  originalSummary?: string | null;
 };
 
 export type ArticleEntityMatch = {
@@ -37,7 +38,7 @@ export function matchArticleEntities(
   companies: CompanyConfigRecord[],
   topics: TopicConfigRecord[],
 ): ArticleEntityMatch {
-  const text = [article.title, article.originalTitle, article.summary].filter(Boolean).join('\n');
+  const text = [article.title, article.originalTitle, article.summary, article.originalSummary].filter(Boolean).join('\n');
 
   return {
     articleId: article.id,

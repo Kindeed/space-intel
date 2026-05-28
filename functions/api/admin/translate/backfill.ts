@@ -1,11 +1,19 @@
-import sourcesConfig from '../../../../config/sources.generated.json';
-import { createCollectorRegistry, parseSourcesConfig, runSourceIngestion, spaceflightNewsCollector } from '../../../../src/ingestion';
+import { backfillArticleTranslations } from '../../../../src/translation/backfill';
 import type { TranslationEnv } from '../../../../src/translation';
 
 type Env = TranslationEnv & {
   DB: D1Database;
   ADMIN_TOKEN?: string;
 };
+
+function parseLimit(value: string | null): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const expectedToken = env.ADMIN_TOKEN;
@@ -15,24 +23,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const source = parseSourcesConfig(sourcesConfig).find((item) => item.key === 'snapi');
-
-  if (!source) {
-    return Response.json({ error: 'SNAPI source is not configured' }, { status: 500 });
-  }
-
-const registry = createCollectorRegistry([spaceflightNewsCollector]);
-  const result = await runSourceIngestion(
+  const url = new URL(request.url);
+  const result = await backfillArticleTranslations(
     env.DB,
-    source,
-    registry,
+    env,
     {
       fetch: (input, init) => fetch(input, init),
       now: () => new Date(),
     },
-    {
-      translationEnv: env,
-    },
+    parseLimit(url.searchParams.get('limit')),
   );
 
   return Response.json(result);
