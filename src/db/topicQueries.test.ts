@@ -35,6 +35,10 @@ class FakeStatement implements DbStatement {
     }
 
     if (this.query.includes('FROM articles a')) {
+      if (this.database.failTranslationColumns && this.query.includes('a.original_summary')) {
+        throw new Error('D1_ERROR: no such column: a.original_summary');
+      }
+
       return { results: this.database.articleResults as T[] };
     }
 
@@ -45,6 +49,7 @@ class FakeStatement implements DbStatement {
 class FakeTopicDatabase implements SqlDatabase {
   queries: string[] = [];
   values: unknown[][] = [];
+  failTranslationColumns = false;
   topicResults: TopicRow[] = [];
   articleResults: ArticleSummaryRow[] = [];
   curationResults: TopicCurationRow[] = [];
@@ -124,6 +129,26 @@ describe('topic queries', () => {
     expect(db.queries[1]).toContain('AS companiesJson');
     expect(db.queries[2]).not.toContain('weight,');
     expect(db.values).toEqual([['reusable-rockets'], [topic.id], [topic.slug]]);
+  });
+
+  it('falls back to legacy topic article queries when translation columns are missing', async () => {
+    const db = new FakeTopicDatabase();
+    db.failTranslationColumns = true;
+    db.firstResult = topic;
+    db.articleResults = [{ ...article, originalSummary: null, translationStatus: 'skipped', translationProvider: null }];
+    db.curationResults = [curation];
+
+    const result = await getTopicBySlug(db, 'reusable-rockets');
+
+    expect(result?.articles[0]).toMatchObject({
+      id: 10,
+      originalSummary: null,
+      translationStatus: 'skipped',
+    });
+    expect(db.queries).toHaveLength(4);
+    expect(db.queries[1]).toContain('a.original_summary AS originalSummary');
+    expect(db.queries[2]).toContain('NULL AS originalSummary');
+    expect(db.queries[3]).toContain('FROM curations');
   });
 
   it('returns null for blank or missing topic slugs', async () => {

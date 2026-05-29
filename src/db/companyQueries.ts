@@ -1,4 +1,11 @@
-import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
+import {
+  articleRelationSelectFields,
+  articleTranslationSelectFields,
+  isMissingArticleTranslationColumnError,
+  toArticleSummary,
+  type ArticleSummaryDbRow,
+  type ArticleSummaryRow,
+} from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type CompanyRow = {
@@ -79,14 +86,17 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
     return null;
   }
 
-  const articleResult = await db
-    .prepare(
-      `SELECT
+  const companyId = company.id;
+
+  async function listCompanyArticles(includeTranslationFields: boolean): Promise<ArticleSummaryRow[]> {
+    const articleResult = await db
+      .prepare(
+        `SELECT
         a.id,
         a.title,
         a.original_title AS originalTitle,
         a.summary,
-        a.original_summary AS originalSummary,
+        ${articleTranslationSelectFields(includeTranslationFields)},
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -95,8 +105,6 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
-        a.translation_status AS translationStatus,
-        a.translation_provider AS translationProvider,
         ${articleRelationSelectFields}
       FROM articles a
       JOIN article_companies ac ON ac.article_id = a.id
@@ -104,16 +112,31 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
       WHERE ac.company_id = ?
       ORDER BY a.published_at DESC, a.id DESC
       LIMIT 20`,
-    )
-    .bind(company.id)
-    .all?.<ArticleSummaryDbRow>();
+      )
+      .bind(companyId)
+      .all?.<ArticleSummaryDbRow>();
 
-  if (!articleResult) {
-    throw new Error('Database statement does not support all()');
+    if (!articleResult) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    return articleResult.results.map(toArticleSummary);
+  }
+
+  let articles: ArticleSummaryRow[];
+
+  try {
+    articles = await listCompanyArticles(true);
+  } catch (error) {
+    if (!isMissingArticleTranslationColumnError(error)) {
+      throw error;
+    }
+
+    articles = await listCompanyArticles(false);
   }
 
   return {
     ...company,
-    articles: articleResult.results.map(toArticleSummary),
+    articles,
   };
 }

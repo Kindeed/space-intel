@@ -26,6 +26,12 @@ class FakeStatement implements DbStatement {
   async all<T = unknown>(): Promise<{ results: T[] }> {
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
+    this.database.queries.push(this.query);
+
+    if (this.database.failTranslationColumns && this.query.includes('a.original_summary')) {
+      throw new Error('D1_ERROR: no such column: a.original_summary');
+    }
+
     return { results: this.database.results as T[] };
   }
 }
@@ -33,6 +39,8 @@ class FakeStatement implements DbStatement {
 class FakeHomeDatabase implements SqlDatabase {
   lastQuery = '';
   lastValues: unknown[] = [];
+  queries: string[] = [];
+  failTranslationColumns = false;
   results: Array<RankedHomeArticle | TrendingTag> = [];
 
   prepare(query: string): DbStatement {
@@ -65,5 +73,17 @@ describe('home ranking queries', () => {
     expect(db.lastQuery).toContain("WHERE a.published_at >= datetime('now', '-7 days')");
     expect(db.lastQuery).toContain('ORDER BY count DESC, t.name ASC');
     expect(db.lastValues).toEqual([12]);
+  });
+
+  it('falls back to legacy home article queries when translation columns are missing', async () => {
+    const db = new FakeHomeDatabase();
+    db.failTranslationColumns = true;
+
+    await listRankedHomeArticles(db, 4);
+
+    expect(db.queries).toHaveLength(2);
+    expect(db.queries[0]).toContain('a.original_summary AS originalSummary');
+    expect(db.queries[1]).toContain('NULL AS originalSummary');
+    expect(db.lastValues).toEqual([4]);
   });
 });

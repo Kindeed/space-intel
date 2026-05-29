@@ -86,6 +86,20 @@ export const articleRelationSelectFields = `
         WHERE ac.article_id = a.id
       ), '[]') AS companiesJson`;
 
+export function articleTranslationSelectFields(includeTranslationFields = true): string {
+  if (!includeTranslationFields) {
+    return `
+      NULL AS originalSummary,
+      'skipped' AS translationStatus,
+      NULL AS translationProvider`;
+  }
+
+  return `
+      a.original_summary AS originalSummary,
+      a.translation_status AS translationStatus,
+      a.translation_provider AS translationProvider`;
+}
+
 export const articleDetailRelationSelectFields = `${articleRelationSelectFields},
       COALESCE((
         SELECT json_group_array(json_object(
@@ -179,6 +193,15 @@ function likeValue(value: string): string {
   return `%${value.trim().toLowerCase()}%`;
 }
 
+export function isMissingArticleTranslationColumnError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+
+  return (
+    message.toLowerCase().includes('no such column') &&
+    ['original_summary', 'translation_status', 'translation_provider'].some((column) => message.includes(column))
+  );
+}
+
 function normalizeStoryText(value: string): string {
   return value
     .toLowerCase()
@@ -239,63 +262,67 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   const page = normalizePage(filters.page);
   const limit = normalizeLimit(filters.limit);
   const offset = (page - 1) * limit;
-  const conditions: string[] = [];
-  const values: unknown[] = [];
 
-  if (filters.region) {
-    conditions.push('a.region = ?');
-    values.push(filters.region);
-  }
+  async function runQuery(includeTranslationFields: boolean): Promise<ArticleListResult> {
+    const conditions: string[] = [];
+    const values: unknown[] = [];
 
-  if (filters.source) {
-    conditions.push('s.key = ?');
-    values.push(filters.source);
-  }
+    if (filters.region) {
+      conditions.push('a.region = ?');
+      values.push(filters.region);
+    }
 
-  if (filters.query?.trim()) {
-    conditions.push(
-      '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ? OR LOWER(a.original_summary) LIKE ?)',
-    );
-    const query = likeValue(filters.query);
-    values.push(query, query, query, query);
-  }
+    if (filters.source) {
+      conditions.push('s.key = ?');
+      values.push(filters.source);
+    }
 
-  if (filters.tag) {
-    conditions.push(
-      `EXISTS (
+    if (filters.query?.trim()) {
+      conditions.push(
+        includeTranslationFields
+          ? '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ? OR LOWER(a.original_summary) LIKE ?)'
+          : '(LOWER(a.title) LIKE ? OR LOWER(a.summary) LIKE ? OR LOWER(a.original_title) LIKE ?)',
+      );
+      const query = likeValue(filters.query);
+      values.push(...(includeTranslationFields ? [query, query, query, query] : [query, query, query]));
+    }
+
+    if (filters.tag) {
+      conditions.push(
+        `EXISTS (
         SELECT 1 FROM article_tags at
         JOIN tags t ON t.id = at.tag_id
         WHERE at.article_id = a.id AND t.slug = ?
       )`,
-    );
-    values.push(filters.tag);
-  }
+      );
+      values.push(filters.tag);
+    }
 
-  if (filters.company) {
-    conditions.push(
-      `EXISTS (
+    if (filters.company) {
+      conditions.push(
+        `EXISTS (
         SELECT 1 FROM article_companies ac
         JOIN companies c ON c.id = ac.company_id
         WHERE ac.article_id = a.id AND c.slug = ?
       )`,
-    );
-    values.push(filters.company);
-  }
+      );
+      values.push(filters.company);
+    }
 
-  if (filters.category === 'policy') {
-    conditions.push('s.type = ?');
-    values.push('official_page');
-  }
+    if (filters.category === 'policy') {
+      conditions.push('s.type = ?');
+      values.push('official_page');
+    }
 
-  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const rawFetchLimit = Math.min(limit * 4 + 1, maxLimit * 4 + 1);
-  const statement = db.prepare(
-    `SELECT
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const rawFetchLimit = Math.min(limit * 4 + 1, maxLimit * 4 + 1);
+    const statement = db.prepare(
+      `SELECT
       a.id,
       a.title,
       a.original_title AS originalTitle,
       a.summary,
-      a.original_summary AS originalSummary,
+      ${articleTranslationSelectFields(includeTranslationFields)},
       a.url,
       s.key AS sourceKey,
       s.name AS sourceName,
@@ -304,30 +331,39 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       a.language,
       a.region,
       a.fetch_status AS fetchStatus,
-      a.translation_status AS translationStatus,
-      a.translation_provider AS translationProvider,
       ${articleRelationSelectFields}
     FROM articles a
     JOIN sources s ON s.id = a.source_id
     ${whereClause}
     ORDER BY a.published_at DESC, a.id DESC
     LIMIT ? OFFSET ?`,
-  );
-  const queryResult = await statement.bind(...values, rawFetchLimit, offset).all?.<ArticleSummaryDbRow>();
+    );
+    const queryResult = await statement.bind(...values, rawFetchLimit, offset).all?.<ArticleSummaryDbRow>();
 
-  if (!queryResult) {
-    throw new Error('Database statement does not support all()');
+    if (!queryResult) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    const rows = queryResult.results.map(toArticleSummary);
+    const clusteredRows = clusterArticleRows(rows, rawFetchLimit);
+
+    return {
+      items: clusteredRows.slice(0, limit),
+      page,
+      limit,
+      hasMore: rows.length === rawFetchLimit || clusteredRows.length > limit,
+    };
   }
 
-  const rows = queryResult.results.map(toArticleSummary);
-  const clusteredRows = clusterArticleRows(rows, rawFetchLimit);
+  try {
+    return await runQuery(true);
+  } catch (error) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      return runQuery(false);
+    }
 
-  return {
-    items: clusteredRows.slice(0, limit),
-    page,
-    limit,
-    hasMore: rows.length === rawFetchLimit || clusteredRows.length > limit,
-  };
+    throw error;
+  }
 }
 
 export async function getArticleById(db: SqlDatabase, id: number): Promise<ArticleDetailRow | null> {
@@ -335,14 +371,15 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
     return null;
   }
 
-  const row = await db
-    .prepare(
-      `SELECT
+  async function runQuery(includeTranslationFields: boolean): Promise<ArticleDetailRow | null> {
+    const row = await db
+      .prepare(
+        `SELECT
         a.id,
         a.title,
         a.original_title AS originalTitle,
         a.summary,
-        a.original_summary AS originalSummary,
+        ${articleTranslationSelectFields(includeTranslationFields)},
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -351,15 +388,24 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
-        a.translation_status AS translationStatus,
-        a.translation_provider AS translationProvider,
         ${articleDetailRelationSelectFields}
       FROM articles a
       JOIN sources s ON s.id = a.source_id
       WHERE a.id = ?`,
-    )
-    .bind(id)
-    .first<ArticleDetailDbRow>();
+      )
+      .bind(id)
+      .first<ArticleDetailDbRow>();
 
-  return toArticleDetail(row);
+    return toArticleDetail(row);
+  }
+
+  try {
+    return await runQuery(true);
+  } catch (error) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      return runQuery(false);
+    }
+
+    throw error;
+  }
 }
