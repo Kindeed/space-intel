@@ -17,6 +17,7 @@
 
 当前任务：
 
+- DONE：UI 主导航从五栏/六入口收敛为四个主入口，并将公司库、专题追踪降级为次级索引入口；`vitest` 局部测试、`tsc -b --noEmit`、`eslint .`、`vite build`、`verify-layout` 和本地 Playwright desktop/mobile 布局检查均已通过。
 - IN_PROGRESS：Launch Library 2 endpoint 已加入明确 User-Agent 且 scheduled Worker 已可部署；继续复跑 production `/api/admin/ingest/launches` 并验证 `/api/launches` 返回未来发射。
 - DONE：治理文档整理已完成。已拆分稳定约束、任务账本和问题账本，避免约束文件承担任务流水和 bug 账本职责；`tsc -b --noEmit`、`eslint .`、diff check 和 secret-pattern scan 均已通过。
 - IN_PROGRESS：生产文章相关 API 500 已实现旧 schema 兼容兜底，覆盖 `/api/home`、`/api/articles`、文章详情、公司详情和专题详情；待部署后复查生产接口并确认 D1 `0004_article_translation_fields` 迁移状态。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-005`。
