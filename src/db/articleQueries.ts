@@ -195,11 +195,12 @@ function likeValue(value: string): string {
 
 export function isMissingArticleTranslationColumnError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
-
-  return (
-    message.toLowerCase().includes('no such column') &&
-    ['original_summary', 'translation_status', 'translation_provider'].some((column) => message.includes(column))
+  const normalized = message.toLowerCase();
+  const hasTranslationColumn = ['original_summary', 'translation_status', 'translation_provider', 'translated_at', 'translation_error'].some((column) =>
+    normalized.includes(column),
   );
+
+  return hasTranslationColumn && (normalized.includes('no such column') || normalized.includes('has no column named'));
 }
 
 function normalizeStoryText(value: string): string {
@@ -311,14 +312,13 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
 
     if (filters.category === 'policy') {
       conditions.push(
-        `s.type = ?
-        AND EXISTS (
+        `EXISTS (
           SELECT 1 FROM article_tags at_policy
           JOIN tags t_policy ON t_policy.id = at_policy.tag_id
           WHERE at_policy.article_id = a.id AND t_policy.slug = ?
         )`,
       );
-      values.push('official_page', 'policy-and-regulation');
+      values.push('policy-and-regulation');
     }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';

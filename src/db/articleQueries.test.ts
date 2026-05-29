@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clusterArticleRows,
   getArticleById,
+  isMissingArticleTranslationColumnError,
   listArticles,
   type ArticleDetailDbRow,
   type ArticleSummaryDbRow,
@@ -85,6 +86,11 @@ const article: ArticleSummaryRow = {
 };
 
 describe('article queries', () => {
+  it('recognizes missing translation columns in select and insert errors', () => {
+    expect(isMissingArticleTranslationColumnError(new Error('D1_ERROR: no such column: a.original_summary'))).toBe(true);
+    expect(isMissingArticleTranslationColumnError(new Error('D1_ERROR: table articles has no column named original_summary'))).toBe(true);
+  });
+
   it('lists articles with filters and pagination', async () => {
     const db = new FakeDatabase();
     db.allResults = [article, { ...article, id: 2 }];
@@ -149,15 +155,15 @@ describe('article queries', () => {
     expect(result.hasMore).toBe(true);
   });
 
-  it('filters policy articles to official sources with policy tags', async () => {
+  it('filters policy articles by policy tag across source types', async () => {
     const db = new FakeDatabase();
     db.allResults = [article];
 
     await listArticles(db, { category: 'policy' });
 
-    expect(db.lastQuery).toContain('s.type = ?');
+    expect(db.lastQuery).not.toContain('s.type = ?');
     expect(db.lastQuery).toContain('t_policy.slug = ?');
-    expect(db.lastValues).toEqual(['official_page', 'policy-and-regulation', 81, 0]);
+    expect(db.lastValues).toEqual(['policy-and-regulation', 81, 0]);
   });
 
   it('falls back to legacy article list queries when translation columns are missing', async () => {

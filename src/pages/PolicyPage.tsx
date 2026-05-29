@@ -47,7 +47,7 @@ export function PolicyPage() {
         <form className="filter-form" action="/policy">
           <label>关键词<input name="query" type="search" defaultValue={searchParams.get('query') ?? ''} placeholder="地方、园区、讲话、行动方案" /></label>
           <label>地区<select name="region" defaultValue={searchParams.get('region') ?? ''}><option value="">全部地区</option><option value="cn">国内</option><option value="global">国际</option></select></label>
-          <label>来源<select name="source" defaultValue={searchParams.get('source') ?? ''}><option value="">全部来源</option><SourceOptions type="official_page" /></select></label>
+          <label>来源<select name="source" defaultValue={searchParams.get('source') ?? ''}><option value="">全部来源</option><SourceOptions types={['official_page', 'procurement_page', 'rss']} /></select></label>
           <button type="submit"><Search size={16} aria-hidden="true" /> 应用</button>
         </form>
       </details>

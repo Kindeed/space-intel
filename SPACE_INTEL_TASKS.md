@@ -22,7 +22,7 @@
 - IN_PROGRESS：Launch Library 2 endpoint 已加入明确 User-Agent 且 scheduled Worker 已可部署；继续复跑 production `/api/admin/ingest/launches` 并验证 `/api/launches` 返回未来发射。
 - DONE：治理文档整理已完成。已拆分稳定约束、任务账本和问题账本，避免约束文件承担任务流水和 bug 账本职责；`tsc -b --noEmit`、`eslint .`、diff check 和 secret-pattern scan 均已通过。
 - IN_PROGRESS：生产文章相关 API 500 已实现旧 schema 兼容兜底，覆盖 `/api/home`、`/api/articles`、文章详情、公司详情和专题详情；待部署后复查生产接口并确认 D1 `0004_article_translation_fields` 迁移状态。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-005`。
-- TODO：排查 production health 中的未闭合 ingestion logs 和官方网页来源失败；跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-006`。
+- DONE：已修复政策页为空和采集入库兼容问题。政策页按 `policy-and-regulation` 标签展示官方页、采购页和 RSS 政策记录；采集入库在生产 D1 缺翻译字段时会降级写入旧 schema，避免爬虫抓到内容后整源失败。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-006` 和 `SI-ISSUE-007`。
 - DONE：修复 scheduled ingestion 与 config-first/source-enabled 约束的偏差。`snapi` 和 `launch-library-2` 已尊重 `enabled`，新增 `procurement_page` 公开采购公告源类型和中国政府采购网中央公告源。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-003` 和 `SI-ISSUE-004`。
 - DONE：将“资本”完整替换为“政策”。已移除 market seed/API/schema 路径，新增 `/policy` 页面、政策动态 HUD、地方政府官方政策源、通用 HTML 列表轻爬虫解析能力和 `0005_drop_market_items.sql`；typecheck、lint、test、build、config check、layout 和本地浏览器检查均已通过。
 - TODO：继续观察新增 RSS 和官方网页来源的采集质量、重复率和相关性；Google News RSS 仅作为必要时手动启用的备用聚合源。

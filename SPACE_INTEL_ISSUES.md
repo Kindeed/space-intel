@@ -92,13 +92,24 @@
 ### 2026-05-29 - SI-ISSUE-006 - Production health reports open ingestion logs and recent official-page failures
 
 - Priority: P2
-- Status: OPEN
+- Status: FIXED
 - Area: ingestion
 - Found In: production `/api/health` check
 - Evidence: `/api/health` returns `openIngestionLogCount: 15` and recent failed source logs for `deepblueaerospace-news`, `changguang-satellite-news`, `cas-space-news`, `landspace-news`, and `orienspace-news`; each recent failed log has `successCount: 0`, `failureCount: 1`, and `hasError: true`.
-- Fix: Inspect production ingestion logs and official-page collector behavior, then either harden parsing/timeouts for these sources or disable failing sources until route health is stable.
-- Regression Check: Unverified; production health endpoint confirms the symptoms but does not expose internal error details.
-- Notes: This may reduce domestic official/company-source freshness even though the rest of the site can still render launch, company, and topic data.
+- Fix: Added legacy D1 insert fallback in `persistArticleRecords` for production databases missing translation columns. This prevents official-page/procurement crawlers from failing after collection when the durable migration has not yet been applied.
+- Regression Check: Passed `vitest` targeted DB/ingestion tests, full `vitest`, `tsc -b --noEmit`, `eslint .`, `vite build`, `generate-config --check`, `verify-layout`, and `git diff --check`. Production health will need recheck after deployment and the next scheduled ingestion.
+- Notes: The durable database fix remains applying `0004_article_translation_fields.sql`; this compatibility fix keeps crawler writes working until schema drift is closed.
+
+### 2026-05-29 - SI-ISSUE-007 - Policy page renders empty because policy filters are too narrow
+
+- Priority: P1
+- Status: FIXED
+- Area: api | frontend | ingestion
+- Found In: user report and production browser check
+- Evidence: `https://space.bytebaud.com/policy` renders successfully but shows `暂无政策信息。`; the API filter only accepts `official_page` articles with `policy-and-regulation`, so policy-tagged procurement and RSS records are excluded, and official-page failures can empty the page.
+- Fix: Broadened policy API filtering to all `policy-and-regulation` tagged records and expanded the policy source selector to official pages, procurement pages, and RSS sources.
+- Regression Check: Production `/api/articles?tag=policy-and-regulation&limit=5` confirmed existing policy-tagged records are present; local targeted tests, full tests, typecheck, lint, build, config check, layout check, and diff check passed.
+- Notes: The fix reuses real source-backed records; no placeholder content was added.
 
 ## Historical Review Artifacts
 

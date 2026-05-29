@@ -1,6 +1,7 @@
 import type { IngestionRecord } from '../ingestion/run';
 import type { SourceConfig } from '../ingestion/types';
-import type { DbStatement, SqlDatabase } from './types';
+import { isMissingArticleTranslationColumnError } from './articleQueries';
+import type { DbRunResult, DbStatement, SqlDatabase } from './types';
 
 export type PersistArticlesResult = {
   inserted: number;
@@ -112,6 +113,61 @@ async function linkArticleLaunches(db: SqlDatabase, articleId: number, launchExt
   await runStatements(db, statements);
 }
 
+async function insertArticleRecord(
+  db: SqlDatabase,
+  sourceId: number,
+  record: IngestionRecord,
+  includeTranslationFields: boolean,
+): Promise<DbRunResult> {
+  if (!includeTranslationFields) {
+    return db
+      .prepare(
+        `INSERT OR IGNORE INTO articles (
+          source_id, title, original_title, summary, url, published_at, language, region, dedupe_hash, fetch_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        sourceId,
+        record.item.title,
+        record.item.originalTitle ?? null,
+        record.item.summary,
+        record.item.url,
+        record.item.publishedAt,
+        record.item.language,
+        record.item.region,
+        record.dedupeHash,
+        'fetched',
+      )
+      .run();
+  }
+
+  return db
+    .prepare(
+      `INSERT OR IGNORE INTO articles (
+        source_id, title, original_title, summary, original_summary, url, published_at, language, region, dedupe_hash,
+        fetch_status, translation_status, translation_provider, translated_at, translation_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      sourceId,
+      record.item.title,
+      record.item.originalTitle ?? null,
+      record.item.summary,
+      record.item.originalSummary ?? null,
+      record.item.url,
+      record.item.publishedAt,
+      record.item.language,
+      record.item.region,
+      record.dedupeHash,
+      'fetched',
+      record.item.translationStatus ?? 'skipped',
+      record.item.translationProvider ?? null,
+      record.item.translatedAt ?? null,
+      record.item.translationError ?? null,
+    )
+    .run();
+}
+
 export async function persistArticleRecords(
   db: SqlDatabase,
   source: SourceConfig,
@@ -119,33 +175,21 @@ export async function persistArticleRecords(
 ): Promise<PersistArticlesResult> {
   const sourceId = await ensureSource(db, source);
   let inserted = 0;
+  let includeTranslationFields = true;
 
   for (const record of records) {
-    const result = await db
-      .prepare(
-        `INSERT OR IGNORE INTO articles (
-          source_id, title, original_title, summary, original_summary, url, published_at, language, region, dedupe_hash,
-          fetch_status, translation_status, translation_provider, translated_at, translation_error
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        sourceId,
-        record.item.title,
-        record.item.originalTitle ?? null,
-        record.item.summary,
-        record.item.originalSummary ?? null,
-        record.item.url,
-        record.item.publishedAt,
-        record.item.language,
-        record.item.region,
-        record.dedupeHash,
-        'fetched',
-        record.item.translationStatus ?? 'skipped',
-        record.item.translationProvider ?? null,
-        record.item.translatedAt ?? null,
-        record.item.translationError ?? null,
-      )
-      .run();
+    let result: DbRunResult;
+
+    try {
+      result = await insertArticleRecord(db, sourceId, record, includeTranslationFields);
+    } catch (error) {
+      if (!includeTranslationFields || !isMissingArticleTranslationColumnError(error)) {
+        throw error;
+      }
+
+      includeTranslationFields = false;
+      result = await insertArticleRecord(db, sourceId, record, includeTranslationFields);
+    }
 
     inserted += result.meta?.changes ?? 0;
 

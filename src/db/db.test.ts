@@ -61,6 +61,7 @@ class MemoryDatabase implements SqlDatabase {
   readonly articleCompanies: Array<{ articleId: number; company: string }> = [];
   readonly articleLaunches: Array<{ articleId: number; launchExternalId: string }> = [];
   readonly logs: LogRow[] = [];
+  failTranslationColumns = false;
 
   prepare(query: string): DbStatement {
     return new MemoryStatement(this, query);
@@ -97,15 +98,20 @@ class MemoryDatabase implements SqlDatabase {
     }
 
     if (normalized.startsWith('INSERT OR IGNORE INTO articles')) {
-      const dedupeHash = String(values[9]);
+      if (this.failTranslationColumns && normalized.includes('original_summary')) {
+        throw new Error('D1_ERROR: no such column: original_summary');
+      }
+
+      const hasTranslationFields = normalized.includes('original_summary');
+      const dedupeHash = String(values[hasTranslationFields ? 9 : 8]);
       if (!this.articles.some((article) => article.dedupeHash === dedupeHash)) {
         this.articles.push({
           id: this.articles.length + 1,
           dedupeHash,
           title: String(values[1]),
-          originalSummary: values[4] ? String(values[4]) : null,
-          url: String(values[5]),
-          translationStatus: String(values[11]),
+          originalSummary: hasTranslationFields && values[4] ? String(values[4]) : null,
+          url: String(values[hasTranslationFields ? 5 : 4]),
+          translationStatus: hasTranslationFields ? String(values[11]) : 'skipped',
         });
         return { meta: { changes: 1, last_row_id: this.articles.length } };
       }
@@ -287,6 +293,28 @@ describe('D1 persistence flow', () => {
       credibility: 4,
       enabled: false,
     });
+  });
+
+  it('falls back to legacy article insert when production D1 is missing translation columns', async () => {
+    const db = new MemoryDatabase();
+    db.failTranslationColumns = true;
+    const registry = createCollectorRegistry([collector]);
+
+    const result = await runSourceIngestion(db, source, registry, {
+      fetch,
+      now: () => new Date('2026-05-09T00:00:00Z'),
+    });
+
+    expect(result).toMatchObject({ collected: 1, inserted: 1, skipped: 0, failures: 0 });
+    expect(db.articles).toEqual([
+      expect.objectContaining({
+        title: 'Reusable rocket milestone',
+        originalSummary: null,
+        translationStatus: 'skipped',
+      }),
+    ]);
+    expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
+    expect(db.logs[0]).toMatchObject({ successCount: 1, failureCount: 0, error: null });
   });
 
   it('syncs disabled source config into the catalog', async () => {
