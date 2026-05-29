@@ -1,4 +1,11 @@
-import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
+import {
+  articleRelationSelectFields,
+  articleTranslationSelectFields,
+  isMissingArticleTranslationColumnError,
+  toArticleSummary,
+  type ArticleSummaryDbRow,
+  type ArticleSummaryRow,
+} from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type TopicRow = {
@@ -77,14 +84,18 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
     return null;
   }
 
-  const articleResult = await db
-    .prepare(
-      `SELECT
+  const topicId = topic.id;
+  const topicSlug = topic.slug;
+
+  async function listTopicArticles(includeTranslationFields: boolean): Promise<ArticleSummaryRow[]> {
+    const articleResult = await db
+      .prepare(
+        `SELECT
         a.id,
         a.title,
         a.original_title AS originalTitle,
         a.summary,
-        a.original_summary AS originalSummary,
+        ${articleTranslationSelectFields(includeTranslationFields)},
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -93,8 +104,6 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
-        a.translation_status AS translationStatus,
-        a.translation_provider AS translationProvider,
         ${articleRelationSelectFields}
       FROM articles a
       JOIN article_tags at ON at.article_id = a.id
@@ -102,12 +111,27 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       WHERE at.tag_id = ?
       ORDER BY a.published_at DESC, a.id DESC
       LIMIT 20`,
-    )
-    .bind(topic.id)
-    .all?.<ArticleSummaryDbRow>();
+      )
+      .bind(topicId)
+      .all?.<ArticleSummaryDbRow>();
 
-  if (!articleResult) {
-    throw new Error('Database statement does not support all()');
+    if (!articleResult) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    return articleResult.results.map(toArticleSummary);
+  }
+
+  let articles: ArticleSummaryRow[];
+
+  try {
+    articles = await listTopicArticles(true);
+  } catch (error) {
+    if (!isMissingArticleTranslationColumnError(error)) {
+      throw error;
+    }
+
+    articles = await listTopicArticles(false);
   }
 
   const curationResult = await db
@@ -124,7 +148,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       WHERE target_type = 'topic' AND target_key = ? AND enabled = 1
       ORDER BY weight DESC, created_at DESC`,
     )
-    .bind(topic.slug)
+    .bind(topicSlug)
     .all?.<TopicCurationRow>();
 
   if (!curationResult) {
@@ -133,7 +157,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
 
   return {
     ...topic,
-    articles: articleResult.results.map(toArticleSummary),
+    articles,
     curations: curationResult.results,
   };
 }

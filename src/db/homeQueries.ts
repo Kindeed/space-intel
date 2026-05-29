@@ -1,4 +1,11 @@
-import { articleRelationSelectFields, toArticleSummary, type ArticleSummaryDbRow, type ArticleSummaryRow } from './articleQueries';
+import {
+  articleRelationSelectFields,
+  articleTranslationSelectFields,
+  isMissingArticleTranslationColumnError,
+  toArticleSummary,
+  type ArticleSummaryDbRow,
+  type ArticleSummaryRow,
+} from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type RankedHomeArticle = ArticleSummaryRow & {
@@ -24,14 +31,15 @@ export type TrendingTag = {
 };
 
 export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promise<RankedHomeArticle[]> {
-  const result = await db
-    .prepare(
-      `SELECT
+  async function runQuery(includeTranslationFields: boolean): Promise<RankedHomeArticle[]> {
+    const result = await db
+      .prepare(
+        `SELECT
         a.id,
         a.title,
         a.original_title AS originalTitle,
         a.summary,
-        a.original_summary AS originalSummary,
+        ${articleTranslationSelectFields(includeTranslationFields)},
         a.url,
         s.key AS sourceKey,
         s.name AS sourceName,
@@ -40,8 +48,6 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
         a.language,
         a.region,
         a.fetch_status AS fetchStatus,
-        a.translation_status AS translationStatus,
-        a.translation_provider AS translationProvider,
         ${articleRelationSelectFields},
         COALESCE(MAX(c.weight), 0) AS curationWeight,
         s.credibility AS sourceCredibility
@@ -51,19 +57,30 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
       GROUP BY a.id
       ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC, a.id DESC
       LIMIT ?`,
-    )
-    .bind(Math.max(1, Math.min(Math.floor(limit), 50)))
-    .all?.<RankedHomeArticleDbRow>();
+      )
+      .bind(Math.max(1, Math.min(Math.floor(limit), 50)))
+      .all?.<RankedHomeArticleDbRow>();
 
-  if (!result) {
-    throw new Error('Database statement does not support all()');
+    if (!result) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    return result.results.map((row) => ({
+      ...toArticleSummary(row),
+      curationWeight: row.curationWeight,
+      sourceCredibility: row.sourceCredibility,
+    }));
   }
 
-  return result.results.map((row) => ({
-    ...toArticleSummary(row),
-    curationWeight: row.curationWeight,
-    sourceCredibility: row.sourceCredibility,
-  }));
+  try {
+    return await runQuery(true);
+  } catch (error) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      return runQuery(false);
+    }
+
+    throw error;
+  }
 }
 
 export async function listTrendingTags(db: SqlDatabase, limit = 6): Promise<TrendingTag[]> {

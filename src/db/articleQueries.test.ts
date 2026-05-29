@@ -29,12 +29,24 @@ class FakeStatement implements DbStatement {
   async first<T = unknown>(): Promise<T | null> {
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
+    this.database.queries.push(this.query);
+
+    if (this.database.failTranslationColumns && this.query.includes('a.original_summary')) {
+      throw new Error('D1_ERROR: no such column: a.original_summary');
+    }
+
     return this.database.firstResult as T | null;
   }
 
   async all<T = unknown>(): Promise<{ results: T[] }> {
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
+    this.database.queries.push(this.query);
+
+    if (this.database.failTranslationColumns && this.query.includes('a.original_summary')) {
+      throw new Error('D1_ERROR: no such column: a.original_summary');
+    }
+
     return { results: this.database.allResults as T[] };
   }
 }
@@ -42,6 +54,8 @@ class FakeStatement implements DbStatement {
 class FakeDatabase implements SqlDatabase {
   lastQuery = '';
   lastValues: unknown[] = [];
+  queries: string[] = [];
+  failTranslationColumns = false;
   allResults: ArticleSummaryDbRow[] = [];
   firstResult: ArticleDetailDbRow | null = null;
 
@@ -145,6 +159,26 @@ describe('article queries', () => {
     expect(db.lastValues).toEqual(['official_page', 81, 0]);
   });
 
+  it('falls back to legacy article list queries when translation columns are missing', async () => {
+    const db = new FakeDatabase();
+    db.failTranslationColumns = true;
+    db.allResults = [{ ...article, originalSummary: null, translationStatus: 'skipped', translationProvider: null }];
+
+    const result = await listArticles(db, { query: 'rocket', limit: 1 });
+
+    expect(result.items[0]).toMatchObject({
+      id: 1,
+      originalSummary: null,
+      translationStatus: 'skipped',
+      translationProvider: null,
+    });
+    expect(db.queries).toHaveLength(2);
+    expect(db.queries[0]).toContain('a.original_summary AS originalSummary');
+    expect(db.queries[1]).toContain('NULL AS originalSummary');
+    expect(db.queries[1]).not.toContain('LOWER(a.original_summary)');
+    expect(db.lastValues).toEqual(['%rocket%', '%rocket%', '%rocket%', 5, 0]);
+  });
+
   it('clusters repeated story coverage before returning article cards', () => {
     const clustered = clusterArticleRows(
       [
@@ -193,6 +227,30 @@ describe('article queries', () => {
     expect(result && 'dedupeHash' in result).toBe(false);
     expect(db.lastQuery).toContain('FROM article_launches al');
     expect(db.lastValues).toEqual([1]);
+  });
+
+  it('falls back to legacy article detail queries when translation columns are missing', async () => {
+    const db = new FakeDatabase();
+    db.failTranslationColumns = true;
+    db.firstResult = {
+      ...article,
+      originalSummary: null,
+      translationStatus: 'skipped',
+      translationProvider: null,
+      launches: [],
+    };
+
+    const result = await getArticleById(db, 1);
+
+    expect(result).toMatchObject({
+      id: 1,
+      originalSummary: null,
+      translationStatus: 'skipped',
+      translationProvider: null,
+    });
+    expect(db.queries).toHaveLength(2);
+    expect(db.queries[0]).toContain('a.original_summary AS originalSummary');
+    expect(db.queries[1]).toContain('NULL AS originalSummary');
   });
 
   it('returns null for invalid article ids', async () => {

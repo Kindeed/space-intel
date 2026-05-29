@@ -29,9 +29,14 @@ class FakeStatement implements DbStatement {
   async all<T = unknown>(): Promise<{ results: T[] }> {
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
+    this.database.queries.push(this.query);
 
     if (this.query.includes('FROM companies c') && !this.query.includes('WHERE c.slug')) {
       return { results: this.database.companyResults as T[] };
+    }
+
+    if (this.database.failTranslationColumns && this.query.includes('a.original_summary')) {
+      throw new Error('D1_ERROR: no such column: a.original_summary');
     }
 
     return { results: this.database.articleResults as T[] };
@@ -41,6 +46,8 @@ class FakeStatement implements DbStatement {
 class FakeCompanyDatabase implements SqlDatabase {
   lastQuery = '';
   lastValues: unknown[] = [];
+  queries: string[] = [];
+  failTranslationColumns = false;
   companyResults: CompanyRow[] = [];
   articleResults: ArticleSummaryRow[] = [];
   firstResult: CompanyRow | null = null;
@@ -110,6 +117,24 @@ describe('company queries', () => {
     expect(db.lastQuery).toContain('AS tagsJson');
     expect(db.lastQuery).toContain('AS companiesJson');
     expect(db.lastValues).toEqual([company.id]);
+  });
+
+  it('falls back to legacy company article queries when translation columns are missing', async () => {
+    const db = new FakeCompanyDatabase();
+    db.failTranslationColumns = true;
+    db.firstResult = company;
+    db.articleResults = [{ ...article, originalSummary: null, translationStatus: 'skipped', translationProvider: null }];
+
+    const result = await getCompanyBySlug(db, 'rocket-lab');
+
+    expect(result?.articles[0]).toMatchObject({
+      id: 10,
+      originalSummary: null,
+      translationStatus: 'skipped',
+    });
+    expect(db.queries).toHaveLength(2);
+    expect(db.queries[0]).toContain('a.original_summary AS originalSummary');
+    expect(db.queries[1]).toContain('NULL AS originalSummary');
   });
 
   it('returns null for missing company slugs', async () => {
