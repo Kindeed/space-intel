@@ -1,16 +1,24 @@
 import { NavLink } from 'react-router-dom';
-import { missionNav } from '../constants';
+import { primaryNav, secondaryNav } from '../constants';
 import type { ApiHomeStats } from '../types';
 
 export function MissionNav({ stats }: { stats?: ApiHomeStats }) {
   return (
     <aside className="mission-nav" aria-label="站点导航">
       <div className="nav-card">
-        {missionNav.map(({ label, to, icon: Icon, signal }) => (
+        {primaryNav.map(({ label, to, icon: Icon, signal }) => (
           <NavLink key={label} to={to}>
             <Icon size={17} aria-hidden="true" />
             <span>{label}</span>
             <em>{signal}</em>
+          </NavLink>
+        ))}
+      </div>
+      <div className="nav-card nav-card--secondary">
+        {secondaryNav.map(({ label, to, icon: Icon }) => (
+          <NavLink key={label} to={to}>
+            <Icon size={16} aria-hidden="true" />
+            <span>{label}</span>
           </NavLink>
         ))}
       </div>

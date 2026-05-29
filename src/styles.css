@@ -259,6 +259,12 @@ select {
   gap: 6px;
 }
 
+.nav-card--secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 8px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
 .nav-card a {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr) max-content;
@@ -287,6 +293,14 @@ select {
   font-size: 0.7rem;
   font-style: normal;
   font-variant-numeric: tabular-nums;
+}
+
+.nav-card--secondary a {
+  grid-template-columns: 18px minmax(0, 1fr);
+  min-height: 34px;
+  padding: 7px 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 .signal-card {
@@ -597,6 +611,30 @@ select {
   color: #10b981;
   font-size: 1.1rem;
   font-variant-numeric: tabular-nums;
+}
+
+.intel-snapshot {
+  gap: 10px;
+}
+
+.snapshot-tags {
+  display: grid;
+  grid-template-columns: 16px max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  padding-top: 10px;
+}
+
+.snapshot-tags > svg {
+  color: var(--accent);
+}
+
+.snapshot-tags > span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 820;
+  white-space: nowrap;
 }
 
 .compact-list {
@@ -961,11 +999,15 @@ select {
     justify-items: center;
   }
 
-.nav-card span,
-.nav-card em,
-.signal-card {
-  display: none;
-}
+  .nav-card span,
+  .nav-card em,
+  .signal-card {
+    display: none;
+  }
+
+  .nav-card--secondary {
+    display: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1000,7 +1042,7 @@ select {
   }
 
   .nav-card {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .nav-card span,
@@ -1011,6 +1053,11 @@ select {
   .nav-card a {
     grid-template-columns: 18px minmax(0, 1fr);
     justify-items: start;
+  }
+
+  .nav-card--secondary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .filter-form {
@@ -1074,7 +1121,7 @@ select {
     left: 10px;
     z-index: 40;
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: 10px;
     padding: 6px;

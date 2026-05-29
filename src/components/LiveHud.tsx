@@ -66,10 +66,10 @@ export function LiveHud({ stats, trendingTags }: { stats?: ApiHomeStats; trendin
         </ul>
       </section>
 
-      <section className="panel">
-        <SectionTitle icon={Activity} title="来源状态" kicker="已启用" />
+      <section className="panel intel-snapshot">
+        <SectionTitle icon={Activity} title="情报索引" kicker="来源与热词" />
         <div className="source-status">
-          {sourceStats.length ? sourceStats.map((source) => (
+          {sourceStats.length ? sourceStats.slice(0, 3).map((source) => (
             <Link to="/articles" key={source.type}>
               <span>{sourceTypeLabel(source.type)}</span>
               <strong>{source.count}</strong>
@@ -77,14 +77,14 @@ export function LiveHud({ stats, trendingTags }: { stats?: ApiHomeStats; trendin
             </Link>
           )) : <div className="empty-state">来源状态暂不可用。</div>}
         </div>
-      </section>
-
-      <section className="panel">
-        <SectionTitle icon={Zap} title="热力词" kicker={hotTagsKicker} />
-        <div className="tag-row">
-          {hotTags.map((tag) => (
-            <Link key={tag.slug} to={`/topics/${tag.slug}`}>{tag.name}</Link>
-          ))}
+        <div className="snapshot-tags">
+          <Zap size={15} aria-hidden="true" />
+          <span>{hotTagsKicker}热词</span>
+          <div className="tag-row">
+            {hotTags.slice(0, 6).map((tag) => (
+              <Link key={tag.slug} to={`/topics/${tag.slug}`}>{tag.name}</Link>
+            ))}
+          </div>
         </div>
       </section>
     </aside>

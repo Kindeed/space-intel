@@ -1,6 +1,5 @@
 import { RadioTower } from 'lucide-react';
 import { ArticleCard } from '../components/ArticleCard';
-import { ChannelChips } from '../components/ChannelChips';
 import { LiveHud } from '../components/LiveHud';
 import { MissionNav } from '../components/MissionNav';
 import { SectionTitle } from '../components/SectionTitle';
@@ -21,7 +20,6 @@ export function HomePage() {
           <SectionTitle icon={RadioTower} title="今日重点" kicker="实时聚合" />
           <p>聚合商业航天新闻、发射、公司、资本和政策线索。</p>
         </div>
-        <ChannelChips />
         {home.error ? <div className="inline-status">{safeLoadMessage('首页数据')}</div> : null}
         {home.isLoading ? <SkeletonFeed /> : null}
         <div className="timeline-feed">
