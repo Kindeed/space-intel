@@ -20,7 +20,7 @@ export function ArticlesPage() {
   const hasMore = apiState.data?.hasMore ?? false;
 
   return (
-    <PageShell title="情报流" subtitle="按时间展示多来源资讯，并用紧凑筛选控制信息密度。">
+    <PageShell title="资讯">
       <ChannelChips />
       <ArticleFilterPanel searchParams={searchParams} region={region} category={category} />
       {apiState.error ? <div className="inline-status">{safeLoadMessage('实时数据')}</div> : null}

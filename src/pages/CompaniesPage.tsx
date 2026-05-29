@@ -8,7 +8,7 @@ export function CompaniesPage() {
   const items = state.data?.items ?? [];
 
   return (
-    <PageShell title="公司库" subtitle="公司档案、赛道、新闻时间线、相关发射和资本动态。">
+    <PageShell title="公司库">
       {state.error ? <div className="inline-status">{safeLoadMessage('公司列表')}</div> : null}
       <div className="card-grid">
         {items.map((company) => (

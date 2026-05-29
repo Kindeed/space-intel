@@ -72,6 +72,22 @@
         "spectrum",
         "commercial space transportation"
       ]
+    },
+    {
+      "slug": "space-procurement",
+      "name": "招投标采购",
+      "category": "market",
+      "keywords": [
+        "招标",
+        "采购",
+        "中标",
+        "成交",
+        "政府采购",
+        "商业航天招标",
+        "卫星采购",
+        "遥感采购",
+        "测控采购"
+      ]
     }
   ]
 }

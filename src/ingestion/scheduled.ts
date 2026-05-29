@@ -3,6 +3,7 @@ import {
   googleNewsRssCollector,
   launchLibraryCollector,
   officialPageCollector,
+  procurementPageCollector,
   rssCollector,
   runLaunchIngestion,
   runSourceIngestion,
@@ -107,7 +108,7 @@ function shouldRunLaunchIngestion(now: Date): boolean {
 }
 
 function concurrencyForSource(source: SourceConfig): number {
-  if (source.type === 'rss' || source.type === 'official_page') {
+  if (source.type === 'rss' || source.type === 'official_page' || source.type === 'procurement_page') {
     return 4;
   }
 
@@ -230,7 +231,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
   if (input.kind === 'hourly') {
     const snapiSource = input.sources.find((source) => source.key === 'snapi');
 
-    if (snapiSource) {
+    if (snapiSource?.enabled) {
       sourceRuns.push(
         await runArticleSourceSafely(snapiSource, () =>
           runSourceIngestion(input.db, snapiSource, createCollectorRegistry([spaceflightNewsCollector]), input.context, {
@@ -243,7 +244,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
 
     const launchSource = input.sources.find((source) => source.key === 'launch-library-2');
 
-    if (launchSource && shouldRunLaunchIngestion(input.context.now())) {
+    if (launchSource?.enabled && shouldRunLaunchIngestion(input.context.now())) {
       sourceRuns.push(
         await runLaunchSourceSafely(launchSource, () =>
           runLaunchIngestion(input.db, launchSource, launchLibraryCollector, input.context, {
@@ -282,6 +283,17 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
         (source) => () =>
           runArticleSourceSafely(source, () =>
             runSourceIngestion(input.db, source, officialPageRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
+          ),
+      )),
+    );
+
+    const procurementPageRegistry = createCollectorRegistry([procurementPageCollector]);
+    sourceRuns.push(
+      ...(await runSourceGroup(
+        input.sources.filter((item) => item.type === 'procurement_page' && item.enabled),
+        (source) => () =>
+          runArticleSourceSafely(source, () =>
+            runSourceIngestion(input.db, source, procurementPageRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
           ),
       )),
     );

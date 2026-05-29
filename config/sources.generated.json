@@ -469,6 +469,55 @@
       "dedupe_strategy": "url_title_source"
     },
     {
+      "key": "cmse-news",
+      "name": "中国载人航天工程新闻",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.cmse.gov.cn/xwzx/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Official human spaceflight program updates that can surface commercial cargo, payload, and supplier context.",
+      "expected_content": "Official announcement metadata, publication dates when available, and original links.",
+      "risk_notes": "Official page; store metadata, generated summaries, and links only.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ]
+    },
+    {
+      "key": "most-news",
+      "name": "科学技术部工作动态",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.most.gov.cn/kjbgz/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Official science and technology policy updates relevant to aerospace, satellite applications, and industrial programs.",
+      "expected_content": "Official work-update metadata and original links.",
+      "risk_notes": "Broad government source; filter by aerospace, satellite, remote-sensing, and space-policy keywords.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ]
+    },
+    {
+      "key": "ccgp-central-procurement",
+      "name": "中国政府采购网中央公告",
+      "type": "procurement_page",
+      "region": "cn",
+      "url": "https://www.ccgp.gov.cn/cggg/zygg/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Monitor central government procurement notices for satellite, remote-sensing, measurement-control, and space-information projects.",
+      "expected_content": "Public procurement listing metadata, notice titles, dates when available, and original notice links.",
+      "risk_notes": "Public listing page only; do not bypass login, CAPTCHA, robots controls, or store full tender documents.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "space-procurement",
+        "policy-and-regulation"
+      ]
+    },
+    {
       "key": "spacechina-news",
       "name": "中国航天科技集团新闻",
       "type": "official_page",
@@ -626,7 +675,7 @@
       "region": "global",
       "url": "https://www.sec.gov/edgar/browse/?CIK=1819994",
       "credibility": 5,
-      "enabled": true,
+      "enabled": false,
       "purpose": "Public-company filings and capital-market disclosure links.",
       "expected_content": "Filing metadata and SEC original links.",
       "risk_notes": "Capital-market information only; no investment advice.",
@@ -639,7 +688,7 @@
       "region": "global",
       "url": "https://www.sec.gov/edgar/browse/?CIK=1780312",
       "credibility": 5,
-      "enabled": true,
+      "enabled": false,
       "purpose": "Public-company filings and capital-market disclosure links.",
       "expected_content": "Filing metadata and SEC original links.",
       "risk_notes": "Capital-market information only; no investment advice.",
@@ -652,7 +701,7 @@
       "region": "global",
       "url": "https://www.sec.gov/edgar/browse/?CIK=1836833",
       "credibility": 5,
-      "enabled": true,
+      "enabled": false,
       "purpose": "Public-company filings and capital-market disclosure links.",
       "expected_content": "Filing metadata and SEC original links.",
       "risk_notes": "Capital-market information only; no investment advice.",
@@ -665,7 +714,7 @@
       "region": "global",
       "url": "https://www.sec.gov/edgar/browse/?CIK=1844452",
       "credibility": 5,
-      "enabled": true,
+      "enabled": false,
       "purpose": "Public-company filings and capital-market disclosure links.",
       "expected_content": "Filing metadata and SEC original links.",
       "risk_notes": "Capital-market information only; no investment advice.",

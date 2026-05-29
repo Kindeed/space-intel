@@ -11,6 +11,7 @@ import {
   officialPageCollector,
   parseSourcesConfig,
   parseSourcesYaml,
+  procurementPageCollector,
   rssCollector,
   spaceflightNewsCollector,
 } from './index';
@@ -58,9 +59,11 @@ describe('source config', () => {
     expect(sources.some((source) => source.type === 'api')).toBe(true);
     expect(sources.some((source) => source.type === 'rss')).toBe(true);
     expect(sources.some((source) => source.type === 'google_news_rss')).toBe(true);
+    expect(sources.some((source) => source.type === 'procurement_page')).toBe(true);
     expect(sources.some((source) => source.type === 'capital_filing')).toBe(true);
     expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(0);
-    expect(sources.filter((source) => source.enabled && ['rss', 'official_page'].includes(source.type)).length).toBeGreaterThanOrEqual(25);
+    expect(sources.filter((source) => source.enabled && source.type === 'capital_filing')).toHaveLength(0);
+    expect(sources.filter((source) => source.enabled && ['rss', 'official_page', 'procurement_page'].includes(source.type)).length).toBeGreaterThanOrEqual(28);
   });
 });
 
@@ -469,5 +472,61 @@ describe('official page collector', () => {
       companies: ['东方空间'],
       tags: ['domestic-private-launch'],
     });
+  });
+});
+
+describe('procurement page collector', () => {
+  it('extracts public procurement links with space-domain signals', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'ccgp-central-procurement',
+          name: '中国政府采购网中央公告',
+          type: 'procurement_page',
+          region: 'cn',
+          url: 'https://www.ccgp.gov.cn/cggg/zygg/',
+          credibility: 5,
+          enabled: true,
+          purpose: 'Monitor public procurement notices.',
+          expected_content: 'Public listing metadata and links.',
+          risk_notes: 'Public listing only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['space-procurement', 'policy-and-regulation'],
+        },
+      ],
+    });
+
+    const items = await procurementPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <ul>
+                <li><span>2026-05-08</span><a href="./notice-1.htm">某卫星遥感数据采购项目中标公告</a></li>
+                <li><span>2026-05-08</span><a href="./notice-2.htm">办公用品采购公告</a></li>
+              </ul>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items).toEqual([
+      {
+        sourceKey: 'ccgp-central-procurement',
+        sourceName: '中国政府采购网中央公告',
+        title: '某卫星遥感数据采购项目中标公告',
+        summary: '采购公告：某卫星遥感数据采购项目中标公告',
+        url: 'https://www.ccgp.gov.cn/cggg/zygg/notice-1.htm',
+        publishedAt: '2026-05-08T00:00:00.000Z',
+        language: 'zh',
+        region: 'cn',
+        rawId: 'https://www.ccgp.gov.cn/cggg/zygg/notice-1.htm',
+        relatedLaunchIds: [],
+        companies: [],
+        tags: ['space-procurement', 'policy-and-regulation', 'commercial-remote-sensing'],
+      },
+    ]);
   });
 });

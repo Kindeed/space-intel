@@ -4,6 +4,7 @@ export type SourceType =
   | 'google_news_rss'
   | 'rsshub'
   | 'official_page'
+  | 'procurement_page'
   | 'capital_filing';
 
 export type SourceRegion = 'cn' | 'global';

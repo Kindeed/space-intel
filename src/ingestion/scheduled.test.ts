@@ -518,6 +518,70 @@ describe('scheduled ingestion', () => {
     expect(db.logs).toEqual([]);
   });
 
+  it('skips disabled API sources even when they have dedicated scheduled collectors', async () => {
+    const db = new MemoryScheduledDatabase();
+    let fetchCount = 0;
+    const disabledSources = sources.map((source) => ({ ...source, enabled: false }));
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: disabledSources,
+      context: {
+        now: () => new Date('2026-05-09T00:00:00Z'),
+        fetch: async () => {
+          fetchCount += 1;
+          return new Response('{}');
+        },
+      },
+      kind: 'hourly',
+    });
+
+    expect(fetchCount).toBe(0);
+    expect(result.sourceRuns).toEqual([]);
+    expect(db.logs).toEqual([]);
+  });
+
+  it('runs enabled public procurement page sources during hourly ingestion', async () => {
+    const db = new MemoryScheduledDatabase();
+    const procurementSource: SourceConfig = {
+      key: 'ccgp-central-procurement',
+      name: '中国政府采购网中央公告',
+      type: 'procurement_page',
+      region: 'cn',
+      url: 'https://www.ccgp.gov.cn/cggg/zygg/',
+      credibility: 5,
+      enabled: true,
+      purpose: 'Monitor public procurement notices.',
+      expected_content: 'Public listing metadata and links.',
+      risk_notes: 'Public listing only.',
+      dedupe_strategy: 'url_title_source',
+      default_tags: ['space-procurement', 'policy-and-regulation'],
+    };
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [procurementSource],
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async () =>
+          new Response(`<html><body>
+            <li><span>2026-05-08</span><a href="./notice-1.htm">卫星遥感数据采购项目中标公告</a></li>
+          </body></html>`),
+      },
+      kind: 'hourly',
+    });
+
+    expect(result.sourceRuns).toEqual([
+      expect.objectContaining({
+        sourceKey: 'ccgp-central-procurement',
+        failures: 0,
+        inserted: 1,
+      }),
+    ]);
+    expect(db.articleHashes.size).toBe(1);
+    expect(db.logs[0]).toMatchObject({ sourceKey: 'ccgp-central-procurement', successCount: 1 });
+  });
+
   it('seeds market items during hourly runs idempotently', async () => {
     const db = new MemoryScheduledDatabase();
     db.marketArticles = [

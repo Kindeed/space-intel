@@ -16,7 +16,7 @@ export function ArticleDetailPage() {
   const detailLaunches = article?.launches ?? [];
 
   return (
-    <PageShell title={title} subtitle="文章详情、相关公司、专题和发射信息。">
+    <PageShell title={title}>
       {apiState.error ? <div className="inline-status">{safeLoadMessage('文章详情')}</div> : null}
       <section className="detail-panel">
         <div className="metadata-grid">

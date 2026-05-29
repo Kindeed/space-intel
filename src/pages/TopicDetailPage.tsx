@@ -18,7 +18,7 @@ export function TopicDetailPage() {
     : null;
 
   return (
-    <PageShell title={state.data?.name ?? '专题详情'} subtitle={state.data ? `${state.data.category} / ${state.data.articleCount} 篇相关新闻` : '专题相关新闻与精选资料。'}>
+    <PageShell title={state.data?.name ?? '专题详情'}>
       {pageError ? <div className="inline-status">{pageError}</div> : null}
       {state.data?.curations.length ? (
         <section className="detail-panel">

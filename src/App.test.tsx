@@ -18,7 +18,11 @@ describe('App', () => {
     expect(html).toContain('今日重点');
     expect(html).toContain('发射时间线');
     expect(html).toContain('资本市场内容仅作信息聚合，不构成投资建议');
-    expect(html).toContain('实时聚合');
+    expect(html).toContain('来源状态');
+    expect(html).not.toContain('情报索引');
+    expect(html).not.toContain('配置热词');
+    expect(html).not.toContain('来源与热词');
+    expect(html).not.toContain('聚合商业航天');
     expect(html).not.toContain('来源透明');
     expect(html).not.toContain('Mission Feed');
     expect(html).not.toContain('Mission Control');
@@ -59,7 +63,7 @@ describe('App', () => {
       ['等高', '时间轴'].join(''),
     ];
 
-    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重', ...rejectedChineseCopy]) {
+    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重', '按时间展示', '信息密度', ...rejectedChineseCopy]) {
       expect(html).not.toContain(text);
     }
   });

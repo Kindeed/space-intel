@@ -8,7 +8,7 @@ export function TopicsPage() {
   const items = state.data?.items ?? [];
 
   return (
-    <PageShell title="专题追踪" subtitle="围绕重点主题持续汇总相关新闻和精选资料。">
+    <PageShell title="专题追踪">
       {state.error ? <div className="inline-status">{safeLoadMessage('专题列表')}</div> : null}
       <div className="card-grid">
         {items.map((topic) => (

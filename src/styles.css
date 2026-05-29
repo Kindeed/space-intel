@@ -370,7 +370,6 @@ select {
 }
 
 .timeline-header p,
-.page-header p,
 .article-card p,
 .detail-panel p,
 .market-item p,
@@ -615,26 +614,6 @@ select {
 
 .intel-snapshot {
   gap: 10px;
-}
-
-.snapshot-tags {
-  display: grid;
-  grid-template-columns: 16px max-content minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
-  padding-top: 10px;
-}
-
-.snapshot-tags > svg {
-  color: var(--accent);
-}
-
-.snapshot-tags > span {
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 820;
-  white-space: nowrap;
 }
 
 .compact-list {

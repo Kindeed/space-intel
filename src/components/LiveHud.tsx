@@ -1,9 +1,8 @@
-import { Activity, CalendarDays, CircleDollarSign, Zap } from 'lucide-react';
+import { Activity, CalendarDays, CircleDollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { slugify, trendTags } from '../data';
 import { SectionTitle } from './SectionTitle';
 import { useLaunchesQuery, useMarketQuery, useSourcesQuery } from '../hooks/queries';
-import type { ApiHomeStats, ApiLaunch, ApiMarketItem, ApiTrendingTag } from '../types';
+import type { ApiHomeStats, ApiLaunch, ApiMarketItem } from '../types';
 import { displayLaunchStatus, formatLaunchWindow } from '../utils';
 
 function sourceTypeLabel(type: string): string {
@@ -12,6 +11,7 @@ function sourceTypeLabel(type: string): string {
     rss: 'RSS 源',
     google_news_rss: '备用聚合',
     official_page: '官网发布',
+    procurement_page: '采购公告',
     capital_filing: '资本披露',
     rsshub: 'RSSHub',
   };
@@ -40,14 +40,11 @@ function MarketBrief({ item }: { item: ApiMarketItem }) {
   );
 }
 
-export function LiveHud({ stats, trendingTags }: { stats?: ApiHomeStats; trendingTags?: ApiTrendingTag[] }) {
+export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
   const launches = useLaunchesQuery('/api/launches?limit=4');
   const market = useMarketQuery('/api/market?limit=4');
   const sources = useSourcesQuery();
   const sourceStats = sources.data?.stats ?? stats?.enabledSourcesByType ?? [];
-  const fallbackTags = trendTags.map((tag) => ({ slug: slugify(tag), name: tag, count: 0 }));
-  const hotTags = trendingTags?.length ? trendingTags : fallbackTags;
-  const hotTagsKicker = trendingTags?.length ? '近期' : '配置';
 
   return (
     <aside className="live-hud" aria-label="实时情报 HUD">
@@ -67,24 +64,15 @@ export function LiveHud({ stats, trendingTags }: { stats?: ApiHomeStats; trendin
       </section>
 
       <section className="panel intel-snapshot">
-        <SectionTitle icon={Activity} title="情报索引" kicker="来源与热词" />
+        <SectionTitle icon={Activity} title="来源状态" kicker="已启用" />
         <div className="source-status">
-          {sourceStats.length ? sourceStats.slice(0, 3).map((source) => (
+          {sourceStats.length ? sourceStats.slice(0, 6).map((source) => (
             <Link to="/articles" key={source.type}>
               <span>{sourceTypeLabel(source.type)}</span>
               <strong>{source.count}</strong>
               <em>可用</em>
             </Link>
           )) : <div className="empty-state">来源状态暂不可用。</div>}
-        </div>
-        <div className="snapshot-tags">
-          <Zap size={15} aria-hidden="true" />
-          <span>{hotTagsKicker}热词</span>
-          <div className="tag-row">
-            {hotTags.slice(0, 6).map((tag) => (
-              <Link key={tag.slug} to={`/topics/${tag.slug}`}>{tag.name}</Link>
-            ))}
-          </div>
         </div>
       </section>
     </aside>

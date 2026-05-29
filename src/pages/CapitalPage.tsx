@@ -24,7 +24,7 @@ export function CapitalPage() {
   const items = state.data?.items ?? [];
 
   return (
-    <PageShell title="资本情报" subtitle="汇总融资、公告、财报和市场相关资讯。">
+    <PageShell title="资本情报">
       <div className="notice-banner">{state.data?.notice ?? '资本市场内容仅作信息聚合，不构成投资建议。'}</div>
       <details className="filter-drawer">
         <summary><Filter size={16} aria-hidden="true" /> 资本筛选</summary>

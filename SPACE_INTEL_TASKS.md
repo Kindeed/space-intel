@@ -18,11 +18,12 @@
 当前任务：
 
 - DONE：UI 主导航从五栏/六入口收敛为四个主入口，并将公司库、专题追踪降级为次级索引入口；`vitest` 局部测试、`tsc -b --noEmit`、`eslint .`、`vite build`、`verify-layout` 和本地 Playwright desktop/mobile 布局检查均已通过。
+- DONE：UI 文案去“情报流/AI 说明味”已完成。主入口改为“资讯”，页面统一移除固定解释副标题，首页移除“聚合商业航天新闻...”说明，右侧“情报索引/配置热词”改为“来源状态”；本地 text/overflow 检查、`verify-layout`、完整测试和 build 均已通过。
 - IN_PROGRESS：Launch Library 2 endpoint 已加入明确 User-Agent 且 scheduled Worker 已可部署；继续复跑 production `/api/admin/ingest/launches` 并验证 `/api/launches` 返回未来发射。
 - DONE：治理文档整理已完成。已拆分稳定约束、任务账本和问题账本，避免约束文件承担任务流水和 bug 账本职责；`tsc -b --noEmit`、`eslint .`、diff check 和 secret-pattern scan 均已通过。
 - IN_PROGRESS：生产文章相关 API 500 已实现旧 schema 兼容兜底，覆盖 `/api/home`、`/api/articles`、文章详情、公司详情和专题详情；待部署后复查生产接口并确认 D1 `0004_article_translation_fields` 迁移状态。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-005`。
 - TODO：排查 production health 中的未闭合 ingestion logs 和官方网页来源失败；跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-006`。
-- TODO：修复 scheduled ingestion 与 config-first/source-enabled 约束的偏差；跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-003` 和 `SI-ISSUE-004`。
+- DONE：修复 scheduled ingestion 与 config-first/source-enabled 约束的偏差。`snapi` 和 `launch-library-2` 已尊重 `enabled`，未实现采集器的 `capital_filing` 源先禁用；新增 `procurement_page` 公开采购公告源类型和中国政府采购网中央公告源。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-003` 和 `SI-ISSUE-004`。
 - TODO：继续观察新增 RSS 和官方网页来源的采集质量、重复率和相关性；Google News RSS 仅作为必要时手动启用的备用聚合源。
 - TODO：后续大版本依赖升级单独评估，不混入常规 bug 修复或来源维护任务。
 

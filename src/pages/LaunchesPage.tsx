@@ -58,7 +58,7 @@ export function LaunchesPage() {
   const items = state.data?.items ?? [];
 
   return (
-    <PageShell title="发射时间线" subtitle="按时间展示发射窗口、服务商和状态，支持关键词筛选。">
+    <PageShell title="发射时间线">
       <details className="filter-drawer">
         <summary><Filter size={16} aria-hidden="true" /> 发射筛选</summary>
         <form className="filter-form" action="/launches">

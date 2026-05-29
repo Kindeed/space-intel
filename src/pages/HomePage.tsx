@@ -17,8 +17,7 @@ export function HomePage() {
       <MissionNav stats={home.data?.stats} />
       <section className="timeline-column" aria-label="情报时间线">
         <div className="timeline-header">
-          <SectionTitle icon={RadioTower} title="今日重点" kicker="实时聚合" />
-          <p>聚合商业航天新闻、发射、公司、资本和政策线索。</p>
+          <SectionTitle icon={RadioTower} title="今日重点" kicker="最新" />
         </div>
         {home.error ? <div className="inline-status">{safeLoadMessage('首页数据')}</div> : null}
         {home.isLoading ? <SkeletonFeed /> : null}
@@ -28,7 +27,7 @@ export function HomePage() {
           {!home.isLoading && !feed.length ? <div className="empty-state">暂无可展示线索。</div> : null}
         </div>
       </section>
-      <LiveHud stats={home.data?.stats} trendingTags={home.data?.trendingTags} />
+      <LiveHud stats={home.data?.stats} />
     </div>
   );
 }

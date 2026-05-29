@@ -4,7 +4,7 @@ export type MissionNavItem = { label: string; to: string; icon: LucideIcon; sign
 
 export const primaryNav: MissionNavItem[] = [
   { label: '总览', to: '/', icon: Home, signal: '最新' },
-  { label: '情报流', to: '/articles', icon: Newspaper, signal: '聚合' },
+  { label: '资讯', to: '/articles', icon: Newspaper, signal: '聚合' },
   { label: '发射', to: '/launches', icon: Rocket, signal: '窗口' },
   { label: '资本', to: '/capital', icon: CircleDollarSign, signal: '提示' },
 ];

@@ -59,24 +59,24 @@
 ### 2026-05-29 - SI-ISSUE-003 - Enabled capital filing sources are not scheduled for ingestion
 
 - Priority: P1
-- Status: OPEN
+- Status: VERIFIED
 - Area: ingestion
 - Found In: local architecture review
 - Evidence: `config/sources.yaml` enables four `capital_filing` SEC sources, but `src/ingestion/scheduled.ts` only schedules SNAPI, Launch Library 2, RSS, Google News RSS, and `official_page` sources. `SPACE_INTEL_DEV_CONSTRAINTS.md` and `docs/INGESTION_ARCHITECTURE.md` both describe `capital_filing` as a source family that should have collector coverage.
-- Fix: Implement a conservative `capital_filing` collector and scheduled route, or disable these sources until the collector behavior is defined.
-- Regression Check: Unverified; current `.\node_modules\.bin\tsc.cmd -b --noEmit`, `node scripts\generate-config.mjs --check`, and ingestion-focused Vitest checks pass but do not cover this missing route.
-- Notes: The issue can leave the Capital page dependent on keyword seeding from articles rather than the explicitly configured filing sources.
+- Fix: Disabled the four `capital_filing` SEC sources in `config/sources.yaml` until a conservative SEC collector and scheduled route are defined. This prevents source status and catalog sync from presenting unscheduled filing feeds as active.
+- Regression Check: Verified with `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\vitest.cmd run src\ingestion\ingestion.test.ts src\ingestion\scheduled.test.ts`, full `.\node_modules\.bin\vitest.cmd run`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, and `.\node_modules\.bin\vite.cmd build`.
+- Notes: The Capital page still receives market rows from article keyword seeding. Re-enable SEC sources only together with a tested `capital_filing` collector.
 
 ### 2026-05-29 - SI-ISSUE-004 - Fixed-key scheduled sources ignore enabled flags
 
 - Priority: P2
-- Status: OPEN
+- Status: VERIFIED
 - Area: ingestion
 - Found In: local architecture review
 - Evidence: `src/ingestion/scheduled.ts` finds `snapi` and `launch-library-2` by key and runs them without checking `source.enabled`, while RSS, Google News RSS, and `official_page` branches filter by `item.enabled`.
-- Fix: Make scheduled ingestion respect `enabled` for all configured sources before dispatching source-specific collectors.
-- Regression Check: Unverified; add tests that disabled `snapi` and `launch-library-2` sources do not fetch, create ingestion logs, or write data.
-- Notes: This violates the config-first source architecture because YAML cannot reliably disable these API-style sources.
+- Fix: Scheduled ingestion now checks `enabled` before dispatching both fixed-key collectors. Added a regression test proving disabled `snapi` and `launch-library-2` do not fetch, create ingestion logs, or write source data.
+- Regression Check: Verified with `.\node_modules\.bin\vitest.cmd run src\ingestion\scheduled.test.ts`, full `.\node_modules\.bin\vitest.cmd run`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, and `.\node_modules\.bin\vite.cmd build`.
+- Notes: This restores the config-first source architecture for API-style scheduled sources.
 
 ### 2026-05-29 - SI-ISSUE-005 - Production article APIs return 500 and leave article content empty
 
