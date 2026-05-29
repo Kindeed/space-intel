@@ -10,7 +10,15 @@ import {
 } from './index';
 import { parseCompaniesConfig, parseTopicsConfig } from '../catalog';
 import { parseCurationsConfig, parseCurationsYaml } from '../curations/config';
-import { closeStaleIngestionLogs, replaceConfiguredCurations, syncConfiguredCatalog, type FullCatalogSyncResult, type SqlDatabase } from '../db';
+import {
+  cleanupRetainedData,
+  closeStaleIngestionLogs,
+  replaceConfiguredCurations,
+  syncConfiguredCatalog,
+  type FullCatalogSyncResult,
+  type RetentionCleanupResult,
+  type SqlDatabase,
+} from '../db';
 import { seedMarketItemsFromArticles, type MarketSeedResult } from '../market';
 import type { TranslationEnv } from '../translation';
 import type { LaunchIngestionResult } from './launchIngestion';
@@ -80,10 +88,12 @@ export type ScheduledMarketSeedRunResult =
 export type ScheduledMaintenanceResult =
   | {
       staleIngestionLogsClosed: number;
+      retention: RetentionCleanupResult;
       failures: 0;
     }
   | {
       staleIngestionLogsClosed: 0;
+      retention: null;
       failures: 1;
       error: string;
     };
@@ -187,7 +197,7 @@ async function seedMarketSafely(db: SqlDatabase): Promise<ScheduledMarketSeedRun
   }
 }
 
-async function closeStaleLogsSafely(db: SqlDatabase, now: Date): Promise<ScheduledMaintenanceResult> {
+async function runDailyMaintenanceSafely(db: SqlDatabase, now: Date): Promise<ScheduledMaintenanceResult> {
   try {
     const staleBefore = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
 
@@ -196,11 +206,13 @@ async function closeStaleLogsSafely(db: SqlDatabase, now: Date): Promise<Schedul
         finishedAt: now.toISOString(),
         staleBefore,
       }),
+      retention: await cleanupRetainedData(db, { now }),
       failures: 0,
     };
   } catch (error) {
     return {
       staleIngestionLogsClosed: 0,
+      retention: null,
       failures: 1,
       error: errorMessage(error),
     };
@@ -286,7 +298,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
       });
     }
 
-    maintenance = await closeStaleLogsSafely(input.db, input.context.now());
+    maintenance = await runDailyMaintenanceSafely(input.db, input.context.now());
   }
 
   const curationsInserted =

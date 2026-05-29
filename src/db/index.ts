@@ -9,6 +9,7 @@ export * from './ingestionLogs';
 export * from './launches';
 export * from './launchQueries';
 export * from './marketQueries';
+export * from './retention';
 export * from './sourceQueries';
 export * from './topicQueries';
 export * from './types';

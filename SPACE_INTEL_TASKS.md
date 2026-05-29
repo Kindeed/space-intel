@@ -13,11 +13,12 @@
 
 更新时间：2026-05-28
 
-当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync、文章实体关联、market seed 和 launch cache 均已有 production 数据验证；`CLOUDFLARE_API_TOKEN` 已确认可用于 `main` 推送后的 scheduled Worker 自动部署。本轮执行 Hy-MT 1.8B 英文标题/摘要翻译接入，重点是新增翻译字段、采集前置翻译、受保护历史回填接口、API 返回原文摘要和翻译状态。
+当前重点：v1 开发、验证和部署已基本完成；Git-backed Pages、D1、R2、Pages secret、首批生产数据、公司/专题 catalog sync、文章实体关联、market seed 和 launch cache 均已有 production 数据验证；`CLOUDFLARE_API_TOKEN` 已确认可用于 `main` 推送后的 scheduled Worker 自动部署。本轮在已合入 Hy-MT 翻译链路的基础上补齐 D1 数据保留策略，重点是 scheduled daily 自动清理旧元数据、旧采集日志、旧资本条目和旧发射缓存，避免数据库无限增长。
 
 当前进展：
 
-- IN_PROGRESS：2026-05-28 Hy-MT 1.8B 翻译接入正在执行。计划文件固定为 `docs/TRANSLATION_INTEGRATION_PLAN.md`；实现范围为自部署 OpenAI-compatible 翻译服务 adapter、文章翻译字段、采集链路翻译 enrich、受保护历史回填 endpoint 和 API 翻译元数据返回。翻译服务 secret 只允许通过 Cloudflare runtime secrets 配置，不进入仓库。
+- DONE：2026-05-28 data retention cleanup 已完成本地实现。新增 D1 retention cleanup 模块并接入 daily scheduled maintenance；默认保留 article metadata / article relation rows 730 天、ingestion logs 90 天、market items 1095 天、launch cache 730 天，按 bounded batch 删除，避免单次 cron 过载；本地 typecheck、lint、test、build、layout、config parity、diff check 和 secret scan 均已通过，待 PR/CI。
+- DONE：2026-05-28 Hy-MT 1.8B 翻译接入已合入 main。计划文件固定为 `docs/TRANSLATION_INTEGRATION_PLAN.md`；实现范围为自部署 OpenAI-compatible 翻译服务 adapter、文章翻译字段、采集链路翻译 enrich、受保护历史回填 endpoint 和 API 翻译元数据返回。翻译服务 secret 只允许通过 Cloudflare runtime secrets 配置，不进入仓库。
 - DONE：2026-05-28 architecture hardening 已完成并合入。已实现 `pnpm generate:config` / `pnpm check:config`，CI 增加生成配置漂移检查；scheduled ingestion 增加 RSS/official_page 有界并发、每日 source/company/topic catalog sync、每日 stale ingestion log maintenance、source run 成败统计和耗时返回；D1 增加查询索引 migration，文章关联写入改用 D1 batch 优先；`/api/health` 增加最近成功采集时间和最近失败日志摘要。
 - DONE：2026-05-28 production consistency 修复已完成并合入。已同步 sources catalog 到 D1、让 `/api/launches` 默认只返回未来发射、清理历史未闭合 ingestion logs，并通过 `main` GitHub Actions verify 与 scheduled Worker deploy。
 - DONE：Cloudflare 重建与线上采集问题修复已部署。scheduled ingestion 增加 25 秒单源超时并闭合失败日志；Launch Library 2 改为每 6 小时运行一次以降低 429；`/api/health` 改为返回最近已闭合日志和 `openIngestionLogCount`；2026-05-28 最新 `main` GitHub Actions run 中 `verify` 与 `deploy-scheduled` 均已成功。

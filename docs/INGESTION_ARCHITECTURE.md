@@ -29,7 +29,8 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 - Hourly RSS and official-page sources run with bounded concurrency. API-style sources stay serial unless explicitly changed.
 - Hourly runs seed `market_items` from the updated article metadata so the capital page can refresh without a separate manual admin call.
 - Daily runs synchronize configured sources, companies, and topics into D1, then sync curations.
-- Daily maintenance closes ingestion logs that have stayed open for more than two hours.
+- Daily maintenance closes ingestion logs that have stayed open for more than two hours and prunes retained operational data in bounded batches.
+- Retention defaults keep article metadata and article relation rows for 730 days, ingestion logs for 90 days, market items for 1095 days, and launch cache rows for 730 days after `window_start`. Source, company, tag, and curation catalog rows are retained until config or editorial changes remove them.
 
 ## D1 Write Path
 
