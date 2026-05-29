@@ -13,7 +13,7 @@
 
 更新时间：2026-05-29
 
-当前重点：v1 已具备 React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序、主要业务页面、Git-backed Pages 部署、scheduled Worker、R2、production ingestion、catalog sync、实体关联、market seed、launch cache、Hy-MT 翻译链路和 D1 数据保留策略。当前开发重心从“大功能补齐”转为治理文档清晰化、线上采集质量观察、回归问题闭环和后续增强筛选。
+当前重点：v1 已具备 React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序、主要业务页面、Git-backed Pages 部署、scheduled Worker、R2、production ingestion、catalog sync、实体关联、launch cache、Hy-MT 翻译链路和 D1 数据保留策略。当前开发重心从“大功能补齐”转为治理文档清晰化、线上采集质量观察、回归问题闭环和后续增强筛选。
 
 当前任务：
 
@@ -23,13 +23,14 @@
 - DONE：治理文档整理已完成。已拆分稳定约束、任务账本和问题账本，避免约束文件承担任务流水和 bug 账本职责；`tsc -b --noEmit`、`eslint .`、diff check 和 secret-pattern scan 均已通过。
 - IN_PROGRESS：生产文章相关 API 500 已实现旧 schema 兼容兜底，覆盖 `/api/home`、`/api/articles`、文章详情、公司详情和专题详情；待部署后复查生产接口并确认 D1 `0004_article_translation_fields` 迁移状态。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-005`。
 - TODO：排查 production health 中的未闭合 ingestion logs 和官方网页来源失败；跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-006`。
-- DONE：修复 scheduled ingestion 与 config-first/source-enabled 约束的偏差。`snapi` 和 `launch-library-2` 已尊重 `enabled`，未实现采集器的 `capital_filing` 源先禁用；新增 `procurement_page` 公开采购公告源类型和中国政府采购网中央公告源。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-003` 和 `SI-ISSUE-004`。
+- DONE：修复 scheduled ingestion 与 config-first/source-enabled 约束的偏差。`snapi` 和 `launch-library-2` 已尊重 `enabled`，新增 `procurement_page` 公开采购公告源类型和中国政府采购网中央公告源。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-003` 和 `SI-ISSUE-004`。
+- DONE：将“资本”完整替换为“政策”。已移除 market seed/API/schema 路径，新增 `/policy` 页面、政策动态 HUD、地方政府官方政策源、通用 HTML 列表轻爬虫解析能力和 `0005_drop_market_items.sql`；typecheck、lint、test、build、config check、layout 和本地浏览器检查均已通过。
 - TODO：继续观察新增 RSS 和官方网页来源的采集质量、重复率和相关性；Google News RSS 仅作为必要时手动启用的备用聚合源。
 - TODO：后续大版本依赖升级单独评估，不混入常规 bug 修复或来源维护任务。
 
 最近完成：
 
-- DONE：2026-05-28 data retention cleanup 已完成本地实现。新增 D1 retention cleanup 模块并接入 daily scheduled maintenance；默认保留 article metadata / article relation rows 730 天、ingestion logs 90 天、market items 1095 天、launch cache 730 天，按 bounded batch 删除；本地 typecheck、lint、test、build、layout、config parity、diff check 和 secret scan 均已通过，待 PR/CI。
+- DONE：2026-05-28 data retention cleanup 已完成本地实现。新增 D1 retention cleanup 模块并接入 daily scheduled maintenance；默认保留 article metadata / article relation rows 730 天、ingestion logs 90 天、launch cache 730 天，按 bounded batch 删除；本地 typecheck、lint、test、build、layout、config parity、diff check 和 secret scan 均已通过，待 PR/CI。
 - DONE：2026-05-28 Hy-MT 1.8B 翻译接入已合入 main。计划文件为 `docs/TRANSLATION_INTEGRATION_PLAN.md`；实现范围包括自部署 OpenAI-compatible 翻译服务 adapter、文章翻译字段、采集链路翻译 enrich、受保护历史回填 endpoint 和 API 翻译元数据返回。
 - DONE：2026-05-28 architecture hardening 已完成并合入。包含 `pnpm generate:config` / `pnpm check:config`、配置漂移检查、scheduled ingestion 有界并发、每日 catalog sync、stale ingestion log maintenance、D1 查询索引、D1 batch 优先写入和 `/api/health` 增强。
 - DONE：2026-05-28 production consistency 修复已完成并合入。同步 sources catalog 到 D1、让 `/api/launches` 默认只返回未来发射、清理历史未闭合 ingestion logs，并通过 `main` GitHub Actions verify 与 scheduled Worker deploy。
@@ -47,8 +48,8 @@
 | DONE | Architecture Guardrails | Reference review, plugin-style source interface, optional VPS enrichment boundary, and current architecture notes are documented. |
 | DONE | Data Foundation | D1 schema, source/company/topic/curation configs, generated config checks, and catalog sync are implemented. |
 | DONE | Ingestion Pipeline | SNAPI, Launch Library 2, RSS, Google News RSS backup, official page ingestion, deduplication, ingestion logs, scheduled ingestion, and retention cleanup exist. |
-| DONE | API Layer | Home, article, company, launch, market, topic, curation, enrichment, seed, and health endpoints exist with protected admin routes where needed. |
-| DONE | Frontend Pages | Home, article list/detail, company, launch, capital, and topic pages are implemented with local fallback data where appropriate. |
+| DONE | API Layer | Home, article, company, launch, topic, curation, enrichment, seed, and health endpoints exist with protected admin routes where needed. |
+| DONE | Frontend Pages | Home, article list/detail, company, launch, policy, and topic pages are implemented with local fallback data where appropriate. |
 | DONE | Curation And Editorial Controls | Manual curation loader, protected curation endpoint, ranking rules, and config-backed curated content exist. |
 | DONE | Verification And Launch | CI, production Pages, preview deployment, D1/R2 binding checks, responsive layout checks, and existing-service safety checks have passed in prior release work. |
 

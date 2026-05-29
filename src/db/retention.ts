@@ -5,7 +5,6 @@ export type RetentionCleanupInput = {
   batchLimit?: number;
   articleRetentionDays?: number;
   ingestionLogRetentionDays?: number;
-  marketItemRetentionDays?: number;
   launchRetentionDays?: number;
 };
 
@@ -15,14 +14,12 @@ export type RetentionCleanupResult = {
   articleLaunchesDeleted: number;
   articlesDeleted: number;
   ingestionLogsDeleted: number;
-  marketItemsDeleted: number;
   launchesDeleted: number;
 };
 
 const defaultBatchLimit = 500;
 const defaultArticleRetentionDays = 730;
 const defaultIngestionLogRetentionDays = 90;
-const defaultMarketItemRetentionDays = 1095;
 const defaultLaunchRetentionDays = 730;
 
 function cutoff(now: Date, days: number): string {
@@ -57,7 +54,6 @@ export async function cleanupRetainedData(
   const batchLimit = normalizeBatchLimit(input.batchLimit);
   const articleCutoff = cutoff(input.now, input.articleRetentionDays ?? defaultArticleRetentionDays);
   const ingestionLogCutoff = cutoff(input.now, input.ingestionLogRetentionDays ?? defaultIngestionLogRetentionDays);
-  const marketItemCutoff = cutoff(input.now, input.marketItemRetentionDays ?? defaultMarketItemRetentionDays);
   const launchCutoff = cutoff(input.now, input.launchRetentionDays ?? defaultLaunchRetentionDays);
 
   const articleTagsDeleted = await runDelete(
@@ -96,18 +92,6 @@ export async function cleanupRetainedData(
      )`,
     [ingestionLogCutoff, batchLimit],
   );
-  const marketItemsDeleted = await runDelete(
-    db,
-    `DELETE FROM market_items
-     WHERE id IN (
-       SELECT id
-       FROM market_items
-       WHERE published_at < ?
-       ORDER BY published_at ASC, id ASC
-       LIMIT ?
-     )`,
-    [marketItemCutoff, batchLimit],
-  );
   const launchesDeleted = await runDelete(
     db,
     `DELETE FROM launches
@@ -128,7 +112,6 @@ export async function cleanupRetainedData(
     articleLaunchesDeleted,
     articlesDeleted,
     ingestionLogsDeleted,
-    marketItemsDeleted,
     launchesDeleted,
   };
 }

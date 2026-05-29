@@ -63,7 +63,6 @@ describe('retention cleanup', () => {
       articleLaunchesDeleted: 1,
       articlesDeleted: 2,
       ingestionLogsDeleted: 1,
-      marketItemsDeleted: 1,
       launchesDeleted: 1,
     });
     expect(db.deletes.map((item) => item.table)).toEqual([
@@ -72,12 +71,11 @@ describe('retention cleanup', () => {
       'article_launches',
       'articles',
       'ingestion_logs',
-      'market_items',
       'launches',
     ]);
     expect(db.deletes.every((item) => item.limit === 25)).toBe(true);
     expect(db.deletes[0].cutoff).toBe('2024-05-28T00:00:00.000Z');
     expect(db.deletes[4].cutoff).toBe('2026-02-27T00:00:00.000Z');
-    expect(db.deletes[5].cutoff).toBe('2023-05-29T00:00:00.000Z');
+    expect(db.deletes[5].cutoff).toBe('2024-05-28T00:00:00.000Z');
   });
 });

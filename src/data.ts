@@ -27,8 +27,6 @@ export const upcomingLaunches: Array<{
   status: string;
 }> = [];
 
-export const marketBriefs: string[] = [];
-
 export const sourceStatus: Array<{ label: string; value: string; state: string }> = [];
 
 export const trendTags = ['可回收火箭', '卫星互联网', '商业遥感', '月球商业服务', '低轨通信', '政策监管'];

@@ -1,8 +1,8 @@
-import { Activity, CalendarDays, CircleDollarSign } from 'lucide-react';
+import { Activity, CalendarDays, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SectionTitle } from './SectionTitle';
-import { useLaunchesQuery, useMarketQuery, useSourcesQuery } from '../hooks/queries';
-import type { ApiHomeStats, ApiLaunch, ApiMarketItem } from '../types';
+import { useArticlesQuery, useLaunchesQuery, useSourcesQuery } from '../hooks/queries';
+import type { ApiArticleSummary, ApiHomeStats, ApiLaunch } from '../types';
 import { displayLaunchStatus, formatLaunchWindow } from '../utils';
 
 function sourceTypeLabel(type: string): string {
@@ -12,7 +12,6 @@ function sourceTypeLabel(type: string): string {
     google_news_rss: '备用聚合',
     official_page: '官网发布',
     procurement_page: '采购公告',
-    capital_filing: '资本披露',
     rsshub: 'RSSHub',
   };
 
@@ -32,17 +31,17 @@ function LaunchStrip({ launch, index }: { launch: ApiLaunch; index: number }) {
   );
 }
 
-function MarketBrief({ item }: { item: ApiMarketItem }) {
+function PolicyBrief({ item }: { item: ApiArticleSummary }) {
   return (
     <li>
-      {item.url ? <a href={item.url} target="_blank" rel="noreferrer">{item.title}</a> : <Link to="/capital">{item.title}</Link>}
+      <Link to={`/articles/${item.id}`}>{item.title}</Link>
     </li>
   );
 }
 
 export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
   const launches = useLaunchesQuery('/api/launches?limit=4');
-  const market = useMarketQuery('/api/market?limit=4');
+  const policy = useArticlesQuery('/api/articles?category=policy&limit=4');
   const sources = useSourcesQuery();
   const sourceStats = sources.data?.stats ?? stats?.enabledSourcesByType ?? [];
 
@@ -56,10 +55,9 @@ export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
       </section>
 
       <section className="panel">
-        <SectionTitle icon={CircleDollarSign} title="资本快讯" kicker="信息聚合" />
-        <p className="notice-copy">资本市场内容仅作信息聚合，不构成投资建议。</p>
+        <SectionTitle icon={FileText} title="政策动态" kicker="官方来源" />
         <ul className="compact-list">
-          {market.data?.items.length ? market.data.items.slice(0, 4).map((item) => <MarketBrief key={item.id} item={item} />) : <li>暂无资本线索。</li>}
+          {policy.data?.items.length ? policy.data.items.slice(0, 4).map((item) => <PolicyBrief key={item.id} item={item} />) : <li>暂无政策信息。</li>}
         </ul>
       </section>
 

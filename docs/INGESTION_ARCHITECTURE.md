@@ -27,10 +27,9 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 - Use `pnpm deploy:scheduled` as the manual fallback after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
 - Hourly runs isolate failures per source. One failed feed or API records a failed source result but does not stop the remaining sources.
 - Hourly RSS and official-page sources run with bounded concurrency. API-style sources stay serial unless explicitly changed.
-- Hourly runs seed `market_items` from the updated article metadata so the capital page can refresh without a separate manual admin call.
 - Daily runs synchronize configured sources, companies, and topics into D1, then sync curations.
 - Daily maintenance closes ingestion logs that have stayed open for more than two hours and prunes retained operational data in bounded batches.
-- Retention defaults keep article metadata and article relation rows for 730 days, ingestion logs for 90 days, market items for 1095 days, and launch cache rows for 730 days after `window_start`. Source, company, tag, and curation catalog rows are retained until config or editorial changes remove them.
+- Retention defaults keep article metadata and article relation rows for 730 days, ingestion logs for 90 days, and launch cache rows for 730 days after `window_start`. Source, company, tag, and curation catalog rows are retained until config or editorial changes remove them.
 
 ## D1 Write Path
 
@@ -49,7 +48,7 @@ Each collector owns one source family:
 - `google_news_rss`: Google News keyword RSS feeds.
 - `rsshub`: optional Chinese platform feeds through RSSHub.
 - `official_page`: official policy pages that need conservative page parsing.
-- `capital_filing`: public disclosure and filing links.
+- `procurement_page`: public procurement listing pages that need conservative list parsing.
 
 Collectors may normalize field names and timestamps, but they must not store full copyrighted article bodies.
 

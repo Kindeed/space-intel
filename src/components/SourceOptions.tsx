@@ -1,8 +1,8 @@
 import { useSourcesQuery } from '../hooks/queries';
 
-export function SourceOptions() {
+export function SourceOptions({ type }: { type?: string }) {
   const state = useSourcesQuery();
-  const sources = state.data?.items ?? [];
+  const sources = (state.data?.items ?? []).filter((source) => !type || source.type === type);
 
   return (
     <>

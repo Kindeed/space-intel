@@ -60,10 +60,8 @@ describe('source config', () => {
     expect(sources.some((source) => source.type === 'rss')).toBe(true);
     expect(sources.some((source) => source.type === 'google_news_rss')).toBe(true);
     expect(sources.some((source) => source.type === 'procurement_page')).toBe(true);
-    expect(sources.some((source) => source.type === 'capital_filing')).toBe(true);
     expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(0);
-    expect(sources.filter((source) => source.enabled && source.type === 'capital_filing')).toHaveLength(0);
-    expect(sources.filter((source) => source.enabled && ['rss', 'official_page', 'procurement_page'].includes(source.type)).length).toBeGreaterThanOrEqual(28);
+    expect(sources.filter((source) => source.enabled && ['rss', 'official_page', 'procurement_page'].includes(source.type)).length).toBeGreaterThanOrEqual(40);
   });
 });
 
@@ -473,6 +471,55 @@ describe('official page collector', () => {
       tags: ['domestic-private-launch'],
     });
   });
+
+  it('uses list item context dates and configured include terms for local policy pages', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'beijing-jxj-notices',
+          name: '北京市经信局通知公告',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://jxj.beijing.gov.cn/jxdt/tzgg/',
+          credibility: 5,
+          enabled: true,
+          purpose: 'Official notices.',
+          expected_content: 'Official metadata and links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['policy-and-regulation'],
+          include_terms: ['公共试验平台'],
+          exclude_terms: ['教育'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <ul>
+                <li><span>2026-05-08</span><a href="./demo.html">商业航天公共试验平台申报通知</a></li>
+                <li><span>2026-05-08</span><a href="./edu.html">教育培训服务通知</a></li>
+              </ul>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items).toEqual([
+      expect.objectContaining({
+        sourceKey: 'beijing-jxj-notices',
+        title: '商业航天公共试验平台申报通知',
+        url: 'https://jxj.beijing.gov.cn/jxdt/tzgg/demo.html',
+        publishedAt: '2026-05-08T00:00:00Z',
+        tags: ['policy-and-regulation'],
+      }),
+    ]);
+  });
 });
 
 describe('procurement page collector', () => {
@@ -519,7 +566,7 @@ describe('procurement page collector', () => {
         title: '某卫星遥感数据采购项目中标公告',
         summary: '采购公告：某卫星遥感数据采购项目中标公告',
         url: 'https://www.ccgp.gov.cn/cggg/zygg/notice-1.htm',
-        publishedAt: '2026-05-08T00:00:00.000Z',
+        publishedAt: '2026-05-08T00:00:00Z',
         language: 'zh',
         region: 'cn',
         rawId: 'https://www.ccgp.gov.cn/cggg/zygg/notice-1.htm',

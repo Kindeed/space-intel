@@ -2,7 +2,7 @@
 
 ## Summary
 
-- 项目目标：建设一个国内外商业航天全量情报网站，覆盖新闻、发射、公司、资本市场、政策和中文平台热点。
+- 项目目标：建设一个国内外商业航天全量情报网站，覆盖新闻、发射、公司、政策、招投标采购和中文平台热点。
 - 当前部署形态：前端、API、D1、R2 和 scheduled Worker 主要运行在 Cloudflare；代码托管、CI 和 PR 审查使用 GitHub。
 - 内容策略：自动聚合 + 人工精选；英文内容可以生成中文标题/摘要，但必须保留原文标题和来源链接。
 - 进度和问题不在本文件维护：任务状态见 `SPACE_INTEL_TASKS.md`，bug/问题见 `SPACE_INTEL_ISSUES.md`。
@@ -96,11 +96,11 @@ space-intel/
 ## Plugin-Style Source Architecture
 
 - 新增来源必须通过 `config/sources.yaml` 声明，不允许把来源 URL、关键词、地区规则散落硬编码在页面或 API 中。
-- 每类来源应有独立采集器：SNAPI、Launch Library 2、标准 RSS、官方网页源、Google News RSS 备用源、RSSHub、资本市场资讯。
+- 每类来源应有独立采集器：SNAPI、Launch Library 2、标准 RSS、官方网页源、采购公告页、Google News RSS 备用源、RSSHub。
 - 采集器输出统一 normalized item，再进入去重、翻译 enrich、标签识别、公司匹配和写入流程。
 - 新增采集器必须记录来源用途、预期内容类型、失败行为、合规风险和去重策略。
 - Google News RSS 中文关键词源默认禁用，只作为国内直连源不足时的备用聚合入口。
-- 资本市场来源优先使用公开 RSS、公告页、新闻源和原文链接；不得把逆向接口作为 v1 依赖。
+- 政策和采购来源优先使用公开官网列表页、公告页、新闻源和原文链接；不得把逆向接口作为 v1 依赖。
 
 ## Content And Data Rules
 
@@ -117,7 +117,6 @@ space-intel/
 - `article_companies`：文章与公司关联。
 - `tags` / `article_tags`：主题标签和文章关联。
 - `launches`：Launch Library 2 发射事件缓存。
-- `market_items`：融资、公告、财报、股价相关资讯。
 - `curations`：人工精选、置顶、专题归属、首页权重。
 - `ingestion_logs`：抓取时间、来源、成功数量、失败数量、错误信息。
 - retention cleanup 只能清理可再生缓存、旧日志和过期元数据；不得破坏当前页面需要的可见内容。
@@ -131,7 +130,6 @@ space-intel/
 - `GET /api/companies/:slug`
 - `GET /api/launches`
 - `GET /api/launches/:id`
-- `GET /api/market`
 - `GET /api/topics`
 - `GET /api/topics/:slug`
 - `POST /api/admin/curations`
@@ -140,7 +138,7 @@ Admin endpoints must require a protected token or equivalent access control. Pub
 
 ## UI And Product Constraints
 
-- 首页、列表、详情、公司、发射、资本、专题页面必须保持信息密集但可读。
+- 首页、列表、详情、公司、发射、政策、专题页面必须保持信息密集但可读。
 - 移动端不得出现文字重叠、按钮溢出、固定宽度破坏布局或长标题撑破容器。
 - 页面布局变更必须验证 desktop 和 mobile 视图。
 - 本地 API 不可用时可以使用示例数据兜底，但示例数据不得冒充真实新闻、不得包含开发说明或内部备注。

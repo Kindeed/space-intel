@@ -62,10 +62,10 @@
 - Status: VERIFIED
 - Area: ingestion
 - Found In: local architecture review
-- Evidence: `config/sources.yaml` enables four `capital_filing` SEC sources, but `src/ingestion/scheduled.ts` only schedules SNAPI, Launch Library 2, RSS, Google News RSS, and `official_page` sources. `SPACE_INTEL_DEV_CONSTRAINTS.md` and `docs/INGESTION_ARCHITECTURE.md` both describe `capital_filing` as a source family that should have collector coverage.
-- Fix: Disabled the four `capital_filing` SEC sources in `config/sources.yaml` until a conservative SEC collector and scheduled route are defined. This prevents source status and catalog sync from presenting unscheduled filing feeds as active.
+- Evidence: Earlier `config/sources.yaml` enabled four `capital_filing` SEC sources, but `src/ingestion/scheduled.ts` only scheduled SNAPI, Launch Library 2, RSS, Google News RSS, and `official_page` sources.
+- Fix: The interim fix disabled those SEC sources. The 2026-05-29 policy pivot fully removed the capital feature, `capital_filing` source type, and market seed path.
 - Regression Check: Verified with `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\vitest.cmd run src\ingestion\ingestion.test.ts src\ingestion\scheduled.test.ts`, full `.\node_modules\.bin\vitest.cmd run`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, and `.\node_modules\.bin\vite.cmd build`.
-- Notes: The Capital page still receives market rows from article keyword seeding. Re-enable SEC sources only together with a tested `capital_filing` collector.
+- Notes: Reintroducing capital data in the future would require a new product decision and a tested collector/schema path.
 
 ### 2026-05-29 - SI-ISSUE-004 - Fixed-key scheduled sources ignore enabled flags
 
@@ -84,7 +84,7 @@
 - Status: FIXED
 - Area: api
 - Found In: production browser/API check
-- Evidence: `https://space.bytebaud.com/` renders shell content, but the homepage article area stays in skeleton/empty state. `/api/home?limit=12`, `/api/articles?limit=5`, `/api/articles/1`, `/api/companies/spacex`, and `/api/topics/satellite-internet` return HTTP 500. Routes not using article summary translation fields, including `/api/launches`, `/api/market`, `/api/companies`, `/api/topics`, and `/api/health`, return 200. Chrome page checks confirm `/articles` stays shell-only while launches, companies, capital, and topic list pages render data.
+- Evidence: `https://space.bytebaud.com/` renders shell content, but the homepage article area stays in skeleton/empty state. `/api/home?limit=12`, `/api/articles?limit=5`, `/api/articles/1`, `/api/companies/spacex`, and `/api/topics/satellite-internet` return HTTP 500. Routes not using article summary translation fields, including `/api/launches`, `/api/companies`, `/api/topics`, and `/api/health`, return 200. Chrome page checks confirm `/articles` stays shell-only while launches, companies, and topic list pages render data.
 - Fix: Implemented a public API compatibility fallback for article summary queries. The code first uses the current translation-field schema, then retries with legacy-safe selected values when D1 reports missing `original_summary`, `translation_status`, or `translation_provider`. This covers home, article list/detail, company detail, and topic detail queries until the production D1 migration state is guaranteed.
 - Regression Check: Local fallback tests passed with `.\node_modules\.bin\vitest.cmd run src/db/articleQueries.test.ts src/db/homeQueries.test.ts src/db/companyQueries.test.ts src/db/topicQueries.test.ts`; full `.\node_modules\.bin\vitest.cmd run`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, `node scripts\generate-config.mjs --check`, `git diff --check`, and elevated `.\node_modules\.bin\vite.cmd build` passed. Production D1 schema query and remote regression remain blocked locally because `CLOUDFLARE_API_TOKEN` is not available in this shell.
 - Notes: The durable database fix is still to confirm/apply `migrations/0004_article_translation_fields.sql` on production D1; the code fallback prevents missing migration state from taking public pages down.
@@ -98,7 +98,7 @@
 - Evidence: `/api/health` returns `openIngestionLogCount: 15` and recent failed source logs for `deepblueaerospace-news`, `changguang-satellite-news`, `cas-space-news`, `landspace-news`, and `orienspace-news`; each recent failed log has `successCount: 0`, `failureCount: 1`, and `hasError: true`.
 - Fix: Inspect production ingestion logs and official-page collector behavior, then either harden parsing/timeouts for these sources or disable failing sources until route health is stable.
 - Regression Check: Unverified; production health endpoint confirms the symptoms but does not expose internal error details.
-- Notes: This may reduce domestic official/company-source freshness even though the rest of the site can still render launch, market, company, and topic data.
+- Notes: This may reduce domestic official/company-source freshness even though the rest of the site can still render launch, company, and topic data.
 
 ## Historical Review Artifacts
 

@@ -310,8 +310,15 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
     }
 
     if (filters.category === 'policy') {
-      conditions.push('s.type = ?');
-      values.push('official_page');
+      conditions.push(
+        `s.type = ?
+        AND EXISTS (
+          SELECT 1 FROM article_tags at_policy
+          JOIN tags t_policy ON t_policy.id = at_policy.tag_id
+          WHERE at_policy.article_id = a.id AND t_policy.slug = ?
+        )`,
+      );
+      values.push('official_page', 'policy-and-regulation');
     }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';

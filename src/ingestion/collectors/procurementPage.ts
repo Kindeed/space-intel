@@ -1,4 +1,5 @@
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
+import { extractDate as extractHtmlDate, extractHtmlListLinks } from '../htmlList';
 
 const domainTerms = [
   '航天',
@@ -18,37 +19,8 @@ const domainTerms = [
 
 const procurementTerms = ['招标', '采购', '中标', '成交', '公告', '公示', '项目'];
 
-function decodeHtml(input: string): string {
-  return input
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
-
-function stripHtml(input: string): string {
-  return decodeHtml(input.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
-}
-
-function absoluteUrl(base: string, href: string): string {
-  try {
-    return new URL(href, base).toString();
-  } catch {
-    return href;
-  }
-}
-
 function extractDate(input: string, fallback: Date): string {
-  const match = input.match(/(20\d{2})[-/.年](\d{1,2})[-/.月](\d{1,2})/);
-
-  if (!match) {
-    return fallback.toISOString();
-  }
-
-  const [, year, month, day] = match;
-  return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).toISOString();
+  return extractHtmlDate(input) ?? fallback.toISOString();
 }
 
 function titleTags(title: string): string[] {
@@ -73,35 +45,6 @@ function hasSpaceProcurementSignal(text: string): boolean {
   return domainTerms.some((term) => text.includes(term)) && procurementTerms.some((term) => text.includes(term));
 }
 
-function extractBlocks(html: string): string[] {
-  const blocks = [...html.matchAll(/<(li|tr)\b[^>]*>[\s\S]*?<\/\1>/gi)].map((match) => match[0]);
-
-  if (blocks.length) {
-    return blocks;
-  }
-
-  return [...html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/gi)].map((match) => match[0]);
-}
-
-function extractLink(block: string, baseUrl: string): { title: string; url: string } | null {
-  const match = block.match(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/i);
-
-  if (!match) {
-    return null;
-  }
-
-  const title = stripHtml(match[2]);
-
-  if (!title || title.length < 4) {
-    return null;
-  }
-
-  return {
-    title,
-    url: absoluteUrl(baseUrl, match[1]),
-  };
-}
-
 export const procurementPageCollector: SourceCollector = {
   type: 'procurement_page',
   async collect(source: SourceConfig, context: CollectorContext): Promise<NormalizedItem[]> {
@@ -120,15 +63,12 @@ export const procurementPageCollector: SourceCollector = {
     const seen = new Set<string>();
     const items: NormalizedItem[] = [];
 
-    for (const block of extractBlocks(html)) {
-      const link = extractLink(block, source.url);
-
-      if (!link || seen.has(link.url)) {
+    for (const link of extractHtmlListLinks(html, source.url)) {
+      if (seen.has(link.url)) {
         continue;
       }
 
-      const contextText = stripHtml(block);
-      const signalText = `${link.title} ${contextText}`;
+      const signalText = `${link.title} ${link.contextText}`;
 
       if (!hasSpaceProcurementSignal(signalText)) {
         continue;

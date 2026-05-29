@@ -99,23 +99,6 @@ export type ApiLaunchListResult = {
   hasMore: boolean;
 };
 
-export type ApiMarketItem = {
-  id: number;
-  title: string;
-  itemType: string;
-  companyName: string | null;
-  companySlug: string | null;
-  sourceName: string | null;
-  url: string;
-  summary: string;
-  publishedAt: string;
-};
-
-export type ApiMarketListResult = {
-  items: ApiMarketItem[];
-  notice: string;
-};
-
 export type ApiTopic = {
   id: number;
   slug: string;

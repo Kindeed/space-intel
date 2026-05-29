@@ -234,7 +234,7 @@ select {
 .page-list,
 .entity-card,
 .notice-banner,
-.market-item,
+.policy-item,
 .filter-drawer,
 .launch-timeline {
   border: 1px solid var(--border);
@@ -248,7 +248,7 @@ select {
 .panel,
 .detail-panel,
 .notice-banner,
-.market-item,
+.policy-item,
 .entity-card,
 .filter-drawer {
   padding: 14px;
@@ -284,7 +284,7 @@ select {
 .filter-row a[aria-current="page"],
 .article-card:hover,
 .entity-card:hover,
-.market-item:hover {
+.policy-item:hover {
   background: var(--surface-hover);
 }
 
@@ -372,7 +372,7 @@ select {
 .timeline-header p,
 .article-card p,
 .detail-panel p,
-.market-item p,
+.policy-item p,
 .notice-copy,
 .inline-status,
 .empty-state {
@@ -412,7 +412,7 @@ select {
 
 .timeline-feed,
 .page-list,
-.market-list,
+.policy-list,
 .compact-list,
 .launch-stack,
 .card-grid,
@@ -475,7 +475,7 @@ select {
 }
 
 .article-card h3,
-.market-item h3 {
+.policy-item h3 {
   margin: 0;
   color: #f8fafc;
   font-size: 1.02rem;
@@ -816,16 +816,16 @@ select {
   font-weight: 800;
 }
 
-.market-list {
+.policy-list {
   gap: 12px;
 }
 
-.market-item {
+.policy-item {
   display: grid;
   gap: 9px;
 }
 
-.market-item > a {
+.policy-item > a {
   width: max-content;
   max-width: 100%;
 }

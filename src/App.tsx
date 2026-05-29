@@ -5,12 +5,12 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { SiteHeader } from './components/SiteHeader';
 import { ArticleDetailPage } from './pages/ArticleDetailPage';
 import { ArticlesPage } from './pages/ArticlesPage';
-import { CapitalPage } from './pages/CapitalPage';
 import { CompaniesPage } from './pages/CompaniesPage';
 import { CompanyDetailPage } from './pages/CompanyDetailPage';
 import { HomePage } from './pages/HomePage';
 import { LaunchDetailPage } from './pages/LaunchDetailPage';
 import { LaunchesPage } from './pages/LaunchesPage';
+import { PolicyPage } from './pages/PolicyPage';
 import { TopicDetailPage } from './pages/TopicDetailPage';
 import { TopicsPage } from './pages/TopicsPage';
 import { queryClient } from './queryClient';
@@ -29,7 +29,7 @@ export function AppRoutes() {
             <Route path="/companies/:slug" element={<CompanyDetailPage />} />
             <Route path="/launches" element={<LaunchesPage />} />
             <Route path="/launches/:slug" element={<LaunchDetailPage />} />
-            <Route path="/capital" element={<CapitalPage />} />
+            <Route path="/policy" element={<PolicyPage />} />
             <Route path="/topics" element={<TopicsPage />} />
             <Route path="/topics/:slug" element={<TopicDetailPage />} />
           </Routes>

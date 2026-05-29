@@ -4,8 +4,7 @@ export type SourceType =
   | 'google_news_rss'
   | 'rsshub'
   | 'official_page'
-  | 'procurement_page'
-  | 'capital_filing';
+  | 'procurement_page';
 
 export type SourceRegion = 'cn' | 'global';
 
@@ -23,6 +22,9 @@ export type SourceConfig = {
   dedupe_strategy: string;
   default_tags?: string[];
   default_companies?: string[];
+  include_terms?: string[];
+  exclude_terms?: string[];
+  max_items?: number;
 };
 
 export type NormalizedItem = {

@@ -7,7 +7,6 @@ import type {
   ApiHomeResult,
   ApiLaunch,
   ApiLaunchListResult,
-  ApiMarketListResult,
   ApiSourceListResult,
   ApiTopic,
   ApiTopicDetail,
@@ -63,10 +62,6 @@ export function useLaunchesQuery(path: string) {
 
 export function useLaunchDetailQuery(slug: string) {
   return useApiQuery<ApiLaunch>(['launch', slug], slug ? `/api/launches/${encodeURIComponent(slug)}` : null);
-}
-
-export function useMarketQuery(path: string) {
-  return useApiQuery<ApiMarketListResult>(['market', path], path);
 }
 
 export function useSourcesQuery() {

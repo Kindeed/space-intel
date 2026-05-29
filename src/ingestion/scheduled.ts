@@ -20,7 +20,6 @@ import {
   type RetentionCleanupResult,
   type SqlDatabase,
 } from '../db';
-import { seedMarketItemsFromArticles, type MarketSeedResult } from '../market';
 import type { TranslationEnv } from '../translation';
 import type { LaunchIngestionResult } from './launchIngestion';
 import type { PersistedIngestionResult } from './persistedRun';
@@ -45,7 +44,6 @@ export type ScheduledIngestionResult = {
   kind: 'hourly' | 'daily';
   sourceRuns: ScheduledSourceRunResult[];
   curationsInserted: number;
-  marketSeed: ScheduledMarketSeedRunResult | null;
   catalogSync: FullCatalogSyncResult | null;
   maintenance: ScheduledMaintenanceResult | null;
   durationMs: number;
@@ -75,16 +73,6 @@ export type ScheduledSourceRunResult =
   | LaunchIngestionResult
   | FailedArticleIngestionResult
   | FailedLaunchIngestionResult;
-
-export type ScheduledMarketSeedRunResult =
-  | (MarketSeedResult & { failures: 0 })
-  | {
-      candidates: 0;
-      inserted: 0;
-      skipped: 0;
-      failures: 1;
-      error: string;
-    };
 
 export type ScheduledMaintenanceResult =
   | {
@@ -181,23 +169,6 @@ async function runLaunchSourceSafely(
   }
 }
 
-async function seedMarketSafely(db: SqlDatabase): Promise<ScheduledMarketSeedRunResult> {
-  try {
-    return {
-      ...(await seedMarketItemsFromArticles(db)),
-      failures: 0,
-    };
-  } catch (error) {
-    return {
-      candidates: 0,
-      inserted: 0,
-      skipped: 0,
-      failures: 1,
-      error: errorMessage(error),
-    };
-  }
-}
-
 async function runDailyMaintenanceSafely(db: SqlDatabase, now: Date): Promise<ScheduledMaintenanceResult> {
   try {
     const staleBefore = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
@@ -223,7 +194,6 @@ async function runDailyMaintenanceSafely(db: SqlDatabase, now: Date): Promise<Sc
 export async function runScheduledIngestion(input: ScheduledIngestionInput): Promise<ScheduledIngestionResult> {
   const startedAt = input.context.now();
   const sourceRuns: ScheduledSourceRunResult[] = [];
-  let marketSeed: ScheduledMarketSeedRunResult | null = null;
   let catalogSync: FullCatalogSyncResult | null = null;
   let maintenance: ScheduledMaintenanceResult | null = null;
   const timeoutMs = input.sourceTimeoutMs ?? sourceIngestionTimeoutMs;
@@ -297,8 +267,6 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
           ),
       )),
     );
-
-    marketSeed = await seedMarketSafely(input.db);
   }
 
   if (input.kind === 'daily') {
@@ -330,7 +298,6 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
     kind: input.kind,
     sourceRuns,
     curationsInserted,
-    marketSeed,
     catalogSync,
     maintenance,
     durationMs,

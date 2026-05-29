@@ -149,14 +149,15 @@ describe('article queries', () => {
     expect(result.hasMore).toBe(true);
   });
 
-  it('filters policy articles to official sources only', async () => {
+  it('filters policy articles to official sources with policy tags', async () => {
     const db = new FakeDatabase();
     db.allResults = [article];
 
     await listArticles(db, { category: 'policy' });
 
     expect(db.lastQuery).toContain('s.type = ?');
-    expect(db.lastValues).toEqual(['official_page', 81, 0]);
+    expect(db.lastQuery).toContain('t_policy.slug = ?');
+    expect(db.lastValues).toEqual(['official_page', 'policy-and-regulation', 81, 0]);
   });
 
   it('falls back to legacy article list queries when translation columns are missing', async () => {
@@ -195,7 +196,7 @@ describe('article queries', () => {
           ...article,
           id: 3,
           title: 'Satellite financing update',
-          sourceName: 'Capital Source',
+          sourceName: 'Policy Source',
         },
       ],
       10,

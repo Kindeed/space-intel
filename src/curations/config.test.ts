@@ -7,7 +7,7 @@ describe('curation config', () => {
 home_highlights:
   # - url: https://example.com/top
 pinned_items:
-  # - target: capital
+  # - target: policy
 topics:
   # - slug: reusable-rockets
 `);
@@ -22,8 +22,8 @@ home_highlights:
     weight: 100
     note: Top story
 pinned_items:
-  - target: capital
-    url: https://example.com/filing
+  - target: policy
+    url: https://example.com/policy
     weight: 80
 topics:
   - slug: reusable-rockets
@@ -44,8 +44,8 @@ topics:
       },
       {
         targetType: 'pinned',
-        targetKey: 'capital',
-        itemUrl: 'https://example.com/filing',
+        targetKey: 'policy',
+        itemUrl: 'https://example.com/policy',
         weight: 80,
         note: '',
         enabled: 1,

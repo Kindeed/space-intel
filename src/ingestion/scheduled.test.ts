@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { runScheduledIngestion } from './scheduled';
 import type { SourceConfig } from './types';
 import type { DbRunResult, DbStatement, SqlDatabase } from '../db/types';
-import type { MarketSeedArticle } from '../market';
 
 class MemoryStatement implements DbStatement {
   private values: unknown[] = [];
@@ -37,10 +36,8 @@ class MemoryScheduledDatabase implements SqlDatabase {
   readonly articleHashes = new Set<string>();
   readonly articles: Array<{ id: number; dedupeHash: string; url: string }> = [];
   readonly launches = new Map<string, string>();
-  readonly marketRows = new Map<string, string>();
   readonly logs: Array<{ id: number; sourceKey: string; startedAt: string; finishedAt: string | null; successCount: number; failureCount: number; error: string | null }> = [];
   readonly retentionDeletes: string[] = [];
-  marketArticles: MarketSeedArticle[] = [];
   curationsInserted = 0;
 
   prepare(query: string): DbStatement {
@@ -78,17 +75,6 @@ class MemoryScheduledDatabase implements SqlDatabase {
         this.tags.push(slug);
       }
 
-      return { meta: { changes: 1 } };
-    }
-
-    if (normalized.startsWith('INSERT OR IGNORE INTO market_items')) {
-      const url = String(values[4]);
-
-      if (this.marketRows.has(url)) {
-        return { meta: { changes: 0 } };
-      }
-
-      this.marketRows.set(url, String(values[1]));
       return { meta: { changes: 1 } };
     }
 
@@ -181,7 +167,6 @@ class MemoryScheduledDatabase implements SqlDatabase {
       normalized.startsWith('DELETE FROM article_launches') ||
       normalized.startsWith('DELETE FROM articles') ||
       normalized.startsWith('DELETE FROM ingestion_logs') ||
-      normalized.startsWith('DELETE FROM market_items') ||
       normalized.startsWith('DELETE FROM launches')
     ) {
       this.retentionDeletes.push(normalized.match(/^DELETE FROM ([a-z_]+)/)?.[1] ?? normalized);
@@ -206,12 +191,6 @@ class MemoryScheduledDatabase implements SqlDatabase {
   }
 
   all(query: string): { results: unknown[] } {
-    const normalized = query.replace(/\s+/g, ' ').trim();
-
-    if (normalized.includes('FROM articles a') && normalized.includes('ORDER BY a.published_at DESC')) {
-      return { results: this.marketArticles };
-    }
-
     throw new Error(`Unsupported all query: ${query}`);
   }
 }
@@ -582,37 +561,6 @@ describe('scheduled ingestion', () => {
     expect(db.logs[0]).toMatchObject({ sourceKey: 'ccgp-central-procurement', successCount: 1 });
   });
 
-  it('seeds market items during hourly runs idempotently', async () => {
-    const db = new MemoryScheduledDatabase();
-    db.marketArticles = [
-      {
-        id: 1,
-        title: 'Commercial space company closes funding round',
-        summary: 'Funding summary.',
-        url: 'https://example.com/funding',
-        publishedAt: '2026-05-09T00:00:00Z',
-        sourceId: 1,
-        companyId: null,
-      },
-    ];
-    const input = {
-      db,
-      sources: [],
-      context: {
-        now: () => new Date('2026-05-09T00:00:00Z'),
-        fetch,
-      },
-      kind: 'hourly' as const,
-    };
-
-    const first = await runScheduledIngestion(input);
-    const second = await runScheduledIngestion(input);
-
-    expect(first.marketSeed).toEqual({ candidates: 1, inserted: 1, skipped: 0, failures: 0 });
-    expect(second.marketSeed).toEqual({ candidates: 1, inserted: 0, skipped: 1, failures: 0 });
-    expect(db.marketRows).toEqual(new Map([['https://example.com/funding', 'financing']]));
-  });
-
   it('syncs configured curations on daily runs', async () => {
     const db = new MemoryScheduledDatabase();
     db.logs.push({
@@ -673,7 +621,6 @@ home_highlights:
         articleLaunchesDeleted: 0,
         articlesDeleted: 0,
         ingestionLogsDeleted: 0,
-        marketItemsDeleted: 0,
         launchesDeleted: 0,
       },
       failures: 0,
@@ -686,7 +633,6 @@ home_highlights:
       'article_launches',
       'articles',
       'ingestion_logs',
-      'market_items',
       'launches',
     ]);
   });

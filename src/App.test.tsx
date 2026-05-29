@@ -17,8 +17,10 @@ describe('App', () => {
 
     expect(html).toContain('今日重点');
     expect(html).toContain('发射时间线');
-    expect(html).toContain('资本市场内容仅作信息聚合，不构成投资建议');
+    expect(html).toContain('政策动态');
     expect(html).toContain('来源状态');
+    expect(html).not.toContain('资本市场内容仅作信息聚合');
+    expect(html).not.toContain('资本快讯');
     expect(html).not.toContain('情报索引');
     expect(html).not.toContain('配置热词');
     expect(html).not.toContain('来源与热词');
@@ -51,7 +53,7 @@ describe('App', () => {
     const html = [
       '/',
       '/articles',
-      '/capital',
+      '/policy',
       '/topics',
       '/topics/reusable-rockets',
       '/launches/missing',
@@ -63,7 +65,7 @@ describe('App', () => {
       ['等高', '时间轴'].join(''),
     ];
 
-    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重', '按时间展示', '信息密度', ...rejectedChineseCopy]) {
+    for (const text of ['Mission Control', 'story clustering', 'context', 'company slug', 'topic slug', '缓存', '权重', '按时间展示', '信息密度', '资本', ...rejectedChineseCopy]) {
       expect(html).not.toContain(text);
     }
   });

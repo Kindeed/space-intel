@@ -1,4 +1,5 @@
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
+import { extractDate, extractHtmlListLinks } from '../htmlList';
 
 const relevantPolicyTerms = [
   '航天',
@@ -35,50 +36,39 @@ const relevantPolicyTerms = [
   'commercial space',
   'space bureau',
   'spectrum',
+  '空天',
+  '航空航天',
+  '6g',
+  '北斗',
+  '测控',
+  '重大项目',
+  '产业基金',
+  '产业园',
+  '领导调研',
+  '新闻发布会',
+  '规划',
+  '通知',
+  '意见',
+  '行动方案',
 ];
 
-function decodeHtml(value: string): string {
-  return value
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
+const defaultExcludeTerms = ['文旅', '旅游', '教育', '医疗', '生态环境', '食品安全', '天气', '体育赛事'];
+
+function containsAny(text: string, terms: string[]): boolean {
+  const normalized = text.toLowerCase();
+  return terms.some((term) => normalized.includes(term.toLowerCase()));
 }
 
-function stripHtml(value: string): string {
-  return decodeHtml(value.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' '));
-}
-
-function absoluteUrl(value: string, base: string): string | null {
-  try {
-    return new URL(value, base).toString();
-  } catch {
-    return null;
-  }
-}
-
-function isRelevant(source: SourceConfig, title: string): boolean {
+function isRelevant(source: SourceConfig, text: string): boolean {
   if (source.key === 'cnsa-news') {
     return true;
   }
 
-  const text = title.toLowerCase();
-  return relevantPolicyTerms.some((term) => text.includes(term.toLowerCase()));
-}
-
-function extractDate(value: string): string | null {
-  const match = value.match(/(20\d{2})[-/.年](\d{1,2})[-/.月](\d{1,2})/);
-
-  if (!match) {
-    return null;
+  if (containsAny(text, source.exclude_terms ?? defaultExcludeTerms)) {
+    return false;
   }
 
-  const [, year, month, day] = match;
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00Z`;
+  return containsAny(text, source.include_terms ?? relevantPolicyTerms);
 }
 
 function topicTagsForTitle(title: string): string[] {
@@ -128,36 +118,35 @@ export const officialPageCollector: SourceCollector = {
     }
 
     const html = await response.text();
-    const linkPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
     const seen = new Set<string>();
     const items: NormalizedItem[] = [];
+    const maxItems = source.max_items ?? 20;
 
-    for (const match of html.matchAll(linkPattern)) {
-      const url = absoluteUrl(match[1], source.url);
-      const title = stripHtml(match[2]);
+    for (const link of extractHtmlListLinks(html, source.url)) {
+      const signalText = `${link.title} ${link.contextText} ${link.url}`;
 
-      if (!url || !title || title.length < 4 || seen.has(url) || !isRelevant(source, title)) {
+      if (seen.has(link.url) || !isRelevant(source, signalText)) {
         continue;
       }
 
-      seen.add(url);
+      seen.add(link.url);
       items.push({
         sourceKey: source.key,
         sourceName: source.name,
-        title,
-        originalTitle: title,
-        summary: `官方发布：${title}`,
-        url,
-        publishedAt: extractDate(`${title} ${url}`) ?? context.now().toISOString(),
+        title: link.title,
+        originalTitle: link.title,
+        summary: `官方发布：${link.title}`,
+        url: link.url,
+        publishedAt: extractDate(signalText) ?? context.now().toISOString(),
         language: source.region === 'cn' ? 'zh' : 'en',
         region: source.region,
-        rawId: url,
+        rawId: link.url,
         relatedLaunchIds: [],
         companies: source.default_companies ?? [],
-        tags: itemTags(source, title),
+        tags: itemTags(source, signalText),
       });
 
-      if (items.length >= 20) {
+      if (items.length >= maxItems) {
         break;
       }
     }

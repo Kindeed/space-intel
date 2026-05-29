@@ -5,7 +5,7 @@ import type { SourceConfig } from './types';
 const sourceSchema = z.object({
   key: z.string().min(1),
   name: z.string().min(1),
-  type: z.enum(['api', 'rss', 'google_news_rss', 'rsshub', 'official_page', 'procurement_page', 'capital_filing']),
+  type: z.enum(['api', 'rss', 'google_news_rss', 'rsshub', 'official_page', 'procurement_page']),
   region: z.enum(['cn', 'global']),
   url: z.string().url(),
   credibility: z.number().int().min(1).max(5),
@@ -16,6 +16,9 @@ const sourceSchema = z.object({
   dedupe_strategy: z.string().min(1),
   default_tags: z.array(z.string().min(1)).optional(),
   default_companies: z.array(z.string().min(1)).optional(),
+  include_terms: z.array(z.string().min(1)).optional(),
+  exclude_terms: z.array(z.string().min(1)).optional(),
+  max_items: z.number().int().min(1).max(100).optional(),
 });
 
 const sourcesFileSchema = z.object({

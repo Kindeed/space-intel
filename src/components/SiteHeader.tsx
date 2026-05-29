@@ -43,7 +43,7 @@ export function SiteHeader() {
       </Link>
       <form action="/articles" className="command-search" role="search">
         <Search size={16} aria-hidden="true" />
-        <input name="query" placeholder="搜索公司、发射、政策、资本线索" />
+        <input name="query" placeholder="搜索公司、发射、政策、地方" />
         <kbd>Ctrl K</kbd>
       </form>
       <button className="command-button" type="button" onClick={() => setSearchOpen(true)}>

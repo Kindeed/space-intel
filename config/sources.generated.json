@@ -139,8 +139,8 @@
       "credibility": 4,
       "enabled": true,
       "purpose": "Commercial space business, finance, and industry newsletter-style reporting.",
-      "expected_content": "Article metadata, summaries, publication time, company and market context links.",
-      "risk_notes": "Store metadata and summaries only; capital-market references remain information aggregation.",
+      "expected_content": "Article metadata, summaries, publication time, company and industry context links.",
+      "risk_notes": "Store metadata and summaries only.",
       "dedupe_strategy": "url_title_source"
     },
     {
@@ -192,7 +192,7 @@
       "enabled": true,
       "purpose": "Satellite communications, operators, ground segment, and space business coverage.",
       "expected_content": "Article metadata, summaries, publication time, original link.",
-      "risk_notes": "Store summaries and links only; capital-market context is informational only.",
+      "risk_notes": "Store summaries and links only.",
       "dedupe_strategy": "url_title_source"
     },
     {
@@ -323,19 +323,6 @@
       "purpose": "Track Chinese satellite internet industry coverage.",
       "expected_content": "Aggregated article metadata and original links.",
       "risk_notes": "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
-      "dedupe_strategy": "canonical_url_title"
-    },
-    {
-      "key": "google-news-cn-space-financing",
-      "name": "Google News RSS - 航天融资",
-      "type": "google_news_rss",
-      "region": "cn",
-      "url": "https://news.google.com/rss/search?q=%E8%88%AA%E5%A4%A9%20%E8%9E%8D%E8%B5%84&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
-      "credibility": 3,
-      "enabled": false,
-      "purpose": "Track financing news for commercial space companies.",
-      "expected_content": "Financing article metadata, summaries, timestamps, original links.",
-      "risk_notes": "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers. Capital-market content remains information aggregation only.",
       "dedupe_strategy": "canonical_url_title"
     },
     {
@@ -518,6 +505,318 @@
       ]
     },
     {
+      "key": "beijing-jxj-news",
+      "name": "北京市经信局工作动态",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://jxj.beijing.gov.cn/jxdt/gzdt/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Beijing industry authority updates on commercial space, public test platforms, satellite internet, and aerospace manufacturing policy.",
+      "expected_content": "Official news-list metadata, dates when available, and original links.",
+      "risk_notes": "Public government listing page; store only metadata, generated summaries, and links.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "火箭",
+        "空天",
+        "卫星互联网",
+        "公共试验平台",
+        "产业基金",
+        "重大项目"
+      ]
+    },
+    {
+      "key": "beijing-jxj-notices",
+      "name": "北京市经信局通知公告",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://jxj.beijing.gov.cn/jxdt/tzgg/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Beijing official notices, application calls, and policy filings relevant to commercial space and aerospace manufacturing.",
+      "expected_content": "Official notice metadata, dates when available, and original links.",
+      "risk_notes": "Public government listing page; do not download attachments beyond linking to source pages.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "火箭",
+        "空天",
+        "试验平台",
+        "申报",
+        "通知",
+        "公示"
+      ]
+    },
+    {
+      "key": "shanghai-gov-news",
+      "name": "上海市政府要闻",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.shanghai.gov.cn/nw4411/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Shanghai municipal news, leadership activity, and industrial policy signals around commercial space and the Rocket City initiative.",
+      "expected_content": "Official news metadata, dates when available, and original links.",
+      "risk_notes": "Public government listing page; filter broad city news with aerospace-specific terms.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "火箭星城",
+        "航天",
+        "卫星",
+        "空间信息",
+        "北斗",
+        "遥感",
+        "产业高地"
+      ]
+    },
+    {
+      "key": "shanghai-gov-policy",
+      "name": "上海市政府政策文件",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.shanghai.gov.cn/nw12344/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Shanghai policy files that support commercial space, space information, satellite internet, and aerospace industry clusters.",
+      "expected_content": "Official policy-file metadata and original links.",
+      "risk_notes": "Public government listing page; PDF and attachment links are linked, not parsed as full text.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "空间信息",
+        "卫星互联网",
+        "北斗",
+        "遥感",
+        "行动计划"
+      ]
+    },
+    {
+      "key": "guangdong-gov-policy",
+      "name": "广东省政府政策文件",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.gd.gov.cn/zwgk/gongbao/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Guangdong official policy documents and gazette entries related to commercial space, satellite internet, and aerospace manufacturing.",
+      "expected_content": "Official policy metadata, dates when available, and original links.",
+      "risk_notes": "Broad government listing page; filter with aerospace policy terms and store metadata only.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "火箭",
+        "低轨",
+        "卫星互联网",
+        "空天",
+        "行动方案",
+        "政策措施"
+      ]
+    },
+    {
+      "key": "guangdong-drc-policy",
+      "name": "广东省发改委政策文件",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://drc.gd.gov.cn/qtwj/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Guangdong development and reform policy documents related to commercial space, satellite applications, and industrial investment.",
+      "expected_content": "Official policy metadata and original links.",
+      "risk_notes": "Public government listing page; do not scrape attachment bodies.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "空天",
+        "低轨",
+        "卫星互联网",
+        "政策措施"
+      ]
+    },
+    {
+      "key": "hainan-gov-news",
+      "name": "海南省政府今日海南",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.hainan.gov.cn/hainan/5309/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Hainan government news, interviews, and leadership signals around Wenchang International Aerospace City and commercial launch facilities.",
+      "expected_content": "Official news metadata, dates when available, and original links.",
+      "risk_notes": "Public government listing page; filter broad provincial news with aerospace-specific terms.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "文昌",
+        "航天城",
+        "商业航天",
+        "航天发射",
+        "卫星",
+        "火箭",
+        "访谈",
+        "讲话"
+      ]
+    },
+    {
+      "key": "hainan-wenchang-space-special",
+      "name": "海南文昌国际航天城专场",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.hainan.gov.cn/hainan/wcgjhtczc/list_sljrdscjzfbh.shtml",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Hainan official press-conference material and interview records related to Wenchang International Aerospace City.",
+      "expected_content": "Official press-conference metadata and original links.",
+      "risk_notes": "Public special-topic page; store metadata and links only.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "文昌",
+        "航天城",
+        "商业航天",
+        "发射场",
+        "卫星",
+        "火箭",
+        "招商",
+        "政策"
+      ]
+    },
+    {
+      "key": "sichuan-gov-policy",
+      "name": "四川省政府政策文件",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.sc.gov.cn/10462/zfwjts/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Sichuan official policy documents including commercial space action plans and future-industry measures.",
+      "expected_content": "Official policy metadata and original links.",
+      "risk_notes": "Public government listing page; PDF links are linked, not parsed as full text.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "火箭",
+        "西部商业航天港",
+        "空天",
+        "行动计划",
+        "未来产业"
+      ]
+    },
+    {
+      "key": "sichuan-gov-news",
+      "name": "四川省政府新闻",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.sc.gov.cn/10462/10464/13298/13299/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Sichuan government news and leadership activity around commercial space industry clusters and policy implementation.",
+      "expected_content": "Official news metadata, dates when available, and original links.",
+      "risk_notes": "Public government listing page; filter broad provincial news with aerospace-specific terms.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "火箭",
+        "西部商业航天港",
+        "空天",
+        "产业大会",
+        "领导"
+      ]
+    },
+    {
+      "key": "wuxi-gov-news",
+      "name": "无锡市政府新闻",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.wuxi.gov.cn/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Wuxi official news, leadership activity, and policy signals around commercial space, satellite manufacturing, and the Xinglianti initiative.",
+      "expected_content": "Official news metadata and original links.",
+      "risk_notes": "Broad city homepage; filter with strict aerospace and satellite terms.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "星联体",
+        "航天",
+        "卫星",
+        "空天",
+        "太空枢纽",
+        "卫星互联网"
+      ]
+    },
+    {
+      "key": "wuxi-hightech-news",
+      "name": "无锡高新区新闻",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.wnd.gov.cn/index.shtml",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track Wuxi High-tech Zone official news for aerospace parks, satellite manufacturing, and local industrial ecosystem updates.",
+      "expected_content": "Official park and district news metadata with original links.",
+      "risk_notes": "Broad district homepage; filter with strict aerospace and satellite terms.",
+      "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "policy-and-regulation"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "卫星",
+        "空天",
+        "星联体",
+        "产业园",
+        "卫星互联网"
+      ]
+    },
+    {
       "key": "spacechina-news",
       "name": "中国航天科技集团新闻",
       "type": "official_page",
@@ -667,58 +966,6 @@
       "default_companies": [
         "长光卫星"
       ]
-    },
-    {
-      "key": "sec-rocket-lab",
-      "name": "SEC Filings - Rocket Lab",
-      "type": "capital_filing",
-      "region": "global",
-      "url": "https://www.sec.gov/edgar/browse/?CIK=1819994",
-      "credibility": 5,
-      "enabled": false,
-      "purpose": "Public-company filings and capital-market disclosure links.",
-      "expected_content": "Filing metadata and SEC original links.",
-      "risk_notes": "Capital-market information only; no investment advice.",
-      "dedupe_strategy": "external_id"
-    },
-    {
-      "key": "sec-ast-spacemobile",
-      "name": "SEC Filings - AST SpaceMobile",
-      "type": "capital_filing",
-      "region": "global",
-      "url": "https://www.sec.gov/edgar/browse/?CIK=1780312",
-      "credibility": 5,
-      "enabled": false,
-      "purpose": "Public-company filings and capital-market disclosure links.",
-      "expected_content": "Filing metadata and SEC original links.",
-      "risk_notes": "Capital-market information only; no investment advice.",
-      "dedupe_strategy": "external_id"
-    },
-    {
-      "key": "sec-planet-labs",
-      "name": "SEC Filings - Planet Labs",
-      "type": "capital_filing",
-      "region": "global",
-      "url": "https://www.sec.gov/edgar/browse/?CIK=1836833",
-      "credibility": 5,
-      "enabled": false,
-      "purpose": "Public-company filings and capital-market disclosure links.",
-      "expected_content": "Filing metadata and SEC original links.",
-      "risk_notes": "Capital-market information only; no investment advice.",
-      "dedupe_strategy": "external_id"
-    },
-    {
-      "key": "sec-intuitive-machines",
-      "name": "SEC Filings - Intuitive Machines",
-      "type": "capital_filing",
-      "region": "global",
-      "url": "https://www.sec.gov/edgar/browse/?CIK=1844452",
-      "credibility": 5,
-      "enabled": false,
-      "purpose": "Public-company filings and capital-market disclosure links.",
-      "expected_content": "Filing metadata and SEC original links.",
-      "risk_notes": "Capital-market information only; no investment advice.",
-      "dedupe_strategy": "external_id"
     },
     {
       "key": "rsshub-weibo-space-keyword",
