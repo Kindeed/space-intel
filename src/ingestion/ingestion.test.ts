@@ -263,6 +263,7 @@ describe('Launch Library 2 collector', () => {
 
 describe('RSS collector', () => {
   it('normalizes RSS items into metadata-only article records', async () => {
+    let requestHeaders: HeadersInit | undefined;
     const [source] = parseSourcesConfig({
       sources: [
         {
@@ -277,14 +278,17 @@ describe('RSS collector', () => {
           expected_content: 'Article summaries and links.',
           risk_notes: 'RSS metadata only.',
           dedupe_strategy: 'url_title_source',
+          default_tags: ['satellite-internet'],
+          default_companies: ['Rocket Lab'],
         },
       ],
     });
 
     const items = await rssCollector.collect(source, {
       now: () => new Date('2026-05-09T00:00:00Z'),
-      fetch: async () =>
-        new Response(
+      fetch: async (_input, init) => {
+        requestHeaders = init?.headers;
+        return new Response(
           `<?xml version="1.0"?>
           <rss version="2.0">
             <channel>
@@ -301,10 +305,14 @@ describe('RSS collector', () => {
           {
             headers: { 'content-type': 'application/rss+xml' },
           },
-        ),
+        );
+      },
     });
 
     expect(items).toHaveLength(1);
+    expect(requestHeaders).toMatchObject({
+      'user-agent': 'SpaceIntelBot/1.0 (+https://space.bytebaud.com)',
+    });
     expect(items[0]).toMatchObject({
       sourceKey: 'spacenews-rss',
       sourceName: 'SpaceNews',
@@ -316,6 +324,8 @@ describe('RSS collector', () => {
       region: 'global',
       rawId: 'contract-1',
       relatedLaunchIds: [],
+      companies: ['Rocket Lab'],
+      tags: ['satellite-internet'],
     });
   });
 });

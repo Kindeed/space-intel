@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-05-30 - SI-ISSUE-008 - Review follow-up for ingestion failures and entity-link consistency
+
+- Priority: P1
+- Status: FIXED
+- Area: ingestion | data | frontend
+- Found In: local project review and production `/api/health` check
+- Evidence: Production health on 2026-05-29 reported `openIngestionLogCount: 20` with recent failures from `ars-technica-space-rss`, `ccgp-central-procurement`, and `deepblueaerospace-news`; local review also found RSS records were persisted without default tags/companies, admin entity enrichment deleted all `article_tags` and `article_companies` before rebuilding, translation-field schema fallback did not cover entity matching/backfill paths, and static frontend company/topic lists could drift from D1/config.
+- Fix: Added RSS User-Agent, broader accept header, `max_items`, and source default tag/company propagation; changed entity enrichment to incremental upsert so source-default links are preserved; scheduled daily runs now upsert entity links after catalog sync; entity matching and translation backfill degrade safely when production D1 lacks translation fields; frontend filter and command palette options now read companies/topics from APIs, and catalog/source queries no longer poll every five minutes.
+- Regression Check: Verified with `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, full `.\node_modules\.bin\vitest.cmd run` with 23 files / 85 tests, `.\node_modules\.bin\vite.cmd build`, `node scripts\verify-layout.mjs`, `git diff --check`, and secret-pattern scan over runtime code changes. Local direct requests to the three failing source URLs returned HTTP 200 with explicit User-Agent headers.
+- Notes: Production health still needs recheck after deployment and the next scheduled ingestion window. This issue does not apply the durable production D1 migration; `SI-ISSUE-005` remains the schema-confirmation tracker.
+
 ### 2026-05-29 - SI-ISSUE-001 - Launch Library 2 production refetch still needs verification
 
 - Priority: P2

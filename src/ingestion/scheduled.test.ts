@@ -191,6 +191,12 @@ class MemoryScheduledDatabase implements SqlDatabase {
   }
 
   all(query: string): { results: unknown[] } {
+    const normalized = query.replace(/\s+/g, ' ').trim();
+
+    if (normalized.startsWith('SELECT id, title, original_title AS originalTitle, summary')) {
+      return { results: [] };
+    }
+
     throw new Error(`Unsupported all query: ${query}`);
   }
 }
@@ -612,6 +618,11 @@ home_highlights:
       sources: { configured: 2 },
       companies: { configured: 1 },
       topics: { configured: 1 },
+    });
+    expect(result.entityLinks).toEqual({
+      articleCount: 0,
+      companyLinks: 0,
+      tagLinks: 0,
     });
     expect(result.maintenance).toEqual({
       staleIngestionLogsClosed: 1,

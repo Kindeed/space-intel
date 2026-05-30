@@ -14,6 +14,11 @@ import type {
 
 const autoRefreshInterval = 5 * 60_000;
 
+type ApiQueryOptions = {
+  staleTime?: number;
+  refetchInterval?: number | false;
+};
+
 export async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(path);
 
@@ -24,24 +29,24 @@ export async function fetchJson<T>(path: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function useApiQuery<T>(key: readonly unknown[], path: string | null): UseQueryResult<T, Error> {
+export function useApiQuery<T>(key: readonly unknown[], path: string | null, options: ApiQueryOptions = {}): UseQueryResult<T, Error> {
   return useQuery({
     queryKey: key,
     queryFn: () => fetchJson<T>(path ?? ''),
     enabled: Boolean(path),
-    staleTime: 60_000,
+    staleTime: options.staleTime ?? 60_000,
     gcTime: 5 * 60_000,
-    refetchInterval: autoRefreshInterval,
+    refetchInterval: options.refetchInterval ?? false,
     refetchOnWindowFocus: false,
   });
 }
 
 export function useHomeQuery() {
-  return useApiQuery<ApiHomeResult>(['home'], '/api/home?limit=12');
+  return useApiQuery<ApiHomeResult>(['home'], '/api/home?limit=12', { refetchInterval: autoRefreshInterval });
 }
 
 export function useArticlesQuery(path: string) {
-  return useApiQuery<ApiArticleListResult>(['articles', path], path);
+  return useApiQuery<ApiArticleListResult>(['articles', path], path, { refetchInterval: autoRefreshInterval });
 }
 
 export function useArticleDetailQuery(slug: string) {
@@ -49,7 +54,7 @@ export function useArticleDetailQuery(slug: string) {
 }
 
 export function useCompaniesQuery() {
-  return useApiQuery<{ items: ApiCompany[] }>(['companies'], '/api/companies');
+  return useApiQuery<{ items: ApiCompany[] }>(['companies'], '/api/companies', { staleTime: 15 * 60_000 });
 }
 
 export function useCompanyDetailQuery(slug: string) {
@@ -57,7 +62,7 @@ export function useCompanyDetailQuery(slug: string) {
 }
 
 export function useLaunchesQuery(path: string) {
-  return useApiQuery<ApiLaunchListResult>(['launches', path], path);
+  return useApiQuery<ApiLaunchListResult>(['launches', path], path, { refetchInterval: autoRefreshInterval });
 }
 
 export function useLaunchDetailQuery(slug: string) {
@@ -65,11 +70,11 @@ export function useLaunchDetailQuery(slug: string) {
 }
 
 export function useSourcesQuery() {
-  return useApiQuery<ApiSourceListResult>(['sources'], '/api/sources');
+  return useApiQuery<ApiSourceListResult>(['sources'], '/api/sources', { staleTime: 15 * 60_000 });
 }
 
 export function useTopicsQuery() {
-  return useApiQuery<{ items: ApiTopic[] }>(['topics'], '/api/topics');
+  return useApiQuery<{ items: ApiTopic[] }>(['topics'], '/api/topics', { staleTime: 15 * 60_000 });
 }
 
 export function useTopicDetailQuery(slug: string) {

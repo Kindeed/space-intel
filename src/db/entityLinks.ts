@@ -1,4 +1,5 @@
 import type { ArticleEntityMatch, EnrichmentArticle } from '../enrichment';
+import { isMissingArticleTranslationColumnError } from './articleQueries';
 import type { SqlDatabase } from './types';
 
 export type EntityLinkResult = {
@@ -8,35 +9,44 @@ export type EntityLinkResult = {
 };
 
 export async function listArticlesForEntityMatching(db: SqlDatabase): Promise<EnrichmentArticle[]> {
-  const result = await db
-    .prepare(
-      `SELECT
-        id,
-        title,
-        original_title AS originalTitle,
-        summary,
-        original_summary AS originalSummary
-      FROM articles
-      ORDER BY id ASC`,
-    )
-    .all?.<EnrichmentArticle>();
+  async function runQuery(includeTranslationFields: boolean): Promise<EnrichmentArticle[]> {
+    const result = await db
+      .prepare(
+        `SELECT
+          id,
+          title,
+          original_title AS originalTitle,
+          summary,
+          ${includeTranslationFields ? 'original_summary AS originalSummary' : 'NULL AS originalSummary'}
+        FROM articles
+        ORDER BY id ASC`,
+      )
+      .all?.<EnrichmentArticle>();
 
-  if (!result) {
-    throw new Error('Database statement does not support all()');
+    if (!result) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    return result.results;
   }
 
-  return result.results;
+  try {
+    return await runQuery(true);
+  } catch (error) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      return runQuery(false);
+    }
+
+    throw error;
+  }
 }
 
-export async function replaceConfiguredEntityLinks(
+export async function upsertConfiguredEntityLinks(
   db: SqlDatabase,
   matches: ArticleEntityMatch[],
 ): Promise<EntityLinkResult> {
   let companyLinks = 0;
   let tagLinks = 0;
-
-  await db.prepare('DELETE FROM article_companies').run();
-  await db.prepare('DELETE FROM article_tags').run();
 
   for (const match of matches) {
     for (const slug of match.companySlugs) {
@@ -68,3 +78,5 @@ export async function replaceConfiguredEntityLinks(
     tagLinks,
   };
 }
+
+export const replaceConfiguredEntityLinks = upsertConfiguredEntityLinks;

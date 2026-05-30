@@ -1,4 +1,5 @@
 import type { SqlDatabase } from '../db/types';
+import { isMissingArticleTranslationColumnError } from '../db/articleQueries';
 import type { CollectorContext } from '../ingestion/types';
 import { translateArticleFields, type TranslationEnv, type TranslationStatus } from './index';
 
@@ -101,7 +102,22 @@ export async function backfillArticleTranslations(
   context: CollectorContext,
   limit?: number,
 ): Promise<TranslationBackfillResult> {
-  const candidates = await listTranslationCandidates(db, normalizeLimit(limit));
+  let candidates: TranslationCandidate[];
+
+  try {
+    candidates = await listTranslationCandidates(db, normalizeLimit(limit));
+  } catch (error) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      return {
+        candidates: 0,
+        translated: 0,
+        failed: 0,
+        skipped: 0,
+      };
+    }
+
+    throw error;
+  }
   const result: TranslationBackfillResult = {
     candidates: candidates.length,
     translated: 0,

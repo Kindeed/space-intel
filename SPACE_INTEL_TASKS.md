@@ -11,12 +11,13 @@
 
 ## Current Development Plan
 
-更新时间：2026-05-29
+更新时间：2026-05-30
 
 当前重点：v1 已具备 React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序、主要业务页面、Git-backed Pages 部署、scheduled Worker、R2、production ingestion、catalog sync、实体关联、launch cache、Hy-MT 翻译链路和 D1 数据保留策略。当前开发重心从“大功能补齐”转为治理文档清晰化、线上采集质量观察、回归问题闭环和后续增强筛选。
 
 当前任务：
 
+- DONE：审查后采集与数据关系修复已完成。RSS 采集增加明确 User-Agent、默认标签/公司关系和 `max_items` 限制；daily scheduled maintenance 自动执行实体/专题增量 upsert；实体回填不再清空全表；旧 schema 下实体匹配和翻译回填降级处理；前端公司/专题筛选改用 API 数据且配置类查询停止 5 分钟轮询。`generate-config --check`、`tsc -b --noEmit`、`eslint .`、完整 `vitest`、`vite build`、`verify-layout`、`git diff --check` 和运行时代码改动 secret-pattern scan 均已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-008`。
 - DONE：UI 主导航从五栏/六入口收敛为四个主入口，并将公司库、专题追踪降级为次级索引入口；`vitest` 局部测试、`tsc -b --noEmit`、`eslint .`、`vite build`、`verify-layout` 和本地 Playwright desktop/mobile 布局检查均已通过。
 - DONE：UI 文案去“情报流/AI 说明味”已完成。主入口改为“资讯”，页面统一移除固定解释副标题，首页移除“聚合商业航天新闻...”说明，右侧“情报索引/配置热词”改为“来源状态”；本地 text/overflow 检查、`verify-layout`、完整测试和 build 均已通过。
 - IN_PROGRESS：Launch Library 2 endpoint 已加入明确 User-Agent 且 scheduled Worker 已可部署；继续复跑 production `/api/admin/ingest/launches` 并验证 `/api/launches` 返回未来发射。
