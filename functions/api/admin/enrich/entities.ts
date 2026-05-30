@@ -2,7 +2,7 @@ import companiesConfig from '../../../../config/companies.generated.json';
 import topicsConfig from '../../../../config/topics.generated.json';
 import { parseCompaniesConfig, parseTopicsConfig } from '../../../../src/catalog';
 import { matchArticlesEntities } from '../../../../src/enrichment';
-import { listArticlesForEntityMatching, replaceConfiguredEntityLinks } from '../../../../src/db';
+import { listArticlesForEntityMatching, upsertConfiguredEntityLinks } from '../../../../src/db';
 
 type Env = {
   DB: D1Database;
@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const topics = parseTopicsConfig(topicsConfig);
   const articles = await listArticlesForEntityMatching(env.DB);
   const matches = matchArticlesEntities(articles, companies, topics);
-  const result = await replaceConfiguredEntityLinks(env.DB, matches);
+  const result = await upsertConfiguredEntityLinks(env.DB, matches);
 
   return Response.json(result);
 };

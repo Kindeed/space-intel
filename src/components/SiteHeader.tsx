@@ -2,20 +2,21 @@ import { Command as CommandMenu } from 'cmdk';
 import { Rocket, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { companies, slugify, topicWatch, trendTags } from '../data';
 import { missionNav } from '../constants';
+import { useCompaniesQuery, useTopicsQuery } from '../hooks/queries';
 
 export function SiteHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
+  const companies = useCompaniesQuery();
+  const topics = useTopicsQuery();
   const commands = useMemo(
     () => [
       ...missionNav.map(({ label, to, icon }) => ({ label, to, icon, group: '频道' })),
-      ...companies.map((company) => ({ label: company, to: `/companies/${slugify(company)}`, icon: Rocket, group: '公司' })),
-      ...topicWatch.map((topic) => ({ label: topic.title, to: `/topics/${topic.slug}`, icon: Search, group: '专题' })),
-      ...trendTags.map((tag) => ({ label: tag, to: `/topics/${slugify(tag)}`, icon: Search, group: '热词' })),
+      ...(companies.data?.items ?? []).map((company) => ({ label: company.name, to: `/companies/${company.slug}`, icon: Rocket, group: '公司' })),
+      ...(topics.data?.items ?? []).map((topic) => ({ label: topic.name, to: `/topics/${topic.slug}`, icon: Search, group: '专题' })),
     ],
-    [],
+    [companies.data?.items, topics.data?.items],
   );
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function SiteHeader() {
         </div>
         <CommandMenu.List>
           <CommandMenu.Empty>没有匹配结果</CommandMenu.Empty>
-          {['频道', '公司', '专题', '热词'].map((group) => (
+          {['频道', '公司', '专题'].map((group) => (
             <CommandMenu.Group key={group} heading={group}>
               {commands.filter((command) => command.group === group).map(({ label, to, icon: Icon }) => (
                 <CommandMenu.Item key={`${group}-${label}`} value={`${group} ${label}`} onSelect={() => runCommand(to)}>

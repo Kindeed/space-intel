@@ -11,15 +11,19 @@ import {
 } from './index';
 import { parseCompaniesConfig, parseTopicsConfig } from '../catalog';
 import { parseCurationsConfig, parseCurationsYaml } from '../curations/config';
+import { matchArticlesEntities } from '../enrichment';
 import {
   cleanupRetainedData,
   closeStaleIngestionLogs,
+  listArticlesForEntityMatching,
   replaceConfiguredCurations,
   syncConfiguredCatalog,
+  upsertConfiguredEntityLinks,
   type FullCatalogSyncResult,
   type RetentionCleanupResult,
   type SqlDatabase,
 } from '../db';
+import type { EntityLinkResult } from '../db/entityLinks';
 import type { TranslationEnv } from '../translation';
 import type { LaunchIngestionResult } from './launchIngestion';
 import type { PersistedIngestionResult } from './persistedRun';
@@ -45,6 +49,7 @@ export type ScheduledIngestionResult = {
   sourceRuns: ScheduledSourceRunResult[];
   curationsInserted: number;
   catalogSync: FullCatalogSyncResult | null;
+  entityLinks: EntityLinkResult | null;
   maintenance: ScheduledMaintenanceResult | null;
   durationMs: number;
   successSourceCount: number;
@@ -195,6 +200,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
   const startedAt = input.context.now();
   const sourceRuns: ScheduledSourceRunResult[] = [];
   let catalogSync: FullCatalogSyncResult | null = null;
+  let entityLinks: EntityLinkResult | null = null;
   let maintenance: ScheduledMaintenanceResult | null = null;
   const timeoutMs = input.sourceTimeoutMs ?? sourceIngestionTimeoutMs;
 
@@ -270,12 +276,20 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
   }
 
   if (input.kind === 'daily') {
+    const companies = parseCompaniesConfig(input.companiesConfig);
+    const topics = parseTopicsConfig(input.topicsConfig);
+
     if (input.companiesConfig || input.topicsConfig) {
       catalogSync = await syncConfiguredCatalog(input.db, {
         sources: input.sources,
-        companies: parseCompaniesConfig(input.companiesConfig),
-        topics: parseTopicsConfig(input.topicsConfig),
+        companies,
+        topics,
       });
+
+      entityLinks = await upsertConfiguredEntityLinks(
+        input.db,
+        matchArticlesEntities(await listArticlesForEntityMatching(input.db), companies, topics),
+      );
     }
 
     maintenance = await runDailyMaintenanceSafely(input.db, input.context.now());
@@ -299,6 +313,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
     sourceRuns,
     curationsInserted,
     catalogSync,
+    entityLinks,
     maintenance,
     durationMs,
     successSourceCount: sourceRuns.length - failedSourceCount,

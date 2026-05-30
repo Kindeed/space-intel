@@ -27,7 +27,8 @@ export const rssCollector: SourceCollector = {
   async collect(source: SourceConfig, context: CollectorContext): Promise<NormalizedItem[]> {
     const response = await context.fetch(source.url, {
       headers: {
-        accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml',
+        accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*',
+        'user-agent': 'SpaceIntelBot/1.0 (+https://space.bytebaud.com)',
       },
     });
 
@@ -37,8 +38,11 @@ export const rssCollector: SourceCollector = {
 
     const feed = await parser.parseString(await response.text());
 
+    const maxItems = source.max_items ?? 50;
+
     return feed.items
       .filter((item) => item.title && item.link)
+      .slice(0, maxItems)
       .map((item) => ({
         sourceKey: source.key,
         sourceName: feed.title ?? source.name,
@@ -51,8 +55,8 @@ export const rssCollector: SourceCollector = {
         region: source.region,
         rawId: item.guid ?? item.link,
         relatedLaunchIds: [],
-        companies: [],
-        tags: [],
+        companies: source.default_companies ?? [],
+        tags: source.default_tags ?? [],
       }));
   },
 };

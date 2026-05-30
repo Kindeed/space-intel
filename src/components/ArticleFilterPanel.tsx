@@ -1,6 +1,6 @@
 import { Filter, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { companies, slugify, topicWatch, trendTags } from '../data';
+import { useCompaniesQuery, useTopicsQuery } from '../hooks/queries';
 import { SourceOptions } from './SourceOptions';
 
 export function ArticleFilterPanel({
@@ -12,6 +12,9 @@ export function ArticleFilterPanel({
   region: string | null;
   category: string | null;
 }) {
+  const topics = useTopicsQuery();
+  const companies = useCompaniesQuery();
+
   return (
     <details className="filter-drawer">
       <summary>
@@ -47,11 +50,10 @@ export function ArticleFilterPanel({
         <Link to="/articles">重置</Link>
       </form>
       <datalist id="topic-options">
-        {topicWatch.map((topic) => <option key={topic.slug} value={topic.slug}>{topic.title}</option>)}
-        {trendTags.map((tag) => <option key={tag} value={slugify(tag)}>{tag}</option>)}
+        {topics.data?.items.map((topic) => <option key={topic.slug} value={topic.slug}>{topic.name}</option>)}
       </datalist>
       <datalist id="company-options">
-        {companies.map((company) => <option key={company} value={slugify(company)}>{company}</option>)}
+        {companies.data?.items.map((company) => <option key={company.slug} value={company.slug}>{company.name}</option>)}
       </datalist>
     </details>
   );
