@@ -19,6 +19,11 @@ const sourceSchema = z.object({
   include_terms: z.array(z.string().min(1)).optional(),
   exclude_terms: z.array(z.string().min(1)).optional(),
   max_items: z.number().int().min(1).max(100).optional(),
+  public_category: z.enum(['official', 'media', 'organization', 'notice', 'data', 'source']).optional(),
+  access_domestic: z.enum(['direct', 'limited', 'blocked', 'unknown']).optional(),
+  access_global: z.enum(['direct', 'limited', 'blocked', 'unknown']).optional(),
+  access_note: z.string().optional(),
+  public_badge: z.string().optional(),
 });
 
 const sourcesFileSchema = z.object({

@@ -430,6 +430,12 @@ select {
   gap: 8px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
   padding: 14px 16px;
+  cursor: pointer;
+}
+
+.article-card:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.72);
+  outline-offset: -2px;
 }
 
 .article-card:last-child {

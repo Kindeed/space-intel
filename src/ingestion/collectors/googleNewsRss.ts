@@ -14,8 +14,17 @@ function stripHtml(value: string): string {
   return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function normalizeGoogleNewsTitle(title: string): string {
-  return title.replace(/\s+-\s+[^-]+$/, '').trim();
+function parseGoogleNewsTitle(title: string): { title: string; publisherName: string | null } {
+  const match = title.match(/^(.*?)\s+-\s+([^-]+)$/);
+
+  if (!match) {
+    return { title: title.trim(), publisherName: null };
+  }
+
+  return {
+    title: match[1].trim(),
+    publisherName: match[2].trim() || null,
+  };
 }
 
 function canonicalGoogleNewsUrl(value: string): string {
@@ -53,13 +62,14 @@ export const googleNewsRssCollector: SourceCollector = {
     return feed.items
       .filter((item) => item.title && item.link)
       .map((item) => {
-        const title = normalizeGoogleNewsTitle(item.title ?? '');
+        const parsedTitle = parseGoogleNewsTitle(item.title ?? '');
         const url = canonicalGoogleNewsUrl(item.link ?? '');
 
         return {
           sourceKey: source.key,
-          sourceName: feed.title ?? source.name,
-          title,
+          sourceName: source.name,
+          publisherName: parsedTitle.publisherName ?? source.name,
+          title: parsedTitle.title,
           originalTitle: item.title ?? '',
           summary: stripHtml(item.contentSnippet ?? item.summary ?? item.content ?? ''),
           url,

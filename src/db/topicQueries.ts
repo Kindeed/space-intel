@@ -1,6 +1,8 @@
 import {
+  articlePublisherSelectFields,
   articleRelationSelectFields,
   articleTranslationSelectFields,
+  isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
   toArticleSummary,
   type ArticleSummaryDbRow,
@@ -87,7 +89,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
   const topicId = topic.id;
   const topicSlug = topic.slug;
 
-  async function listTopicArticles(includeTranslationFields: boolean): Promise<ArticleSummaryRow[]> {
+  async function listTopicArticles(includeTranslationFields: boolean, includePublisherField: boolean): Promise<ArticleSummaryRow[]> {
     const articleResult = await db
       .prepare(
         `SELECT
@@ -100,6 +102,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
         s.key AS sourceKey,
         s.name AS sourceName,
         s.type AS sourceType,
+        ${articlePublisherSelectFields(includePublisherField)},
         a.published_at AS publishedAt,
         a.language,
         a.region,
@@ -125,13 +128,31 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
   let articles: ArticleSummaryRow[];
 
   try {
-    articles = await listTopicArticles(true);
+    articles = await listTopicArticles(true, true);
   } catch (error) {
-    if (!isMissingArticleTranslationColumnError(error)) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      try {
+        articles = await listTopicArticles(false, true);
+      } catch (fallbackError) {
+        if (!isMissingArticlePublisherColumnError(fallbackError)) {
+          throw fallbackError;
+        }
+
+        articles = await listTopicArticles(false, false);
+      }
+    } else if (isMissingArticlePublisherColumnError(error)) {
+      try {
+        articles = await listTopicArticles(true, false);
+      } catch (fallbackError) {
+        if (!isMissingArticleTranslationColumnError(fallbackError)) {
+          throw fallbackError;
+        }
+
+        articles = await listTopicArticles(false, false);
+      }
+    } else {
       throw error;
     }
-
-    articles = await listTopicArticles(false);
   }
 
   const curationResult = await db

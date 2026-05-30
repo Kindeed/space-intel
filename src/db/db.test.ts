@@ -19,6 +19,7 @@ type ArticleRow = {
   title: string;
   originalSummary: string | null;
   translationStatus: string;
+  publisherName: string | null;
   url: string;
 };
 
@@ -103,14 +104,16 @@ class MemoryDatabase implements SqlDatabase {
       }
 
       const hasTranslationFields = normalized.includes('original_summary');
-      const dedupeHash = String(values[hasTranslationFields ? 9 : 8]);
+      const hasPublisherField = normalized.includes('publisher_name');
+      const dedupeHash = String(values[hasTranslationFields ? 9 : hasPublisherField ? 9 : 8]);
       if (!this.articles.some((article) => article.dedupeHash === dedupeHash)) {
         this.articles.push({
           id: this.articles.length + 1,
           dedupeHash,
           title: String(values[1]),
           originalSummary: hasTranslationFields && values[4] ? String(values[4]) : null,
-          url: String(values[hasTranslationFields ? 5 : 4]),
+          publisherName: hasPublisherField ? String(values[hasTranslationFields ? 15 : 4]) : null,
+          url: String(values[hasTranslationFields ? 5 : hasPublisherField ? 5 : 4]),
           translationStatus: hasTranslationFields ? String(values[11]) : 'skipped',
         });
         return { meta: { changes: 1, last_row_id: this.articles.length } };
@@ -220,6 +223,7 @@ const collector: SourceCollector = {
       {
         sourceKey: 'snapi',
         sourceName: 'Spaceflight Now',
+        publisherName: 'Spaceflight Now',
         title: 'Reusable rocket milestone',
         originalTitle: 'Reusable rocket milestone',
         summary: 'Short summary only.',
@@ -255,6 +259,7 @@ describe('D1 persistence flow', () => {
     expect(db.articles[0]).toMatchObject({
       originalSummary: 'Short summary only.',
       translationStatus: 'skipped',
+      publisherName: 'Spaceflight Now',
     });
     expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
     expect(db.articleCompanies).toEqual([{ articleId: 1, company: 'rocket-lab' }]);

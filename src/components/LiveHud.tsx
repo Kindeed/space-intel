@@ -5,17 +5,52 @@ import { useArticlesQuery, useLaunchesQuery, useSourcesQuery } from '../hooks/qu
 import type { ApiArticleSummary, ApiHomeStats, ApiLaunch } from '../types';
 import { displayLaunchStatus, formatLaunchWindow } from '../utils';
 
-function sourceTypeLabel(type: string): string {
+function accessLabel(status: string): string {
   const labels: Record<string, string> = {
-    api: 'API 源',
-    rss: 'RSS 源',
-    google_news_rss: '备用聚合',
-    official_page: '官网发布',
-    procurement_page: '采购公告',
-    rsshub: 'RSSHub',
+    direct: '直连',
+    limited: '可能受限',
+    blocked: '受限',
+    unknown: '待验证',
   };
 
-  return labels[type] ?? type;
+  return labels[status] ?? '待验证';
+}
+
+function sourceAccessSummary(source: {
+  directCount?: number;
+  limitedCount?: number;
+  blockedCount?: number;
+  unknownCount?: number;
+}): string {
+  if (source.blockedCount) {
+    return '部分受限';
+  }
+
+  if (source.limitedCount) {
+    return '可能受限';
+  }
+
+  if (source.unknownCount) {
+    return '待验证';
+  }
+
+  return '直连';
+}
+
+function hasAccessCounts(source: unknown): source is {
+  directCount: number;
+  limitedCount: number;
+  blockedCount: number;
+  unknownCount: number;
+} {
+  return (
+    typeof source === 'object' &&
+    source !== null &&
+    typeof (source as { directCount?: unknown }).directCount === 'number' &&
+    typeof (source as { limitedCount?: unknown }).limitedCount === 'number' &&
+    typeof (source as { blockedCount?: unknown }).blockedCount === 'number' &&
+    typeof (source as { unknownCount?: unknown }).unknownCount === 'number'
+  );
 }
 
 function LaunchStrip({ launch, index }: { launch: ApiLaunch; index: number }) {
@@ -43,7 +78,8 @@ export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
   const launches = useLaunchesQuery('/api/launches?limit=4');
   const policy = useArticlesQuery('/api/articles?category=policy&limit=4');
   const sources = useSourcesQuery();
-  const sourceStats = sources.data?.stats ?? stats?.enabledSourcesByType ?? [];
+  const sourceStats = sources.data?.publicStats ?? stats?.enabledSourcesByType.map((item) => ({ label: item.type, count: item.count })) ?? [];
+  const accessStats = sources.data?.accessStats ?? [];
 
   return (
     <aside className="live-hud" aria-label="实时情报 HUD">
@@ -65,10 +101,10 @@ export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
         <SectionTitle icon={Activity} title="来源状态" kicker="已启用" />
         <div className="source-status">
           {sourceStats.length ? sourceStats.slice(0, 6).map((source) => (
-            <Link to="/articles" key={source.type}>
-              <span>{sourceTypeLabel(source.type)}</span>
+            <Link to="/articles" key={source.label}>
+              <span>{source.label}</span>
               <strong>{source.count}</strong>
-              <em>可用</em>
+              <em>{hasAccessCounts(source) ? sourceAccessSummary(source) : accessStats.length ? accessStats.map((item) => `${accessLabel(item.status)} ${item.count}`).join(' / ') : '可用'}</em>
             </Link>
           )) : <div className="empty-state">来源状态暂不可用。</div>}
         </div>

@@ -78,6 +78,7 @@ export const procurementPageCollector: SourceCollector = {
       items.push({
         sourceKey: source.key,
         sourceName: source.name,
+        publisherName: source.name,
         title: link.title,
         summary: `采购公告：${link.title}`,
         url: link.url,

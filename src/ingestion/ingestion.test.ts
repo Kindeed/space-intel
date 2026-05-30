@@ -62,6 +62,8 @@ describe('source config', () => {
     expect(sources.some((source) => source.type === 'procurement_page')).toBe(true);
     expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(0);
     expect(sources.filter((source) => source.enabled && ['rss', 'official_page', 'procurement_page'].includes(source.type)).length).toBeGreaterThanOrEqual(40);
+    expect(sources.filter((source) => source.enabled).every((source) => source.public_category || source.type !== 'google_news_rss')).toBe(true);
+    expect(sources.map((source) => source.name).join('\n')).not.toMatch(/Google News RSS|google_news_rss|API 源|RSS 源|备用聚合/);
   });
 });
 
@@ -155,6 +157,7 @@ describe('Spaceflight News API collector', () => {
       {
         sourceKey: 'snapi',
         sourceName: 'Spaceflight Now',
+        publisherName: 'Spaceflight Now',
         title: 'Rescue mission passes key testing milestone',
         originalTitle: 'Rescue mission passes key testing milestone',
         summary: 'A commercial servicing mission passed testing.',
@@ -336,7 +339,7 @@ describe('Google News RSS collector', () => {
       sources: [
         {
           key: 'google-news-cn-private-launch',
-          name: 'Google News - 商业航天',
+          name: '商业航天来源',
           type: 'google_news_rss',
           region: 'cn',
           url: 'https://news.google.com/rss/search?q=%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9',
@@ -376,7 +379,8 @@ describe('Google News RSS collector', () => {
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({
       sourceKey: 'google-news-cn-private-launch',
-      sourceName: 'Google 新闻 - 商业航天',
+      sourceName: '商业航天来源',
+      publisherName: '示例媒体',
       title: '民营火箭企业完成发动机试车',
       originalTitle: '民营火箭企业完成发动机试车 - 示例媒体',
       summary: '只保留摘要和原文入口。',
@@ -426,6 +430,7 @@ describe('official page collector', () => {
       {
         sourceKey: 'miit-news',
         sourceName: '工业和信息化部新闻',
+        publisherName: '工业和信息化部新闻',
         title: '关于卫星互联网产业发展的通知',
         originalTitle: '关于卫星互联网产业发展的通知',
         summary: '官方发布：关于卫星互联网产业发展的通知',
@@ -573,6 +578,7 @@ describe('procurement page collector', () => {
       {
         sourceKey: 'ccgp-central-procurement',
         sourceName: '中国政府采购网中央公告',
+        publisherName: '中国政府采购网中央公告',
         title: '某卫星遥感数据采购项目中标公告',
         summary: '采购公告：某卫星遥感数据采购项目中标公告',
         url: 'https://www.ccgp.gov.cn/cggg/zygg/notice-1.htm',

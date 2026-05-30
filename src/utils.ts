@@ -1,4 +1,5 @@
 import { slugify, type FeedItem, type FeedLink } from './data';
+import { articlePublisherLabel } from './sourceDisplay';
 import type { ApiArticleDetail, ApiArticleEntity, ApiArticleSummary, FeedStory } from './types';
 
 export function parsePositiveInteger(value: string | null, fallback: number): number {
@@ -148,7 +149,7 @@ export function articleFromApi(row: ApiArticleSummary): FeedStory {
   return {
     slug: String(row.id),
     title: row.title,
-    source: row.sourceName,
+    source: articlePublisherLabel(row),
     sourceKey: row.sourceKey,
     time: displayTime(row.publishedAt),
     category: row.sourceType === 'official_page' ? '政策监管' : region === '国内' ? '国内商业航天' : '国际商业航天',

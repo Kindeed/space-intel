@@ -7,6 +7,8 @@ export type SourceType =
   | 'procurement_page';
 
 export type SourceRegion = 'cn' | 'global';
+export type SourcePublicCategory = 'official' | 'media' | 'organization' | 'notice' | 'data' | 'source';
+export type SourceAccessStatus = 'direct' | 'limited' | 'blocked' | 'unknown';
 
 export type SourceConfig = {
   key: string;
@@ -25,11 +27,17 @@ export type SourceConfig = {
   include_terms?: string[];
   exclude_terms?: string[];
   max_items?: number;
+  public_category?: SourcePublicCategory;
+  access_domestic?: SourceAccessStatus;
+  access_global?: SourceAccessStatus;
+  access_note?: string;
+  public_badge?: string;
 };
 
 export type NormalizedItem = {
   sourceKey: string;
   sourceName: string;
+  publisherName?: string;
   title: string;
   originalTitle?: string;
   summary: string;

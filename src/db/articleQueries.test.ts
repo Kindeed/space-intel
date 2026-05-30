@@ -75,6 +75,7 @@ const article: ArticleSummaryRow = {
   sourceKey: 'snapi',
   sourceName: 'Spaceflight News API',
   sourceType: 'api',
+  publisherName: 'Spaceflight News API',
   publishedAt: '2026-05-09T00:00:00Z',
   language: 'en',
   region: 'global',
@@ -193,9 +194,10 @@ describe('article queries', () => {
         {
           ...article,
           id: 2,
-          sourceKey: 'google-news-cn-commercial-space',
-          sourceName: 'Google News - 商业航天',
-          title: 'Reusable rocket milestone',
+      sourceKey: 'google-news-cn-commercial-space',
+      sourceName: 'Google News - 商业航天',
+      publisherName: '新华社',
+      title: 'Reusable rocket milestone',
           publishedAt: '2026-05-09T01:00:00Z',
         },
         {
@@ -212,7 +214,7 @@ describe('article queries', () => {
     expect(clustered[0]).toMatchObject({
       id: 2,
       relatedSourceCount: 2,
-      relatedSources: ['Spaceflight News API', 'Google News - 商业航天'],
+      relatedSources: ['Spaceflight News API', '新华社'],
     });
   });
 

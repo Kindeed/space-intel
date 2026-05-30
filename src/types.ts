@@ -22,6 +22,7 @@ export type ApiArticleSummary = {
   sourceKey: string;
   sourceName: string;
   sourceType: string;
+  publisherName: string | null;
   publishedAt: string;
   language: string;
   region: string;
@@ -126,11 +127,27 @@ export type ApiSource = {
   type: string;
   region: string;
   credibility: number;
+  publicCategory: string;
+  publicCategoryLabel: string;
+  accessDomestic: string;
+  accessGlobal: string;
+  accessNote: string | null;
+  publicBadge: string | null;
 };
 
 export type ApiSourceListResult = {
   items: ApiSource[];
   stats: Array<{ type: string; count: number }>;
+  publicStats?: Array<{
+    category: string;
+    label: string;
+    count: number;
+    directCount: number;
+    limitedCount: number;
+    blockedCount: number;
+    unknownCount: number;
+  }>;
+  accessStats?: Array<{ status: string; count: number }>;
 };
 
 export type FeedStory = FeedItem & {
