@@ -1,6 +1,8 @@
 import {
   articleRelationSelectFields,
+  articlePublisherSelectFields,
   articleTranslationSelectFields,
+  isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
   toArticleSummary,
   type ArticleSummaryDbRow,
@@ -31,7 +33,7 @@ export type TrendingTag = {
 };
 
 export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promise<RankedHomeArticle[]> {
-  async function runQuery(includeTranslationFields: boolean): Promise<RankedHomeArticle[]> {
+  async function runQuery(includeTranslationFields: boolean, includePublisherField: boolean): Promise<RankedHomeArticle[]> {
     const result = await db
       .prepare(
         `SELECT
@@ -44,6 +46,7 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
         s.key AS sourceKey,
         s.name AS sourceName,
         s.type AS sourceType,
+        ${articlePublisherSelectFields(includePublisherField)},
         a.published_at AS publishedAt,
         a.language,
         a.region,
@@ -73,10 +76,30 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
   }
 
   try {
-    return await runQuery(true);
+    return await runQuery(true, true);
   } catch (error) {
     if (isMissingArticleTranslationColumnError(error)) {
-      return runQuery(false);
+      try {
+        return await runQuery(false, true);
+      } catch (fallbackError) {
+        if (isMissingArticlePublisherColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
+    }
+
+    if (isMissingArticlePublisherColumnError(error)) {
+      try {
+        return await runQuery(true, false);
+      } catch (fallbackError) {
+        if (isMissingArticleTranslationColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
     }
 
     throw error;

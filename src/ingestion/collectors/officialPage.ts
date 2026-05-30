@@ -133,6 +133,7 @@ export const officialPageCollector: SourceCollector = {
       items.push({
         sourceKey: source.key,
         sourceName: source.name,
+        publisherName: source.name,
         title: link.title,
         originalTitle: link.title,
         summary: `官方发布：${link.title}`,

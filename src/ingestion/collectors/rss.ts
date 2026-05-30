@@ -46,6 +46,7 @@ export const rssCollector: SourceCollector = {
       .map((item) => ({
         sourceKey: source.key,
         sourceName: feed.title ?? source.name,
+        publisherName: feed.title ?? source.name,
         title: item.title ?? '',
         originalTitle: item.title ?? '',
         summary: itemSummary(item),

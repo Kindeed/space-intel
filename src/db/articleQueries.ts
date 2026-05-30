@@ -22,6 +22,7 @@ export type ArticleSummaryRow = {
   sourceKey: string;
   sourceName: string;
   sourceType: string;
+  publisherName: string | null;
   publishedAt: string;
   language: string;
   region: string;
@@ -203,6 +204,17 @@ export function isMissingArticleTranslationColumnError(error: unknown): boolean 
   return hasTranslationColumn && (normalized.includes('no such column') || normalized.includes('has no column named'));
 }
 
+export function articlePublisherSelectFields(includePublisherField = true): string {
+  return includePublisherField ? 'a.publisher_name AS publisherName' : 'NULL AS publisherName';
+}
+
+export function isMissingArticlePublisherColumnError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.toLowerCase();
+
+  return normalized.includes('publisher_name') && (normalized.includes('no such column') || normalized.includes('has no column named'));
+}
+
 function normalizeStoryText(value: string): string {
   return value
     .toLowerCase()
@@ -236,13 +248,15 @@ export function clusterArticleRows(rows: ArticleSummaryRow[], limit: number): Ar
         ...row,
         storyKey,
         relatedSourceCount: 1,
-        relatedSources: [row.sourceName],
+        relatedSources: [row.publisherName ?? row.sourceName],
       });
       continue;
     }
 
-    if (!existing.relatedSources.includes(row.sourceName)) {
-      existing.relatedSources.push(row.sourceName);
+    const publisherLabel = row.publisherName ?? row.sourceName;
+
+    if (!existing.relatedSources.includes(publisherLabel)) {
+      existing.relatedSources.push(publisherLabel);
       existing.relatedSourceCount = existing.relatedSources.length;
     }
 
@@ -264,7 +278,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   const limit = normalizeLimit(filters.limit);
   const offset = (page - 1) * limit;
 
-  async function runQuery(includeTranslationFields: boolean): Promise<ArticleListResult> {
+  async function runQuery(includeTranslationFields: boolean, includePublisherField: boolean): Promise<ArticleListResult> {
     const conditions: string[] = [];
     const values: unknown[] = [];
 
@@ -334,6 +348,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       s.key AS sourceKey,
       s.name AS sourceName,
       s.type AS sourceType,
+      ${articlePublisherSelectFields(includePublisherField)},
       a.published_at AS publishedAt,
       a.language,
       a.region,
@@ -363,10 +378,30 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   }
 
   try {
-    return await runQuery(true);
+    return await runQuery(true, true);
   } catch (error) {
     if (isMissingArticleTranslationColumnError(error)) {
-      return runQuery(false);
+      try {
+        return await runQuery(false, true);
+      } catch (fallbackError) {
+        if (isMissingArticlePublisherColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
+    }
+
+    if (isMissingArticlePublisherColumnError(error)) {
+      try {
+        return await runQuery(true, false);
+      } catch (fallbackError) {
+        if (isMissingArticleTranslationColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
     }
 
     throw error;
@@ -378,7 +413,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
     return null;
   }
 
-  async function runQuery(includeTranslationFields: boolean): Promise<ArticleDetailRow | null> {
+  async function runQuery(includeTranslationFields: boolean, includePublisherField: boolean): Promise<ArticleDetailRow | null> {
     const row = await db
       .prepare(
         `SELECT
@@ -391,6 +426,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         s.key AS sourceKey,
         s.name AS sourceName,
         s.type AS sourceType,
+        ${articlePublisherSelectFields(includePublisherField)},
         a.published_at AS publishedAt,
         a.language,
         a.region,
@@ -407,10 +443,30 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
   }
 
   try {
-    return await runQuery(true);
+    return await runQuery(true, true);
   } catch (error) {
     if (isMissingArticleTranslationColumnError(error)) {
-      return runQuery(false);
+      try {
+        return await runQuery(false, true);
+      } catch (fallbackError) {
+        if (isMissingArticlePublisherColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
+    }
+
+    if (isMissingArticlePublisherColumnError(error)) {
+      try {
+        return await runQuery(true, false);
+      } catch (fallbackError) {
+        if (isMissingArticleTranslationColumnError(fallbackError)) {
+          return runQuery(false, false);
+        }
+
+        throw fallbackError;
+      }
     }
 
     throw error;

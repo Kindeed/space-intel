@@ -46,6 +46,7 @@ export const spaceflightNewsCollector: SourceCollector = {
     return payload.results.map((article) => ({
       sourceKey: source.key,
       sourceName: article.news_site || source.name,
+      publisherName: article.news_site || source.name,
       title: article.title,
       originalTitle: article.title,
       summary: article.summary ?? '',

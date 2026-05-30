@@ -9,7 +9,7 @@ export function SourceOptions({ type, types }: { type?: string; types?: string[]
     <>
       {sources.map((source) => (
         <option key={source.key} value={source.key}>
-          {source.name}
+          {source.publicBadge ? `${source.name}（${source.publicBadge}）` : source.name}
         </option>
       ))}
     </>

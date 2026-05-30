@@ -1,6 +1,8 @@
 import {
+  articlePublisherSelectFields,
   articleRelationSelectFields,
   articleTranslationSelectFields,
+  isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
   toArticleSummary,
   type ArticleSummaryDbRow,
@@ -88,7 +90,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
 
   const companyId = company.id;
 
-  async function listCompanyArticles(includeTranslationFields: boolean): Promise<ArticleSummaryRow[]> {
+  async function listCompanyArticles(includeTranslationFields: boolean, includePublisherField: boolean): Promise<ArticleSummaryRow[]> {
     const articleResult = await db
       .prepare(
         `SELECT
@@ -101,6 +103,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         s.key AS sourceKey,
         s.name AS sourceName,
         s.type AS sourceType,
+        ${articlePublisherSelectFields(includePublisherField)},
         a.published_at AS publishedAt,
         a.language,
         a.region,
@@ -126,13 +129,31 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
   let articles: ArticleSummaryRow[];
 
   try {
-    articles = await listCompanyArticles(true);
+    articles = await listCompanyArticles(true, true);
   } catch (error) {
-    if (!isMissingArticleTranslationColumnError(error)) {
+    if (isMissingArticleTranslationColumnError(error)) {
+      try {
+        articles = await listCompanyArticles(false, true);
+      } catch (fallbackError) {
+        if (!isMissingArticlePublisherColumnError(fallbackError)) {
+          throw fallbackError;
+        }
+
+        articles = await listCompanyArticles(false, false);
+      }
+    } else if (isMissingArticlePublisherColumnError(error)) {
+      try {
+        articles = await listCompanyArticles(true, false);
+      } catch (fallbackError) {
+        if (!isMissingArticleTranslationColumnError(fallbackError)) {
+          throw fallbackError;
+        }
+
+        articles = await listCompanyArticles(false, false);
+      }
+    } else {
       throw error;
     }
-
-    articles = await listCompanyArticles(false);
   }
 
   return {

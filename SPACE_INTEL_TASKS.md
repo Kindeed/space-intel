@@ -17,6 +17,8 @@
 
 当前任务：
 
+- DONE：新闻卡片点击体验修复已完成。首页、资讯、政策、公司详情和专题详情复用的新闻卡片现在整卡可进入文章详情，同时保留地区、公司、专题和原文链接的独立点击行为；本地生产站复现确认标题链接可跳转但卡片空白/摘要点击无反应，修复后已补充组件回归测试。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-010`。
+- DONE：来源展示与访问标识升级已完成。前台来源展示不再暴露 `Google News RSS`、`google_news_rss`、`API 源`、`RSS 源`、`备用聚合` 等采集实现词；来源 API 增加官方机构、专业媒体、行业组织、公告信息、数据来源和来源等用户语义分类，以及国内/全球访问状态；Google News 类采集会保留原始发布方用于文章展示。`generate-config --check`、`tsc -b --noEmit`、`eslint .`、完整 `vitest`、`vite build`、`verify-layout` 和本地 Playwright desktop/mobile 技术词与横向溢出检查均已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-009`。
 - DONE：审查后采集与数据关系修复已完成。RSS 采集增加明确 User-Agent、默认标签/公司关系和 `max_items` 限制；daily scheduled maintenance 自动执行实体/专题增量 upsert；实体回填不再清空全表；旧 schema 下实体匹配和翻译回填降级处理；前端公司/专题筛选改用 API 数据且配置类查询停止 5 分钟轮询。`generate-config --check`、`tsc -b --noEmit`、`eslint .`、完整 `vitest`、`vite build`、`verify-layout`、`git diff --check` 和运行时代码改动 secret-pattern scan 均已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-008`。
 - DONE：UI 主导航从五栏/六入口收敛为四个主入口，并将公司库、专题追踪降级为次级索引入口；`vitest` 局部测试、`tsc -b --noEmit`、`eslint .`、`vite build`、`verify-layout` 和本地 Playwright desktop/mobile 布局检查均已通过。
 - DONE：UI 文案去“情报流/AI 说明味”已完成。主入口改为“资讯”，页面统一移除固定解释副标题，首页移除“聚合商业航天新闻...”说明，右侧“情报索引/配置热词”改为“来源状态”；本地 text/overflow 检查、`verify-layout`、完整测试和 build 均已通过。

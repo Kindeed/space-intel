@@ -1,13 +1,62 @@
 import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
+import type { MouseEvent, KeyboardEvent } from 'react';
 import type { FeedStory } from '../types';
+
+function isNestedInteractiveTarget(target: EventTarget | null, boundary: HTMLElement): boolean {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const interactive = target.closest('a, button, input, select, textarea, summary');
+  return Boolean(interactive && interactive !== boundary && boundary.contains(interactive));
+}
 
 export function ArticleCard({ item, feature = false }: { item: FeedStory; feature?: boolean }) {
   const sourceCount = item.relatedSourceCount ?? 1;
+  const navigate = useNavigate();
+  const detailPath = `/articles/${item.slug}`;
+
+  function openDetail() {
+    navigate(detailPath);
+  }
+
+  function handleCardClick(event: MouseEvent<HTMLElement>) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      isNestedInteractiveTarget(event.target, event.currentTarget)
+    ) {
+      return;
+    }
+
+    openDetail();
+  }
+
+  function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.target !== event.currentTarget || event.key !== 'Enter') {
+      return;
+    }
+
+    event.preventDefault();
+    openDetail();
+  }
 
   return (
-    <article className={clsx('article-card', feature && 'article-card--feature')}>
+    <article
+      className={clsx('article-card', feature && 'article-card--feature')}
+      role="link"
+      tabIndex={0}
+      aria-label={`查看 ${item.title} 的详情`}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+    >
       <div className="article-card__meta">
         <Link to={`/articles?region=${item.region === '国内' ? 'cn' : 'global'}`}>{item.region}</Link>
         <span>{item.source}</span>
@@ -15,7 +64,7 @@ export function ArticleCard({ item, feature = false }: { item: FeedStory; featur
         {sourceCount > 1 ? <span className="cluster-badge">{sourceCount} 源覆盖</span> : null}
       </div>
       <h3>
-        <Link to={`/articles/${item.slug}`}>{item.title}</Link>
+        <Link to={detailPath}>{item.title}</Link>
       </h3>
       <p>{item.summary}</p>
       <div className="article-card__footer">
@@ -35,7 +84,7 @@ export function ArticleCard({ item, feature = false }: { item: FeedStory; featur
               <ExternalLink size={15} />
             </a>
           ) : null}
-          <Link to={`/articles/${item.slug}`}>详情</Link>
+          <Link to={detailPath}>详情</Link>
         </div>
       </div>
       {sourceCount > 1 && item.relatedSources?.length ? (

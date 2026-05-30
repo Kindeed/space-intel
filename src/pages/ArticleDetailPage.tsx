@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { PageShell } from '../components/PageShell';
+import { articlePublisherLabel } from '../sourceDisplay';
 import { useArticleDetailQuery } from '../hooks/queries';
 import { companyName, companySlug, displayRegion, displayTime, launchLabel, launchSlug, safeLoadMessage, tagName, tagSlug } from '../utils';
 
@@ -20,7 +21,7 @@ export function ArticleDetailPage() {
       {apiState.error ? <div className="inline-status">{safeLoadMessage('文章详情')}</div> : null}
       <section className="detail-panel">
         <div className="metadata-grid">
-          <span>{article?.sourceName ?? '来源暂不可用'}</span>
+          <span>{article ? articlePublisherLabel(article) : '来源暂不可用'}</span>
           <span>{article ? displayTime(article.publishedAt) : '时间暂不可用'}</span>
           <span>{article ? displayRegion(article.region) : '地区暂不可用'}</span>
           <span>{article?.relatedSourceCount && article.relatedSourceCount > 1 ? `${article.relatedSourceCount} 源覆盖` : '单来源线索'}</span>

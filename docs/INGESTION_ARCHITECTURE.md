@@ -6,15 +6,18 @@ The ingestion pipeline is config-first. Source URLs, purpose, risk notes, expect
 
 YAML config files are canonical. Generated JSON files are build artifacts kept in Git for Workers/Pages imports. Run `pnpm generate:config` after changing config YAML, and CI runs `pnpm check:config` to prevent YAML/JSON drift.
 
+Source `type` is an internal collector routing field. User-facing pages should use the public source category and display helpers instead of rendering collector names such as API, RSS, RSSHub, or Google News RSS. Access notes in source config describe whether a source is likely direct, limited, blocked, or unknown from domestic and global networks; these notes are lightweight user/operations signals and do not disable foreign sources.
+
 ## Source Flow
 
 1. Parse and validate source config.
 2. Select enabled sources.
 3. Route each source to a collector by `type`.
 4. Convert collector output into `NormalizedItem`.
-5. Generate a dedupe hash from external ID when available, otherwise from source, canonical URL, and original title.
-6. Translate eligible English title and summary metadata when the Hy-MT translation adapter is configured.
-7. Store summaries, metadata, tags, companies, launch relations, and original links only.
+5. Preserve publisher/source display metadata separately from the internal collector key.
+6. Generate a dedupe hash from external ID when available, otherwise from source, canonical URL, and original title.
+7. Translate eligible English title and summary metadata when the Hy-MT translation adapter is configured.
+8. Store summaries, metadata, tags, companies, launch relations, publisher labels, and original links only.
 
 ## Scheduled Ingestion
 

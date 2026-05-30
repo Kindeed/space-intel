@@ -34,6 +34,28 @@
 
 ## Current Issues
 
+### 2026-05-30 - SI-ISSUE-010 - Article cards do not navigate when users click the card body
+
+- Priority: P2
+- Status: VERIFIED
+- Area: frontend
+- Found In: user report and production browser reproduction
+- Evidence: Production check on `https://space.bytebaud.com/` found 12 article cards and 12 title links. Clicking the first card body left the URL unchanged at `/`, while clicking the title link navigated to `/articles/82286`. This made normal "click the news card" behavior feel broken even though the title anchor worked.
+- Fix: Made the shared `ArticleCard` navigate to article detail when the non-interactive card body is clicked or focused and activated with Enter. Nested links for region, company, topic, original source, and explicit detail continue to keep their original behavior.
+- Regression Check: Verified with `.\node_modules\.bin\tsc.cmd -b --noEmit`, targeted `.\node_modules\.bin\vitest.cmd run src\components\ArticleCard.test.tsx src\App.test.tsx`, full `.\node_modules\.bin\vitest.cmd run` with 25 files / 87 tests, `.\node_modules\.bin\eslint.cmd .`, `.\node_modules\.bin\vite.cmd build`, `node scripts\verify-layout.mjs`, and local Playwright mocked-data click test confirming card-body click navigates from `/` to `/articles/42`.
+- Notes: This affects all pages using `ArticleCard`, including home, article list, policy, company detail, and topic detail.
+
+### 2026-05-30 - SI-ISSUE-009 - User-facing source labels expose collector implementation terms
+
+- Priority: P2
+- Status: VERIFIED
+- Area: frontend | api | ingestion | data
+- Found In: user report and local source/UI review
+- Evidence: `config/sources.yaml` contained public names like `Google News RSS - 商业航天`; UI surfaces including source filters, article cards, details, and source status could display source names or collector types such as `google_news_rss`, `API 源`, `RSS 源`, or `备用聚合`, which reads like internal implementation rather than a mature Chinese information site. Domestic/global accessibility also had only prose risk notes, not structured display metadata.
+- Fix: Added public source category and access-status metadata, normalized Google News-style collector output to preserve original publisher names, sanitized source API/UI labels, and kept collector type as internal routing data.
+- Regression Check: Verified with `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, full `.\node_modules\.bin\vitest.cmd run` with 24 files / 86 tests, `.\node_modules\.bin\vite.cmd build`, `node scripts\verify-layout.mjs`, and local Playwright desktop/mobile checks confirming no `Google News RSS`, `google_news_rss`, `API 源`, `RSS 源`, or `备用聚合` text and no horizontal overflow.
+- Notes: Foreign sources remain enabled according to source config; access status is a display and operations signal, not an automatic disable switch.
+
 ### 2026-05-30 - SI-ISSUE-008 - Review follow-up for ingestion failures and entity-link consistency
 
 - Priority: P1
