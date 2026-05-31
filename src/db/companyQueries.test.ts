@@ -122,6 +122,8 @@ describe('company queries', () => {
     });
     expect(db.lastQuery).toContain('AS tagsJson');
     expect(db.lastQuery).toContain('AS companiesJson');
+    expect(db.lastQuery).toContain("s.key = 'cnsa-news'");
+    expect(db.lastQuery).toContain("a.url LIKE 'https://www.cnsa.gov.cn/%/index.html'");
     expect(db.lastValues).toEqual([company.id]);
   });
 

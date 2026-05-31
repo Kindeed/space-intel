@@ -85,7 +85,7 @@ describe('sources API', () => {
       accessStats: Array<{ label: string; count: number }>;
     };
 
-    expect(payload.items.map((item) => item.categoryLabel)).toEqual(['官方机构', '专业媒体', '来源', '来源']);
+    expect(payload.items.map((item) => item.categoryLabel)).toEqual(['官方机构', '专业媒体']);
     expect(payload.items[0]).toMatchObject({
       name: '国家航天局新闻',
       categoryLabel: '官方机构',
@@ -103,15 +103,13 @@ describe('sources API', () => {
     expect(payload.publicStats).toEqual([
       { label: '官方机构', count: 1, accessSummaryLabel: '直连' },
       { label: '专业媒体', count: 1, accessSummaryLabel: '可能受限' },
-      { label: '来源', count: 2, accessSummaryLabel: '待验证' },
     ]);
     expect(payload.accessStats).toEqual([
-      { label: '直连', count: 2 },
+      { label: '直连', count: 1 },
       { label: '可能受限', count: 1 },
-      { label: '待验证', count: 1 },
     ]);
-    expect(payload.items).toContainEqual(expect.objectContaining({ name: '微博商业航天关键词', categoryLabel: '来源' }));
-    expect(payload.items).toContainEqual(expect.objectContaining({ name: '历史来源', categoryLabel: '来源' }));
+    expect(payload.items).not.toContainEqual(expect.objectContaining({ name: '微博商业航天关键词' }));
+    expect(payload.items).not.toContainEqual(expect.objectContaining({ name: '历史来源' }));
     expect('key' in payload.items[0]).toBe(false);
     expect('region' in payload.items[0]).toBe(false);
     expect(JSON.stringify(payload)).not.toMatch(/snapi|cnsa-news|Google News RSS|RSSHub|google_news_rss|official_page|publicCategory|media|official|notice|direct|limited|blocked|unknown|accessDomestic|accessGlobal|directCount|limitedCount|blockedCount|unknownCount|API 源|RSS 源|备用聚合|credibility|region|stats/);

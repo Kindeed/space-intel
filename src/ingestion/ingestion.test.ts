@@ -299,7 +299,7 @@ describe('source config', () => {
     expect(sources.some((source) => source.type === 'rss')).toBe(true);
     expect(sources.some((source) => source.type === 'google_news_rss')).toBe(true);
     expect(sources.some((source) => source.type === 'procurement_page')).toBe(true);
-    expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(0);
+    expect(sources.filter((source) => source.enabled && source.type === 'google_news_rss')).toHaveLength(6);
     expect(sources.filter((source) => source.enabled && ['rss', 'official_page', 'procurement_page'].includes(source.type)).length).toBeGreaterThanOrEqual(40);
     expect(
       sources
@@ -1331,7 +1331,7 @@ describe('official page collector', () => {
               <a href="/xwzx/kjkx/">空间科学</a>
               <a href="/xwzx/ztbd/">专题报道</a>
               <a href="/xwdt/gzdt/">工作动态</a>
-              <a href="/n6758967/n6758973/2026-05-08-demo.html">国家航天局发布卫星互联网应用试点通知</a>
+              <a href="/n6758967/n6758973/c10750640/content.html">国家航天局发布卫星互联网应用试点通知</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1339,6 +1339,48 @@ describe('official page collector', () => {
     });
 
     expect(items.map((item) => item.title)).toEqual(['国家航天局发布卫星互联网应用试点通知']);
+  });
+
+  it('requires real CNSA article URLs before accepting broad space-related titles', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'cnsa-news',
+          name: '国家航天局新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://www.cnsa.gov.cn/n6758823/n6758838/index.html',
+          credibility: 5,
+          enabled: true,
+          purpose: 'National space administration updates.',
+          expected_content: 'Official news metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['policy-and-regulation'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="/n6758823/n6758838/index.html">国家航天局商业航天服务入口</a>
+              <a href="/n6758823/n6758838/c10750640/content.html">国家航天局发布商业航天政策通知</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items.map((item) => ({ title: item.title, url: item.url }))).toEqual([
+      {
+        title: '国家航天局发布商业航天政策通知',
+        url: 'https://www.cnsa.gov.cn/n6758823/n6758838/c10750640/content.html',
+      },
+    ]);
   });
 
   it('drops external footer links while keeping external article links from official page candidates', async () => {
@@ -1645,7 +1687,7 @@ describe('official page collector', () => {
         new Response(
           `<html>
             <body>
-              <a href="/news/demo">【2026年5月30日】商业航天政策公告发布</a>
+              <a href="/news/c10750641/content.html">【2026年5月30日】商业航天政策公告发布</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },

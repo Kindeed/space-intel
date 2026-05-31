@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-05-31 - SI-ISSUE-350 - Latest feed is polluted by CNSA navigation pages and stale sources
+
+- Priority: P1
+- Status: VERIFIED
+- Area: ingestion | api | data-quality | sources
+- Found In: user report and production latest/source checks
+- Evidence: Production latest articles returned many `国家航天局新闻` rows that were section/navigation pages such as `咨询建议`, `意见征集`, `互动交流`, `空间科学`, `专题专栏`, and `机构简介`, all with same crawl-time timestamps rather than article timestamps. Production `/api/sources` also exposed stale enabled source rows no longer present in generated source config, including SEC filing collectors.
+- Fix: CNSA collection now requires real content URLs before accepting candidates, public article/home/company/topic queries hide existing CNSA navigation rows, a cleanup migration removes historical polluted rows and disables stale SEC source rows, and the public source API now hides DB-enabled sources unless they are still enabled in generated source config.
+- Regression Check: Verified with targeted `.\node_modules\.bin\vitest.cmd run src\ingestion\ingestion.test.ts src\db\articleQueries.test.ts src\db\homeQueries.test.ts src\db\companyQueries.test.ts src\db\topicQueries.test.ts functions\api\sources.test.ts` passing 6 files / 90 tests, `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, full `.\node_modules\.bin\vitest.cmd run` passing 60 files / 435 tests, `.\node_modules\.bin\vite.cmd build`, `git diff --check`, and added-line sensitive-pattern scan returning no matches.
+- Notes: Google News Chinese keyword feeds are being enabled only as limited backup aggregators because direct domestic source coverage is currently insufficient; the source metadata keeps the domestic access warning.
+
 ### 2026-05-31 - SI-ISSUE-349 - Short navigation filtering misses zero-width title variants
 
 - Priority: P3

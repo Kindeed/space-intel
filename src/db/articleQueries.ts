@@ -75,6 +75,35 @@ export type ArticleListResult = {
 const maxLimit = 50;
 const defaultLimit = 20;
 
+export const publicArticleVisibilityCondition = `NOT (
+      s.key = 'cnsa-news'
+      AND (
+        a.url LIKE 'https://www.cnsa.gov.cn/%/index.html'
+        OR a.url IN ('https://www.cpeos.org.cn/home', 'https://www.cpeos.org.cn/home/')
+        OR a.title IN (
+          '咨询建议',
+          '意见征集',
+          '互动交流',
+          '资源服务',
+          '国际合作',
+          '空间应用',
+          '空间科学',
+          '宇航产品',
+          '重大任务',
+          '中国航天',
+          '专题专栏',
+          '视频点播',
+          '精彩图集',
+          '图解航天',
+          '国际航天',
+          '政策公告',
+          '信息发布',
+          '机构简介',
+          '国家遥感数据与应用服务平台'
+        )
+      )
+    )`;
+
 export const articleRelationSelectFields = `
       COALESCE((
         SELECT json_group_array(json_object('slug', t.slug, 'name', t.name))
@@ -317,7 +346,7 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
   const offset = (page - 1) * limit;
 
   async function runQuery(includeTranslationFields: boolean, includePublisherField: boolean): Promise<ArticleListResult> {
-    const conditions: string[] = [];
+    const conditions: string[] = [publicArticleVisibilityCondition];
     const values: unknown[] = [];
 
     if (filters.region) {
@@ -474,7 +503,7 @@ export async function getArticleById(db: SqlDatabase, id: number): Promise<Artic
         ${articleDetailRelationSelectFields}
       FROM articles a
       JOIN sources s ON s.id = a.source_id
-      WHERE a.id = ?`,
+      WHERE a.id = ? AND ${publicArticleVisibilityCondition}`,
       )
       .bind(id)
       .first<ArticleDetailDbRow>();

@@ -107,6 +107,24 @@ function isRelevant(source: SourceConfig, text: string): boolean {
   return containsAny(text, source.include_terms ?? relevantPolicyTerms);
 }
 
+function isCnsaArticleUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.hostname === 'www.cnsa.gov.cn') {
+      return parsed.pathname.endsWith('/content.html');
+    }
+
+    return parsed.hostname === 'mp.weixin.qq.com';
+  } catch {
+    return false;
+  }
+}
+
+function isAcceptableOfficialLink(source: SourceConfig, url: string): boolean {
+  return source.key !== 'cnsa-news' || isCnsaArticleUrl(url);
+}
+
 function topicTagsForTitle(title: string): string[] {
   const text = title.toLowerCase();
   const tags: string[] = [];
@@ -190,7 +208,7 @@ export const officialPageCollector: SourceCollector = {
 
       const signalText = `${link.title} ${link.contextText} ${link.url}`;
 
-      if (seen.has(link.url) || !isRelevant(source, signalText)) {
+      if (seen.has(link.url) || !isAcceptableOfficialLink(source, link.url) || !isRelevant(source, signalText)) {
         continue;
       }
 
