@@ -78,9 +78,9 @@ describe('health API', () => {
     await expect(response.json()).resolves.toEqual({
       ok: true,
       service: 'space-intel',
-      bindings: {
-        d1: true,
-        r2: true,
+      checks: {
+        database: true,
+        assets: true,
       },
       diagnostics: {
         latestArticlePublishedAt: '2026-05-18T08:00:00Z',
@@ -88,7 +88,7 @@ describe('health API', () => {
         latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z',
         recentFailedIngestionLogs: [
           {
-            sourceKey: 'demo-rss',
+            sourceName: '来源',
             startedAt: '2026-05-18T07:00:00Z',
             finishedAt: '2026-05-18T07:00:02Z',
             successCount: 0,
@@ -97,7 +97,7 @@ describe('health API', () => {
           },
         ],
         latestIngestionLog: {
-          sourceKey: 'google-news-cn-commercial-space',
+          sourceName: '商业航天来源',
           startedAt: '2026-05-18T08:00:00Z',
           finishedAt: '2026-05-18T08:00:05Z',
           successCount: 3,
@@ -106,5 +106,38 @@ describe('health API', () => {
         },
       },
     });
+  });
+
+  it('does not expose internal source keys in diagnostics', async () => {
+    const response = await onRequestGet({
+      env: {
+        DB: new FakeHealthDatabase() as unknown as D1Database,
+        R2_ASSETS: {} as R2Bucket,
+      },
+    } as Parameters<typeof onRequestGet>[0]);
+
+    const payload = JSON.stringify(await response.json());
+
+    expect(payload).not.toContain('sourceKey');
+    expect(payload).not.toContain('google-news-cn-commercial-space');
+    expect(payload).not.toContain('demo-rss');
+  });
+
+  it('uses generic health check names instead of platform binding names', async () => {
+    const response = await onRequestGet({
+      env: {
+        DB: new FakeHealthDatabase() as unknown as D1Database,
+        R2_ASSETS: {} as R2Bucket,
+      },
+    } as Parameters<typeof onRequestGet>[0]);
+
+    const payload = JSON.stringify(await response.json());
+
+    expect(payload).toContain('"checks"');
+    expect(payload).toContain('"database"');
+    expect(payload).toContain('"assets"');
+    expect(payload).not.toContain('"bindings"');
+    expect(payload).not.toContain('"d1"');
+    expect(payload).not.toContain('"r2"');
   });
 });

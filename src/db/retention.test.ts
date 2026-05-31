@@ -78,4 +78,15 @@ describe('retention cleanup', () => {
     expect(db.deletes[4].cutoff).toBe('2026-02-27T00:00:00.000Z');
     expect(db.deletes[5].cutoff).toBe('2024-05-28T00:00:00.000Z');
   });
+
+  it('rejects decimal cleanup batch limits', async () => {
+    const db = new FakeRetentionDatabase();
+
+    await cleanupRetainedData(db, {
+      now: new Date('2026-05-28T00:00:00.000Z'),
+      batchLimit: 25.9,
+    });
+
+    expect(db.deletes.every((item) => item.limit === 500)).toBe(true);
+  });
 });

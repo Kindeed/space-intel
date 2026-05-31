@@ -1,5 +1,6 @@
 import type { CompanyConfigRecord, TopicConfigRecord } from '../catalog';
 import type { SourceConfig } from '../ingestion';
+import { runDbStatements, sumRunChanges } from './statements';
 import type { SqlDatabase } from './types';
 
 export type CatalogSyncResult = {
@@ -16,10 +17,8 @@ export async function upsertConfiguredCompanies(
   db: SqlDatabase,
   companies: CompanyConfigRecord[],
 ): Promise<CatalogSyncResult> {
-  let upserted = 0;
-
-  for (const company of companies) {
-    const result = await db
+  const statements = companies.map((company) =>
+    db
       .prepare(
         `INSERT INTO companies (
           slug,
@@ -53,19 +52,15 @@ export async function upsertConfiguredCompanies(
         company.stockSymbol || null,
         company.logoUrl || null,
       )
-      .run();
+  );
+  const results = await runDbStatements(db, statements);
 
-    upserted += result.meta?.changes ?? 0;
-  }
-
-  return { upserted };
+  return { upserted: sumRunChanges(results) };
 }
 
 export async function upsertConfiguredTags(db: SqlDatabase, topics: TopicConfigRecord[]): Promise<CatalogSyncResult> {
-  let upserted = 0;
-
-  for (const topic of topics) {
-    const result = await db
+  const statements = topics.map((topic) =>
+    db
       .prepare(
         `INSERT INTO tags (slug, name, category)
          VALUES (?, ?, ?)
@@ -74,19 +69,15 @@ export async function upsertConfiguredTags(db: SqlDatabase, topics: TopicConfigR
           category = excluded.category`,
       )
       .bind(topic.slug, topic.name, topic.category)
-      .run();
+  );
+  const results = await runDbStatements(db, statements);
 
-    upserted += result.meta?.changes ?? 0;
-  }
-
-  return { upserted };
+  return { upserted: sumRunChanges(results) };
 }
 
 export async function upsertConfiguredSources(db: SqlDatabase, sources: SourceConfig[]): Promise<CatalogSyncResult> {
-  let upserted = 0;
-
-  for (const source of sources) {
-    const result = await db
+  const statements = sources.map((source) =>
+    db
       .prepare(
         `INSERT INTO sources (
           key,
@@ -126,12 +117,10 @@ export async function upsertConfiguredSources(db: SqlDatabase, sources: SourceCo
         source.risk_notes,
         source.dedupe_strategy,
       )
-      .run();
+  );
+  const results = await runDbStatements(db, statements);
 
-    upserted += result.meta?.changes ?? 0;
-  }
-
-  return { upserted };
+  return { upserted: sumRunChanges(results) };
 }
 
 export async function syncConfiguredCatalog(

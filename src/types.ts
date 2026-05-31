@@ -18,17 +18,12 @@ export type ApiArticleSummary = {
   originalTitle: string | null;
   summary: string;
   originalSummary: string | null;
-  url: string;
-  sourceKey: string;
+  url: string | null;
   sourceName: string;
-  sourceType: string;
+  sourceCategoryLabel: string;
   publisherName: string | null;
   publishedAt: string;
-  language: string;
-  region: string;
-  fetchStatus: string;
-  translationStatus: 'translated' | 'skipped' | 'failed';
-  translationProvider: string | null;
+  regionLabel: FeedItem['region'];
   tags: ApiArticleEntity[];
   companies: ApiArticleEntity[];
   relatedSourceCount?: number;
@@ -49,7 +44,7 @@ export type ApiArticleListResult = {
 export type ApiHomeStats = {
   recentArticleCount: number;
   topicCount: number;
-  enabledSourcesByType: Array<{ type: string; count: number }>;
+  enabledSourceCategories: Array<{ label: string; count: number; accessSummaryLabel: string }>;
 };
 
 export type ApiTrendingTag = {
@@ -65,12 +60,11 @@ export type ApiHomeResult = {
 };
 
 export type ApiCompany = {
-  id: number;
   slug: string;
   name: string;
   englishName: string | null;
-  country: string;
-  sector: string;
+  countryLabel: string;
+  sectorLabel: string;
   website: string | null;
   profile: string;
   stockSymbol: string | null;
@@ -90,27 +84,27 @@ export type ApiLaunch = {
   provider: string | null;
   windowStart: string | null;
   site: string | null;
-  status: string;
-  rawUrl: string | null;
+  statusLabel: string;
+  sourceUrl: string | null;
   isFallback?: boolean;
 };
 
 export type ApiLaunchListResult = {
   items: ApiLaunch[];
+  page: number;
+  limit: number;
   hasMore: boolean;
 };
 
 export type ApiTopic = {
-  id: number;
   slug: string;
   name: string;
-  category: string;
+  categoryLabel: string;
   articleCount: number;
   curationCount: number;
 };
 
 export type ApiTopicCuration = {
-  id: number;
   itemUrl: string;
   note: string | null;
   createdAt: string;
@@ -122,37 +116,27 @@ export type ApiTopicDetail = ApiTopic & {
 };
 
 export type ApiSource = {
-  key: string;
   name: string;
-  type: string;
-  region: string;
-  credibility: number;
-  publicCategory: string;
-  publicCategoryLabel: string;
-  accessDomestic: string;
-  accessGlobal: string;
+  categoryLabel: string;
+  domesticAccessLabel: string;
+  globalAccessLabel: string;
   accessNote: string | null;
   publicBadge: string | null;
 };
 
 export type ApiSourceListResult = {
   items: ApiSource[];
-  stats: Array<{ type: string; count: number }>;
-  publicStats?: Array<{
-    category: string;
+  publicStats: Array<{
     label: string;
     count: number;
-    directCount: number;
-    limitedCount: number;
-    blockedCount: number;
-    unknownCount: number;
+    accessSummaryLabel: string;
   }>;
-  accessStats?: Array<{ status: string; count: number }>;
+  accessStats: Array<{ label: string; count: number }>;
 };
 
 export type FeedStory = FeedItem & {
   url?: string;
-  sourceKey?: string;
+  sourceFilter?: string;
   relatedSourceCount?: number;
   relatedSources?: string[];
 };

@@ -132,6 +132,26 @@ describe('topic queries', () => {
     expect(db.values).toEqual([['reusable-rockets'], [topic.id], [topic.slug]]);
   });
 
+  it('trims topic slugs before querying detail records', async () => {
+    const db = new FakeTopicDatabase();
+    db.firstResult = topic;
+
+    await getTopicBySlug(db, ' reusable-rockets ');
+
+    expect(db.values[0]).toEqual(['reusable-rockets']);
+  });
+
+  it('matches topic detail slugs case-insensitively', async () => {
+    const db = new FakeTopicDatabase();
+    db.firstResult = topic;
+    db.curationResults = [curation];
+
+    await getTopicBySlug(db, ' Reusable-Rockets ');
+
+    expect(db.queries[0]).toContain('LOWER(t.slug) = ?');
+    expect(db.values[0]).toEqual(['reusable-rockets']);
+  });
+
   it('falls back to legacy topic article queries when translation columns are missing', async () => {
     const db = new FakeTopicDatabase();
     db.failTranslationColumns = true;
@@ -148,8 +168,8 @@ describe('topic queries', () => {
     });
     expect(db.queries).toHaveLength(4);
     expect(db.queries[1]).toContain('a.original_summary AS originalSummary');
-    expect(db.queries[2]).toContain('NULL AS originalSummary');
-    expect(db.queries[3]).toContain('FROM curations');
+    expect(db.queries.some((query) => query.includes('NULL AS originalSummary'))).toBe(true);
+    expect(db.queries.some((query) => query.includes('FROM curations'))).toBe(true);
   });
 
   it('returns null for blank or missing topic slugs', async () => {

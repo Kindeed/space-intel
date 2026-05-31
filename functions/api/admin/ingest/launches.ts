@@ -1,23 +1,23 @@
 import sourcesConfig from '../../../../config/sources.generated.json';
 import { launchLibraryCollector, parseSourcesConfig, runLaunchIngestion } from '../../../../src/ingestion';
+import { adminIngestionFailureMessage, adminSourceNotConfiguredResponse, logAdminError, requireAdminRequest, type AdminEnv } from '../../_admin';
+import { findEnabledAdminSourceByKey } from './_sources';
 
-type Env = {
+type Env = AdminEnv & {
   DB: D1Database;
-  ADMIN_TOKEN?: string;
 };
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
-  const expectedToken = env.ADMIN_TOKEN;
-  const providedToken = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  const unauthorized = requireAdminRequest(request, env);
 
-  if (!expectedToken || providedToken !== expectedToken) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  const source = parseSourcesConfig(sourcesConfig).find((item) => item.key === 'launch-library-2');
+  const source = findEnabledAdminSourceByKey(parseSourcesConfig(sourcesConfig), 'launch-library-2');
 
   if (!source) {
-    return Response.json({ error: 'Launch Library 2 source is not configured' }, { status: 500 });
+    return adminSourceNotConfiguredResponse();
   }
 
   try {
@@ -28,12 +28,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
 
     return Response.json(result);
   } catch (error) {
+    logAdminError(`Failed to run launch ingestion for ${source.key}`, error);
     return Response.json({
       sourceKey: source.key,
       collected: 0,
       upserted: 0,
       failures: 1,
-      error: error instanceof Error ? error.message : String(error),
+      error: adminIngestionFailureMessage,
     });
   }
 };

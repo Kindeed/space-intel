@@ -1,15 +1,32 @@
 import type { NormalizedLaunch } from '../ingestion/collectors/launchLibrary';
+import { runDbStatements, sumRunChanges } from './statements';
 import type { SqlDatabase } from './types';
 
 export type PersistLaunchesResult = {
   upserted: number;
 };
 
+function normalizeLaunchExternalId(value: string): string {
+  return value.trim().toLowerCase();
+}
+
 export async function persistLaunchRecords(db: SqlDatabase, launches: NormalizedLaunch[]): Promise<PersistLaunchesResult> {
-  let upserted = 0;
+  const launchByExternalId = new Map<string, NormalizedLaunch>();
 
   for (const launch of launches) {
-    const result = await db
+    const externalId = normalizeLaunchExternalId(launch.externalId);
+
+    if (!externalId) {
+      continue;
+    }
+
+    if (!launchByExternalId.has(externalId)) {
+      launchByExternalId.set(externalId, launch);
+    }
+  }
+
+  const statements = [...launchByExternalId.entries()].map(([externalId, launch]) =>
+    db
       .prepare(
         `INSERT INTO launches (
           external_id, mission, rocket, provider, window_start, site, status, raw_url
@@ -24,7 +41,7 @@ export async function persistLaunchRecords(db: SqlDatabase, launches: Normalized
           raw_url = excluded.raw_url`,
       )
       .bind(
-        launch.externalId,
+        externalId,
         launch.mission,
         launch.rocket,
         launch.provider,
@@ -32,11 +49,10 @@ export async function persistLaunchRecords(db: SqlDatabase, launches: Normalized
         launch.site,
         launch.status,
         launch.rawUrl,
-      )
-      .run();
-
-    upserted += result.meta?.changes ?? 0;
-  }
+      ),
+  );
+  const results = await runDbStatements(db, statements);
+  const upserted = sumRunChanges(results);
 
   return { upserted };
 }

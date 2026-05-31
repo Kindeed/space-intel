@@ -3,25 +3,28 @@ import topicsConfig from '../../../../config/topics.generated.json';
 import { parseCompaniesConfig, parseTopicsConfig } from '../../../../src/catalog';
 import { matchArticlesEntities } from '../../../../src/enrichment';
 import { listArticlesForEntityMatching, upsertConfiguredEntityLinks } from '../../../../src/db';
+import { adminOperationFailureResponse, requireAdminRequest, type AdminEnv } from '../../_admin';
 
-type Env = {
+type Env = AdminEnv & {
   DB: D1Database;
-  ADMIN_TOKEN?: string;
 };
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
-  const expectedToken = env.ADMIN_TOKEN;
-  const providedToken = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  const unauthorized = requireAdminRequest(request, env);
 
-  if (!expectedToken || providedToken !== expectedToken) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  const companies = parseCompaniesConfig(companiesConfig);
-  const topics = parseTopicsConfig(topicsConfig);
-  const articles = await listArticlesForEntityMatching(env.DB);
-  const matches = matchArticlesEntities(articles, companies, topics);
-  const result = await upsertConfiguredEntityLinks(env.DB, matches);
+  try {
+    const companies = parseCompaniesConfig(companiesConfig);
+    const topics = parseTopicsConfig(topicsConfig);
+    const articles = await listArticlesForEntityMatching(env.DB);
+    const matches = matchArticlesEntities(articles, companies, topics);
+    const result = await upsertConfiguredEntityLinks(env.DB, matches);
 
-  return Response.json(result);
+    return Response.json(result);
+  } catch (error) {
+    return adminOperationFailureResponse('Failed to enrich entity links', error);
+  }
 };

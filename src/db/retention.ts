@@ -1,3 +1,4 @@
+import { normalizeBoundedPositiveInteger } from '../number';
 import type { SqlDatabase } from './types';
 
 export type RetentionCleanupInput = {
@@ -27,11 +28,7 @@ function cutoff(now: Date, days: number): string {
 }
 
 function normalizeBatchLimit(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return defaultBatchLimit;
-  }
-
-  return Math.min(Math.floor(value), 2_000);
+  return normalizeBoundedPositiveInteger(value, defaultBatchLimit, 2_000);
 }
 
 async function runDelete(db: SqlDatabase, query: string, values: unknown[]): Promise<number> {

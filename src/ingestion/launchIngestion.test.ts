@@ -41,9 +41,15 @@ class MemoryStatement implements DbStatement {
 class MemoryLaunchDatabase implements SqlDatabase {
   readonly launches: LaunchRow[] = [];
   readonly logs: LogRow[] = [];
+  readonly batchSizes: number[] = [];
 
   prepare(query: string): DbStatement {
     return new MemoryStatement(this, query);
+  }
+
+  async batch(statements: DbStatement[]): Promise<DbRunResult[]> {
+    this.batchSizes.push(statements.length);
+    return Promise.all(statements.map((statement) => statement.run()));
   }
 
   run(query: string, values: unknown[]): DbRunResult {
@@ -116,11 +122,32 @@ describe('launch ingestion', () => {
           JSON.stringify({
             results: [
               {
-                id: 'launch-1',
+                id: ' LAUNCH-1 ',
                 name: 'Reusable rocket test flight',
                 url: 'https://example.com/launch-1',
                 net: '2026-05-10T12:00:00Z',
                 status: { name: 'Go' },
+              },
+              {
+                id: '   ',
+                name: 'Blank id should not be cached',
+                url: 'https://example.com/blank',
+                net: '2026-05-10T12:00:00Z',
+                status: { name: 'Go' },
+              },
+              {
+                id: 'launch-1',
+                name: 'Duplicate launch should not be written twice',
+                url: 'https://example.com/launch-1-duplicate',
+                net: '2026-05-10T12:00:00Z',
+                status: { name: 'Go' },
+              },
+              {
+                id: 'launch-2',
+                name: 'Commercial rideshare mission',
+                url: 'https://example.com/launch-2',
+                net: '2026-05-11T12:00:00Z',
+                status: { name: 'TBD' },
               },
             ],
           }),
@@ -132,11 +159,15 @@ describe('launch ingestion', () => {
 
     expect(result).toEqual({
       sourceKey: 'launch-library-2',
-      collected: 1,
-      upserted: 1,
+      collected: 4,
+      upserted: 2,
       failures: 0,
     });
-    expect(db.launches).toEqual([{ externalId: 'launch-1', mission: 'Reusable rocket test flight' }]);
-    expect(db.logs[0]).toMatchObject({ successCount: 1, failureCount: 0 });
+    expect(db.launches).toEqual([
+      { externalId: 'launch-1', mission: 'Reusable rocket test flight' },
+      { externalId: 'launch-2', mission: 'Commercial rideshare mission' },
+    ]);
+    expect(db.batchSizes).toEqual([2]);
+    expect(db.logs[0]).toMatchObject({ successCount: 2, failureCount: 0 });
   });
 });

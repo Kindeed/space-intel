@@ -373,7 +373,7 @@ describe('scheduled ingestion', () => {
     const result = await runScheduledIngestion({
       db,
       sources: [hangingSource, healthySource],
-      sourceTimeoutMs: 10,
+      sourceTimeoutMs: 100,
       context: {
         now: () => new Date('2026-05-09T01:00:00Z'),
         fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -407,7 +407,7 @@ describe('scheduled ingestion', () => {
       expect.objectContaining({
         sourceKey: 'hanging-rss',
         failures: 1,
-        error: 'Source ingestion timed out after 10ms',
+        error: 'Source ingestion timed out after 100ms',
       }),
       expect.objectContaining({
         sourceKey: 'healthy-rss',
@@ -419,7 +419,7 @@ describe('scheduled ingestion', () => {
       sourceKey: 'hanging-rss',
       finishedAt: '2026-05-09T01:00:00.000Z',
       failureCount: 1,
-      error: 'Source ingestion timed out after 10ms',
+      error: 'Source ingestion timed out after 100ms',
     });
     expect(db.logs[1]).toMatchObject({ sourceKey: 'healthy-rss', successCount: 1, failureCount: 0 });
   });
@@ -474,6 +474,92 @@ describe('scheduled ingestion', () => {
     expect(maxActiveFetches).toBeGreaterThan(1);
     expect(maxActiveFetches).toBeLessThanOrEqual(4);
     expect(db.articleHashes.size).toBe(3);
+  });
+
+  it('closes stale ingestion logs during hourly runs', async () => {
+    const db = new MemoryScheduledDatabase();
+    db.logs.push({
+      id: 1,
+      sourceKey: 'old-rss',
+      startedAt: '2026-05-08T22:59:59.000Z',
+      finishedAt: null,
+      successCount: 0,
+      failureCount: 0,
+      error: null,
+    });
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [],
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async () => new Response(''),
+      },
+      kind: 'hourly',
+    });
+
+    expect(result.maintenance).toEqual({
+      staleIngestionLogsClosed: 1,
+      retention: null,
+      failures: 0,
+    });
+    expect(db.logs[0]).toMatchObject({
+      finishedAt: '2026-05-09T01:00:00.000Z',
+      failureCount: 1,
+      error: 'Maintenance closed stale ingestion log after 2 hours without completion.',
+    });
+    expect(db.retentionDeletes).toEqual([]);
+  });
+
+  it('runs enabled RSSHub sources during hourly ingestion', async () => {
+    const db = new MemoryScheduledDatabase();
+    const rsshubSource: SourceConfig = {
+      key: 'rsshub-weibo-space-keyword',
+      name: '微博商业航天关键词',
+      type: 'rsshub',
+      region: 'cn',
+      url: 'https://rsshub.app/weibo/keyword/%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9',
+      credibility: 2,
+      enabled: true,
+      purpose: 'Chinese platform keyword monitoring.',
+      expected_content: 'Public post metadata and original links.',
+      risk_notes: 'RSSHub route availability may vary; metadata only.',
+      dedupe_strategy: 'url_title_source',
+      default_tags: ['domestic-private-launch'],
+    };
+
+    const result = await runScheduledIngestion({
+      db,
+      sources: [rsshubSource],
+      context: {
+        now: () => new Date('2026-05-09T01:00:00Z'),
+        fetch: async () =>
+          new Response(`<?xml version="1.0"?>
+            <rss version="2.0">
+              <channel>
+                <title>微博商业航天关键词</title>
+                <item>
+                  <title>商业航天发射动态</title>
+                  <link>https://weibo.com/example/status/1</link>
+                  <description>公开平台摘要。</description>
+                  <guid>weibo-1</guid>
+                  <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
+                </item>
+              </channel>
+            </rss>`),
+      },
+      kind: 'hourly',
+    });
+
+    expect(result.sourceRuns).toEqual([
+      expect.objectContaining({
+        sourceKey: 'rsshub-weibo-space-keyword',
+        failures: 0,
+        inserted: 1,
+      }),
+    ]);
+    expect(db.articleHashes.size).toBe(1);
+    expect(db.logs[0]).toMatchObject({ sourceKey: 'rsshub-weibo-space-keyword', successCount: 1 });
   });
 
   it('skips Launch Library ingestion outside the six-hour cadence', async () => {
@@ -567,6 +653,47 @@ describe('scheduled ingestion', () => {
     expect(db.logs[0]).toMatchObject({ sourceKey: 'ccgp-central-procurement', successCount: 1 });
   });
 
+  it('rejects source default references that are missing from daily catalog config', async () => {
+    const db = new MemoryScheduledDatabase();
+
+    await expect(
+      runScheduledIngestion({
+        db,
+        sources: [
+          {
+            ...sources[0],
+            default_tags: ['missing-topic'],
+          },
+        ],
+        companiesConfig: {
+          companies: [
+            {
+              slug: 'rocket-lab',
+              name: 'Rocket Lab',
+              country: 'United States',
+              sector: 'Launch',
+            },
+          ],
+        },
+        topicsConfig: {
+          topics: [
+            {
+              slug: 'reusable-rockets',
+              name: 'Reusable Rockets',
+              category: 'technology',
+              keywords: ['reusable rocket'],
+            },
+          ],
+        },
+        context: {
+          now: () => new Date('2026-05-09T00:00:00Z'),
+          fetch,
+        },
+        kind: 'daily',
+      }),
+    ).rejects.toThrow('Unknown default tag "missing-topic" in source snapi');
+  });
+
   it('syncs configured curations on daily runs', async () => {
     const db = new MemoryScheduledDatabase();
     db.logs.push({
@@ -587,8 +714,8 @@ describe('scheduled ingestion', () => {
           {
             slug: 'rocket-lab',
             name: 'Rocket Lab',
-            country: 'global',
-            sector: 'launch',
+            country: 'United States',
+            sector: 'Launch',
           },
         ],
       },
@@ -598,6 +725,7 @@ describe('scheduled ingestion', () => {
             slug: 'reusable-rockets',
             name: 'Reusable Rockets',
             category: 'technology',
+            keywords: ['reusable rocket'],
           },
         ],
       },

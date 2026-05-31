@@ -1,25 +1,28 @@
 import curationsConfig from '../../../config/curations.generated.json';
 import { parseCurationsConfig } from '../../../src/curations/config';
 import { replaceConfiguredCurations } from '../../../src/db';
+import { adminOperationFailureResponse, requireAdminRequest, type AdminEnv } from '../_admin';
 
-type Env = {
+type Env = AdminEnv & {
   DB: D1Database;
-  ADMIN_TOKEN?: string;
 };
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
-  const expectedToken = env.ADMIN_TOKEN;
-  const providedToken = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  const unauthorized = requireAdminRequest(request, env);
 
-  if (!expectedToken || providedToken !== expectedToken) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (unauthorized) {
+    return unauthorized;
   }
 
-  const records = parseCurationsConfig(curationsConfig);
-  const result = await replaceConfiguredCurations(env.DB, records);
+  try {
+    const records = parseCurationsConfig(curationsConfig);
+    const result = await replaceConfiguredCurations(env.DB, records);
 
-  return Response.json({
-    configured: records.length,
-    inserted: result.inserted,
-  });
+    return Response.json({
+      configured: records.length,
+      inserted: result.inserted,
+    });
+  } catch (error) {
+    return adminOperationFailureResponse('Failed to replace configured curations', error);
+  }
 };

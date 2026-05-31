@@ -58,7 +58,9 @@ export async function listCompanies(db: SqlDatabase): Promise<CompanyRow[]> {
 }
 
 export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<CompanyDetail | null> {
-  if (!slug.trim()) {
+  const normalizedSlug = slug.trim().toLowerCase();
+
+  if (!normalizedSlug) {
     return null;
   }
 
@@ -78,10 +80,10 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
         COUNT(ac.article_id) AS articleCount
       FROM companies c
       LEFT JOIN article_companies ac ON ac.company_id = c.id
-      WHERE c.slug = ?
+      WHERE LOWER(c.slug) = ?
       GROUP BY c.id`,
     )
-    .bind(slug)
+    .bind(normalizedSlug)
     .first<CompanyRow>();
 
   if (!company) {

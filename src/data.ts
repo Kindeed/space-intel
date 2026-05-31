@@ -9,7 +9,7 @@ export type FeedItem = {
   source: string;
   time: string;
   category: string;
-  region: '国内' | '国际';
+  region: '国内' | '国际' | '地区待确认';
   summary: string;
   companies: FeedLink[];
   tags: FeedLink[];

@@ -1,4 +1,5 @@
 import { getLaunchByIdOrExternalId } from '../../../src/db';
+import { publicLaunch } from '../_launches';
 import { logApiError, publicError } from '../_response';
 
 type Env = {
@@ -11,10 +12,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const launch = await getLaunchByIdOrExternalId(env.DB, id ?? '');
 
     if (!launch) {
-      return Response.json({ error: 'Launch not found' }, { status: 404 });
+      return publicError('发射记录不存在或已更新。', 404);
     }
 
-    return Response.json(launch);
+    return Response.json(publicLaunch(launch));
   } catch (error) {
     logApiError('Failed to load launch', error);
     return publicError();

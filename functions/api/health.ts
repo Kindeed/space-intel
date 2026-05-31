@@ -1,3 +1,7 @@
+import sourcesConfig from '../../config/sources.generated.json';
+import { parseSourcesConfig } from '../../src/ingestion';
+import { sourceDisplayName } from '../../src/sourceDisplay';
+
 type LatestIngestionLogRow = {
   sourceKey: string;
   startedAt: string;
@@ -6,6 +10,12 @@ type LatestIngestionLogRow = {
   failureCount: number;
   hasError: number;
 };
+
+const healthSourceNameByKey = new Map(parseSourcesConfig(sourcesConfig).map((source) => [source.key, sourceDisplayName(source)]));
+
+function healthSourceName(sourceKey: string): string {
+  return healthSourceNameByKey.get(sourceKey) ?? '来源';
+}
 
 async function loadDiagnostics(db: D1Database | undefined) {
   if (!db) {
@@ -19,16 +29,16 @@ async function loadDiagnostics(db: D1Database | undefined) {
   }
 
   try {
-    const latestArticle = await db
+    const latestArticleQuery = db
       .prepare('SELECT MAX(published_at) AS latestArticlePublishedAt FROM articles')
       .first<{ latestArticlePublishedAt: string | null }>();
-    const openIngestionLogs = await db
+    const openIngestionLogsQuery = db
       .prepare('SELECT COUNT(*) AS openIngestionLogCount FROM ingestion_logs WHERE finished_at IS NULL')
       .first<{ openIngestionLogCount: number }>();
-    const latestSuccessfulIngestion = await db
+    const latestSuccessfulIngestionQuery = db
       .prepare('SELECT MAX(finished_at) AS latestSuccessfulIngestionAt FROM ingestion_logs WHERE finished_at IS NOT NULL AND failure_count = 0')
       .first<{ latestSuccessfulIngestionAt: string | null }>();
-    const latestIngestionLog = await db
+    const latestIngestionLogQuery = db
       .prepare(
         `SELECT
           source_key AS sourceKey,
@@ -43,7 +53,7 @@ async function loadDiagnostics(db: D1Database | undefined) {
         LIMIT 1`,
       )
       .first<LatestIngestionLogRow>();
-    const recentFailedIngestionLogs = await db
+    const recentFailedIngestionLogsQuery = db
       .prepare(
         `SELECT
           source_key AS sourceKey,
@@ -58,6 +68,13 @@ async function loadDiagnostics(db: D1Database | undefined) {
         LIMIT 5`,
       )
       .all?.<LatestIngestionLogRow>();
+    const [latestArticle, openIngestionLogs, latestSuccessfulIngestion, latestIngestionLog, recentFailedIngestionLogs] = await Promise.all([
+      latestArticleQuery,
+      openIngestionLogsQuery,
+      latestSuccessfulIngestionQuery,
+      latestIngestionLogQuery,
+      recentFailedIngestionLogsQuery,
+    ]);
 
     return {
       latestArticlePublishedAt: latestArticle?.latestArticlePublishedAt ?? null,
@@ -65,7 +82,7 @@ async function loadDiagnostics(db: D1Database | undefined) {
       latestSuccessfulIngestionAt: latestSuccessfulIngestion?.latestSuccessfulIngestionAt ?? null,
       recentFailedIngestionLogs:
         recentFailedIngestionLogs?.results.map((row) => ({
-          sourceKey: row.sourceKey,
+          sourceName: healthSourceName(row.sourceKey),
           startedAt: row.startedAt,
           finishedAt: row.finishedAt,
           successCount: row.successCount,
@@ -74,7 +91,7 @@ async function loadDiagnostics(db: D1Database | undefined) {
         })) ?? [],
       latestIngestionLog: latestIngestionLog
         ? {
-            sourceKey: latestIngestionLog.sourceKey,
+            sourceName: healthSourceName(latestIngestionLog.sourceKey),
             startedAt: latestIngestionLog.startedAt,
             finishedAt: latestIngestionLog.finishedAt,
             successCount: latestIngestionLog.successCount,
@@ -100,9 +117,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   return Response.json({
     ok: true,
     service: 'space-intel',
-    bindings: {
-      d1: Boolean(env.DB),
-      r2: Boolean(env.R2_ASSETS),
+    checks: {
+      database: Boolean(env.DB),
+      assets: Boolean(env.R2_ASSETS),
     },
     diagnostics: await loadDiagnostics(env.DB),
   });

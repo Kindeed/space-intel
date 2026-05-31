@@ -1,4 +1,5 @@
 import { listTopics } from '../../../src/db';
+import { publicTopicListResult } from '../_topics';
 import { logApiError, publicError } from '../_response';
 
 type Env = {
@@ -7,7 +8,7 @@ type Env = {
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   try {
-    return Response.json({ items: await listTopics(env.DB) });
+    return Response.json(publicTopicListResult({ items: await listTopics(env.DB) }));
   } catch (error) {
     logApiError('Failed to list topics', error);
     return publicError();

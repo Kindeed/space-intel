@@ -1,16 +1,68 @@
 import { parse } from 'yaml';
 import { z } from 'zod';
+import { routeSafeIdentifierSchema } from '../config/identifiers';
+import { normalizeHttpUrl } from '../config/url';
+import { companyCountryIds, companySectorIds, companySectorValues, type CompanyCountryId } from './companyTaxonomy';
+import { topicCategoryIds, type TopicCategoryId } from './topicCategories';
+
+const optionalUrlSchema = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z
+    .string()
+    .trim()
+    .url()
+    .transform((value, context) => {
+      const normalized = normalizeHttpUrl(value);
+
+      if (normalized === null) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Catalog URL must be a public http or https URL',
+        });
+        return z.NEVER;
+      }
+
+      return normalized;
+    })
+    .optional()
+    .default(''),
+);
+
+const slugSchema = routeSafeIdentifierSchema('Slug');
+const companyCountrySchema = z.string().transform(normalizeConfigText).pipe(z.enum(companyCountryIds));
+const companySectorSchema = z.string().transform(normalizeCompanySector).superRefine((value, context) => {
+  const sectors = companySectorValues(value);
+  const hasEmptySector = sectors.some((sector) => sector.length === 0);
+  const hasUnsupportedSector = sectors.some((sector) => !companySectorIds.includes(sector as (typeof companySectorIds)[number]));
+
+  if (!value || hasEmptySector || hasUnsupportedSector) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Company sector must use supported values: ${companySectorIds.join(', ')}`,
+    });
+  }
+});
+const topicCategorySchema = z.string().trim().pipe(z.enum(topicCategoryIds));
+const requiredDisplayTextSchema = z
+  .string()
+  .transform(normalizeConfigText)
+  .pipe(z.string().min(1));
+const optionalDisplayTextSchema = z
+  .string()
+  .transform(normalizeConfigText)
+  .optional()
+  .default('');
 
 const companySchema = z.object({
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  english_name: z.string().optional().default(''),
-  country: z.string().min(1),
-  sector: z.string().min(1),
-  website: z.string().url().optional().default(''),
-  profile: z.string().optional().default(''),
-  stock_symbol: z.string().optional().default(''),
-  logo_url: z.string().url().optional().default(''),
+  slug: slugSchema,
+  name: requiredDisplayTextSchema,
+  english_name: optionalDisplayTextSchema,
+  country: companyCountrySchema,
+  sector: companySectorSchema,
+  website: optionalUrlSchema,
+  profile: optionalDisplayTextSchema,
+  stock_symbol: optionalDisplayTextSchema,
+  logo_url: optionalUrlSchema,
 });
 
 const companiesFileSchema = z.object({
@@ -18,9 +70,9 @@ const companiesFileSchema = z.object({
 });
 
 const topicSchema = z.object({
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  category: z.string().min(1),
+  slug: slugSchema,
+  name: requiredDisplayTextSchema,
+  category: topicCategorySchema,
   keywords: z.array(z.string()).default([]),
 });
 
@@ -32,7 +84,7 @@ export type CompanyConfigRecord = {
   slug: string;
   name: string;
   englishName: string;
-  country: string;
+  country: CompanyCountryId;
   sector: string;
   website: string;
   profile: string;
@@ -43,12 +95,77 @@ export type CompanyConfigRecord = {
 export type TopicConfigRecord = {
   slug: string;
   name: string;
-  category: string;
+  category: TopicCategoryId;
   keywords: string[];
 };
 
+function assertUniqueSlugs<T extends { slug: string }>(records: T[], label: string): void {
+  const seen = new Set<string>();
+
+  for (const record of records) {
+    if (seen.has(record.slug)) {
+      throw new Error(`Duplicate ${label} slug: ${record.slug}`);
+    }
+
+    seen.add(record.slug);
+  }
+}
+
+function normalizeKeywords(keywords: string[]): string[] {
+  const seen = new Set<string>();
+
+  return keywords
+    .map(normalizeConfigText)
+    .filter((keyword) => {
+      if (!keyword) {
+        return false;
+      }
+
+      const key = keyword.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+}
+
+function normalizeConfigText(value: string): string {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function normalizeCompanySector(value: string): string {
+  const seen = new Set<string>();
+  const sectors = value.split(',').map(normalizeConfigText);
+
+  return sectors
+    .filter((sector) => {
+      if (!sector) {
+        return true;
+      }
+
+      const key = sector.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    })
+    .join(', ');
+}
+
+function assertTopicKeywords(records: TopicConfigRecord[]): void {
+  for (const record of records) {
+    if (record.keywords.length === 0) {
+      throw new Error(`Topic must define at least one keyword: ${record.slug}`);
+    }
+  }
+}
+
 export function parseCompaniesConfig(input: unknown): CompanyConfigRecord[] {
-  return companiesFileSchema.parse(input ?? {}).companies.map((company) => ({
+  const records = companiesFileSchema.parse(input ?? {}).companies.map((company) => ({
     slug: company.slug,
     name: company.name,
     englishName: company.english_name,
@@ -59,10 +176,20 @@ export function parseCompaniesConfig(input: unknown): CompanyConfigRecord[] {
     stockSymbol: company.stock_symbol,
     logoUrl: company.logo_url,
   }));
+
+  assertUniqueSlugs(records, 'company');
+  return records;
 }
 
 export function parseTopicsConfig(input: unknown): TopicConfigRecord[] {
-  return topicsFileSchema.parse(input ?? {}).topics;
+  const records = topicsFileSchema.parse(input ?? {}).topics.map((topic) => ({
+    ...topic,
+    keywords: normalizeKeywords(topic.keywords),
+  }));
+
+  assertUniqueSlugs(records, 'topic');
+  assertTopicKeywords(records);
+  return records;
 }
 
 export function parseCompaniesYaml(yamlText: string): CompanyConfigRecord[] {

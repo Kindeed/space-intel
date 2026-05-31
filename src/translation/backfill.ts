@@ -1,6 +1,7 @@
 import type { SqlDatabase } from '../db/types';
 import { isMissingArticleTranslationColumnError } from '../db/articleQueries';
 import type { CollectorContext } from '../ingestion/types';
+import { normalizeBoundedPositiveInteger } from '../number';
 import { translateArticleFields, type TranslationEnv, type TranslationStatus } from './index';
 
 export type TranslationBackfillResult = {
@@ -20,11 +21,7 @@ type TranslationCandidate = {
 };
 
 function normalizeLimit(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return 20;
-  }
-
-  return Math.min(Math.floor(value), 50);
+  return normalizeBoundedPositiveInteger(value, 20, 50);
 }
 
 async function listTranslationCandidates(db: SqlDatabase, limit: number): Promise<TranslationCandidate[]> {

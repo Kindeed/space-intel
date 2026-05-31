@@ -8,6 +8,7 @@ import {
   type ArticleSummaryDbRow,
   type ArticleSummaryRow,
 } from './articleQueries';
+import { normalizeBoundedPositiveInteger } from '../number';
 import type { SqlDatabase } from './types';
 
 export type RankedHomeArticle = ArticleSummaryRow & {
@@ -23,7 +24,7 @@ type RankedHomeArticleDbRow = ArticleSummaryDbRow & {
 export type HomeStats = {
   recentArticleCount: number;
   topicCount: number;
-  enabledSourcesByType: Array<{ type: string; count: number }>;
+  enabledSources: Array<{ key: string; type: string; region: string }>;
 };
 
 export type TrendingTag = {
@@ -61,7 +62,7 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
       ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC, a.id DESC
       LIMIT ?`,
       )
-      .bind(Math.max(1, Math.min(Math.floor(limit), 50)))
+      .bind(normalizeBoundedPositiveInteger(limit, 20, 50))
       .all?.<RankedHomeArticleDbRow>();
 
     if (!result) {
@@ -121,7 +122,7 @@ export async function listTrendingTags(db: SqlDatabase, limit = 6): Promise<Tren
       ORDER BY count DESC, t.name ASC
       LIMIT ?`,
     )
-    .bind(Math.max(1, Math.min(Math.floor(limit), 12)))
+    .bind(normalizeBoundedPositiveInteger(limit, 6, 12))
     .all?.<TrendingTag>();
 
   if (!result) {
@@ -132,19 +133,20 @@ export async function listTrendingTags(db: SqlDatabase, limit = 6): Promise<Tren
 }
 
 export async function getHomeStats(db: SqlDatabase): Promise<HomeStats> {
-  const recent = await db
+  const recentQuery = db
     .prepare("SELECT COUNT(*) AS count FROM articles WHERE published_at >= datetime('now', '-1 day')")
     .first<{ count: number }>();
-  const topics = await db.prepare('SELECT COUNT(*) AS count FROM tags').first<{ count: number }>();
-  const sourceResult = await db
+  const topicsQuery = db.prepare('SELECT COUNT(*) AS count FROM tags').first<{ count: number }>();
+  const sourceQuery = db
     .prepare(
-      `SELECT type, COUNT(*) AS count
+      `SELECT key, type, region
        FROM sources
        WHERE enabled = 1
-       GROUP BY type
-       ORDER BY type ASC`,
+       ORDER BY type ASC, key ASC`,
     )
-    .all?.<{ type: string; count: number }>();
+    .all?.<{ key: string; type: string; region: string }>();
+
+  const [recent, topics, sourceResult] = await Promise.all([recentQuery, topicsQuery, sourceQuery]);
 
   if (!sourceResult) {
     throw new Error('Database statement does not support all()');
@@ -153,6 +155,6 @@ export async function getHomeStats(db: SqlDatabase): Promise<HomeStats> {
   return {
     recentArticleCount: recent?.count ?? 0,
     topicCount: topics?.count ?? 0,
-    enabledSourcesByType: sourceResult.results,
+    enabledSources: sourceResult.results,
   };
 }

@@ -60,7 +60,9 @@ export async function listTopics(db: SqlDatabase): Promise<TopicRow[]> {
 }
 
 export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<TopicDetail | null> {
-  if (!slug.trim()) {
+  const normalizedSlug = slug.trim().toLowerCase();
+
+  if (!normalizedSlug) {
     return null;
   }
 
@@ -76,10 +78,10 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       FROM tags t
       LEFT JOIN article_tags at ON at.tag_id = t.id
       LEFT JOIN curations c ON c.target_type = 'topic' AND c.target_key = t.slug AND c.enabled = 1
-      WHERE t.slug = ?
+      WHERE LOWER(t.slug) = ?
       GROUP BY t.id`,
     )
-    .bind(slug)
+    .bind(normalizedSlug)
     .first<TopicRow>();
 
   if (!topic) {
@@ -125,39 +127,42 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
     return articleResult.results.map(toArticleSummary);
   }
 
-  let articles: ArticleSummaryRow[];
+  async function loadTopicArticles(): Promise<ArticleSummaryRow[]> {
+    try {
+      return await listTopicArticles(true, true);
+    } catch (error) {
+      if (isMissingArticleTranslationColumnError(error)) {
+        try {
+          return await listTopicArticles(false, true);
+        } catch (fallbackError) {
+          if (!isMissingArticlePublisherColumnError(fallbackError)) {
+            throw fallbackError;
+          }
 
-  try {
-    articles = await listTopicArticles(true, true);
-  } catch (error) {
-    if (isMissingArticleTranslationColumnError(error)) {
-      try {
-        articles = await listTopicArticles(false, true);
-      } catch (fallbackError) {
-        if (!isMissingArticlePublisherColumnError(fallbackError)) {
-          throw fallbackError;
+          return listTopicArticles(false, false);
         }
-
-        articles = await listTopicArticles(false, false);
       }
-    } else if (isMissingArticlePublisherColumnError(error)) {
-      try {
-        articles = await listTopicArticles(true, false);
-      } catch (fallbackError) {
-        if (!isMissingArticleTranslationColumnError(fallbackError)) {
-          throw fallbackError;
+
+      if (isMissingArticlePublisherColumnError(error)) {
+        try {
+          return await listTopicArticles(true, false);
+        } catch (fallbackError) {
+          if (!isMissingArticleTranslationColumnError(fallbackError)) {
+            throw fallbackError;
+          }
+
+          return listTopicArticles(false, false);
         }
-
-        articles = await listTopicArticles(false, false);
       }
-    } else {
+
       throw error;
     }
   }
 
-  const curationResult = await db
-    .prepare(
-      `SELECT
+  async function listTopicCurations(): Promise<TopicCurationRow[]> {
+    const curationResult = await db
+      .prepare(
+        `SELECT
         id,
         target_type AS targetType,
         target_key AS targetKey,
@@ -168,17 +173,22 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       FROM curations
       WHERE target_type = 'topic' AND target_key = ? AND enabled = 1
       ORDER BY weight DESC, created_at DESC`,
-    )
-    .bind(topicSlug)
-    .all?.<TopicCurationRow>();
+      )
+      .bind(topicSlug)
+      .all?.<TopicCurationRow>();
 
-  if (!curationResult) {
-    throw new Error('Database statement does not support all()');
+    if (!curationResult) {
+      throw new Error('Database statement does not support all()');
+    }
+
+    return curationResult.results;
   }
+
+  const [articles, curations] = await Promise.all([loadTopicArticles(), listTopicCurations()]);
 
   return {
     ...topic,
     articles,
-    curations: curationResult.results,
+    curations,
   };
 }

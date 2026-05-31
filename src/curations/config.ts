@@ -1,21 +1,42 @@
 import { parse } from 'yaml';
 import { z } from 'zod';
+import { routeSafeIdentifierSchema } from '../config/identifiers';
+import { normalizeHttpUrl } from '../config/url';
+
+const targetKeySchema = routeSafeIdentifierSchema('Curation target key');
+const curationUrlSchema = z
+  .string()
+  .trim()
+  .url()
+  .transform((value, context) => {
+    const normalized = normalizeHttpUrl(value);
+
+    if (normalized === null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Curation URL must be a public http or https URL',
+      });
+      return z.NEVER;
+    }
+
+    return normalized;
+  });
 
 const weightedUrlSchema = z.object({
-  url: z.string().url(),
-  weight: z.number().int().default(0),
-  note: z.string().default(''),
+  url: curationUrlSchema,
+  weight: z.number().int().min(0).max(100).default(0),
+  note: z.string().transform(normalizeDisplayText).default(''),
 });
 
 const pinnedItemSchema = weightedUrlSchema.extend({
-  target: z.string().min(1),
+  target: targetKeySchema,
 });
 
 const topicCurationSchema = z.object({
-  slug: z.string().min(1),
-  urls: z.array(z.string().url()).default([]),
-  weight: z.number().int().default(0),
-  note: z.string().default(''),
+  slug: targetKeySchema,
+  urls: z.array(curationUrlSchema).default([]),
+  weight: z.number().int().min(0).max(100).default(0),
+  note: z.string().transform(normalizeDisplayText).default(''),
 });
 
 const nullableArray = <T extends z.ZodTypeAny>(schema: T) =>
@@ -35,6 +56,24 @@ export type CurationConfigRecord = {
   note: string;
   enabled: number;
 };
+
+function assertUniqueCurationTargets(records: CurationConfigRecord[]): void {
+  const seen = new Set<string>();
+
+  for (const record of records) {
+    const key = `${record.targetType}:${record.targetKey}:${record.itemUrl}`;
+
+    if (seen.has(key)) {
+      throw new Error(`Duplicate curation target: ${record.targetType}/${record.targetKey} ${record.itemUrl}`);
+    }
+
+    seen.add(key);
+  }
+}
+
+function normalizeDisplayText(value: string): string {
+  return value.trim().replace(/\s+/g, ' ');
+}
 
 export function parseCurationsConfig(input: unknown): CurationConfigRecord[] {
   const config = curationsConfigSchema.parse(input ?? {});
@@ -75,6 +114,7 @@ export function parseCurationsConfig(input: unknown): CurationConfigRecord[] {
     }
   }
 
+  assertUniqueCurationTargets(records);
   return records;
 }
 

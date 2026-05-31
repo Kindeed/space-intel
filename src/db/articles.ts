@@ -1,6 +1,7 @@
 import type { IngestionRecord } from '../ingestion/run';
 import type { SourceConfig } from '../ingestion/types';
 import { isMissingArticlePublisherColumnError, isMissingArticleTranslationColumnError } from './articleQueries';
+import { runDbStatements } from './statements';
 import type { DbRunResult, DbStatement, SqlDatabase } from './types';
 
 export type PersistArticlesResult = {
@@ -50,21 +51,6 @@ export async function ensureSource(db: SqlDatabase, source: SourceConfig): Promi
   return row.id;
 }
 
-async function runStatements(db: SqlDatabase, statements: DbStatement[]): Promise<void> {
-  if (!statements.length) {
-    return;
-  }
-
-  if (typeof db.batch === 'function') {
-    await (db.batch as (items: DbStatement[]) => Promise<unknown[]>)(statements);
-    return;
-  }
-
-  for (const statement of statements) {
-    await statement.run();
-  }
-}
-
 async function resolveArticleId(db: SqlDatabase, record: IngestionRecord): Promise<number | null> {
   const row = await db
     .prepare('SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1')
@@ -74,34 +60,38 @@ async function resolveArticleId(db: SqlDatabase, record: IngestionRecord): Promi
   return row?.id ?? null;
 }
 
-async function linkArticleTags(db: SqlDatabase, articleId: number, tags: string[]): Promise<void> {
-  const statements = [...new Set(tags.map((value) => value.trim()).filter(Boolean))].map((tag) =>
+function uniqueLookupValues(values: string[]): string[] {
+  return [...new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean))];
+}
+
+function uniqueNormalizedExternalIds(values: string[]): string[] {
+  return [...new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean))];
+}
+
+function articleTagStatements(db: SqlDatabase, articleId: number, tags: string[]): DbStatement[] {
+  return uniqueLookupValues(tags).map((tag) =>
     db
       .prepare(
         `INSERT OR IGNORE INTO article_tags (article_id, tag_id)
-         SELECT ?, id FROM tags WHERE slug = ?`,
+         SELECT ?, id FROM tags WHERE LOWER(slug) = ?`,
       )
       .bind(articleId, tag),
   );
-
-  await runStatements(db, statements);
 }
 
-async function linkArticleCompanies(db: SqlDatabase, articleId: number, companies: string[]): Promise<void> {
-  const statements = [...new Set(companies.map((value) => value.trim()).filter(Boolean))].map((company) =>
+function articleCompanyStatements(db: SqlDatabase, articleId: number, companies: string[]): DbStatement[] {
+  return uniqueLookupValues(companies).map((company) =>
     db
       .prepare(
         `INSERT OR IGNORE INTO article_companies (article_id, company_id)
-         SELECT ?, id FROM companies WHERE slug = ? OR name = ? OR english_name = ?`,
+         SELECT ?, id FROM companies WHERE LOWER(slug) = ? OR LOWER(name) = ? OR LOWER(english_name) = ?`,
       )
       .bind(articleId, company, company, company),
   );
-
-  await runStatements(db, statements);
 }
 
-async function linkArticleLaunches(db: SqlDatabase, articleId: number, launchExternalIds: string[]): Promise<void> {
-  const statements = [...new Set(launchExternalIds.map((value) => value.trim()).filter(Boolean))].map((launchExternalId) =>
+function articleLaunchStatements(db: SqlDatabase, articleId: number, launchExternalIds: string[]): DbStatement[] {
+  return uniqueNormalizedExternalIds(launchExternalIds).map((launchExternalId) =>
     db
       .prepare(
         `INSERT OR IGNORE INTO article_launches (article_id, launch_external_id)
@@ -109,8 +99,14 @@ async function linkArticleLaunches(db: SqlDatabase, articleId: number, launchExt
       )
       .bind(articleId, launchExternalId),
   );
+}
 
-  await runStatements(db, statements);
+async function linkArticleRelations(db: SqlDatabase, articleId: number, record: IngestionRecord): Promise<void> {
+  await runDbStatements(db, [
+    ...articleTagStatements(db, articleId, record.item.tags),
+    ...articleCompanyStatements(db, articleId, record.item.companies),
+    ...articleLaunchStatements(db, articleId, record.item.relatedLaunchIds),
+  ]);
 }
 
 async function insertArticleRecord(
@@ -257,9 +253,7 @@ export async function persistArticleRecords(
     const articleId = await resolveArticleId(db, record);
 
     if (articleId) {
-      await linkArticleTags(db, articleId, record.item.tags);
-      await linkArticleCompanies(db, articleId, record.item.companies);
-      await linkArticleLaunches(db, articleId, record.item.relatedLaunchIds);
+      await linkArticleRelations(db, articleId, record);
     }
   }
 

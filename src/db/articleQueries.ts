@@ -1,3 +1,5 @@
+import { normalizeBoundedPositiveInteger, normalizePositiveInteger } from '../number';
+import { stripAggregatorPrefix } from '../sourceDisplay';
 import type { SqlDatabase } from './types';
 
 export type ArticleEntityRef = {
@@ -110,7 +112,7 @@ export const articleDetailRelationSelectFields = `${articleRelationSelectFields}
           'name', l.mission
         ))
         FROM article_launches al
-        JOIN launches l ON l.external_id = al.launch_external_id
+        JOIN launches l ON LOWER(l.external_id) = LOWER(al.launch_external_id)
         WHERE al.article_id = a.id
       ), '[]') AS launchesJson`;
 
@@ -175,23 +177,19 @@ export function toArticleDetail(row: ArticleDetailDbRow | null): ArticleDetailRo
 }
 
 function normalizePage(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return 1;
-  }
-
-  return Math.floor(value);
+  return normalizePositiveInteger(value, 1);
 }
 
 function normalizeLimit(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return defaultLimit;
-  }
-
-  return Math.min(Math.floor(value), maxLimit);
+  return normalizeBoundedPositiveInteger(value, defaultLimit, maxLimit);
 }
 
 function likeValue(value: string): string {
   return `%${value.trim().toLowerCase()}%`;
+}
+
+function normalizedEntityFilterValue(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 export function isMissingArticleTranslationColumnError(error: unknown): boolean {
@@ -236,6 +234,39 @@ export function createStoryKey(row: Pick<ArticleSummaryRow, 'title' | 'published
   return `${row.region}:${date}:${titleKey || compactTitle.slice(0, 18)}`;
 }
 
+function relatedSourceKey(label: string): string {
+  return stripAggregatorPrefix(label).toLocaleLowerCase('en-US');
+}
+
+function mergeEntityRefs(existing: ArticleEntityRef[], next: ArticleEntityRef[]): ArticleEntityRef[] {
+  const merged: ArticleEntityRef[] = [];
+  const indexByKey = new Map<string, number>();
+
+  for (const entity of [...existing, ...next]) {
+    const slug = entity.slug.trim();
+    const key = slug.toLocaleLowerCase('en-US');
+
+    if (!slug) {
+      continue;
+    }
+
+    const existingIndex = indexByKey.get(key);
+
+    if (existingIndex !== undefined) {
+      if (!merged[existingIndex].name.trim() && entity.name.trim()) {
+        merged[existingIndex] = { ...entity, slug };
+      }
+
+      continue;
+    }
+
+    indexByKey.set(key, merged.length);
+    merged.push({ ...entity, slug });
+  }
+
+  return merged;
+}
+
 export function clusterArticleRows(rows: ArticleSummaryRow[], limit: number): ArticleSummaryRow[] {
   const clusters = new Map<string, ArticleSummaryRow & { relatedSources: string[] }>();
 
@@ -254,8 +285,13 @@ export function clusterArticleRows(rows: ArticleSummaryRow[], limit: number): Ar
     }
 
     const publisherLabel = row.publisherName ?? row.sourceName;
+    const tags = mergeEntityRefs(existing.tags, row.tags);
+    const companies = mergeEntityRefs(existing.companies, row.companies);
 
-    if (!existing.relatedSources.includes(publisherLabel)) {
+    existing.tags = tags;
+    existing.companies = companies;
+
+    if (!existing.relatedSources.some((source) => relatedSourceKey(source) === relatedSourceKey(publisherLabel))) {
       existing.relatedSources.push(publisherLabel);
       existing.relatedSourceCount = existing.relatedSources.length;
     }
@@ -264,6 +300,8 @@ export function clusterArticleRows(rows: ArticleSummaryRow[], limit: number): Ar
       clusters.set(storyKey, {
         ...row,
         storyKey,
+        tags,
+        companies,
         relatedSourceCount: existing.relatedSourceCount,
         relatedSources: existing.relatedSources,
       });
@@ -302,26 +340,28 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       values.push(...(includeTranslationFields ? [query, query, query, query] : [query, query, query]));
     }
 
-    if (filters.tag) {
+    if (filters.tag?.trim()) {
       conditions.push(
         `EXISTS (
         SELECT 1 FROM article_tags at
         JOIN tags t ON t.id = at.tag_id
-        WHERE at.article_id = a.id AND t.slug = ?
+        WHERE at.article_id = a.id AND (LOWER(t.slug) = ? OR LOWER(t.name) = ?)
       )`,
       );
-      values.push(filters.tag);
+      const tagFilter = normalizedEntityFilterValue(filters.tag);
+      values.push(tagFilter, tagFilter);
     }
 
-    if (filters.company) {
+    if (filters.company?.trim()) {
       conditions.push(
         `EXISTS (
         SELECT 1 FROM article_companies ac
         JOIN companies c ON c.id = ac.company_id
-        WHERE ac.article_id = a.id AND c.slug = ?
+        WHERE ac.article_id = a.id AND (LOWER(c.slug) = ? OR LOWER(c.name) = ? OR LOWER(c.english_name) = ?)
       )`,
       );
-      values.push(filters.company);
+      const companyFilter = normalizedEntityFilterValue(filters.company);
+      values.push(companyFilter, companyFilter, companyFilter);
     }
 
     if (filters.category === 'policy') {

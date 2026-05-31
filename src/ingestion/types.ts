@@ -9,6 +9,8 @@ export type SourceType =
 export type SourceRegion = 'cn' | 'global';
 export type SourcePublicCategory = 'official' | 'media' | 'organization' | 'notice' | 'data' | 'source';
 export type SourceAccessStatus = 'direct' | 'limited' | 'blocked' | 'unknown';
+export const sourceDedupeStrategies = ['url_title_source', 'canonical_url_title', 'external_id'] as const;
+export type SourceDedupeStrategy = (typeof sourceDedupeStrategies)[number];
 
 export type SourceConfig = {
   key: string;
@@ -21,7 +23,7 @@ export type SourceConfig = {
   purpose: string;
   expected_content: string;
   risk_notes: string;
-  dedupe_strategy: string;
+  dedupe_strategy: SourceDedupeStrategy;
   default_tags?: string[];
   default_companies?: string[];
   include_terms?: string[];
