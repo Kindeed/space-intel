@@ -121,8 +121,23 @@ function isCnsaArticleUrl(url: string): boolean {
   }
 }
 
+function isSectionLikeOfficialUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.toLowerCase();
+
+    return path === '' || path === '/' || path.endsWith('/') || /\/(?:index|default)\.s?html?$/.test(path);
+  } catch {
+    return true;
+  }
+}
+
 function isAcceptableOfficialLink(source: SourceConfig, url: string): boolean {
-  return source.key !== 'cnsa-news' || isCnsaArticleUrl(url);
+  if (source.key === 'cnsa-news') {
+    return isCnsaArticleUrl(url);
+  }
+
+  return !isSectionLikeOfficialUrl(url);
 }
 
 function topicTagsForTitle(title: string): string[] {
@@ -207,8 +222,9 @@ export const officialPageCollector: SourceCollector = {
       }
 
       const signalText = `${link.title} ${link.contextText} ${link.url}`;
+      const publishedAt = extractDate(signalText);
 
-      if (seen.has(link.url) || !isAcceptableOfficialLink(source, link.url) || !isRelevant(source, signalText)) {
+      if (seen.has(link.url) || !publishedAt || !isAcceptableOfficialLink(source, link.url) || !isRelevant(source, signalText)) {
         continue;
       }
 
@@ -222,7 +238,7 @@ export const officialPageCollector: SourceCollector = {
         originalTitle: link.title,
         summary: `官方发布：${title}`,
         url: link.url,
-        publishedAt: extractDate(signalText) ?? context.now().toISOString(),
+        publishedAt,
         language: source.region === 'cn' ? 'zh' : 'en',
         region: source.region,
         rawId: link.url,

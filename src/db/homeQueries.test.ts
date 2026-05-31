@@ -67,6 +67,8 @@ describe('home ranking queries', () => {
     expect(db.lastQuery).toContain('COALESCE(MAX(c.weight), 0) AS curationWeight');
     expect(db.lastQuery).toContain("s.key = 'cnsa-news'");
     expect(db.lastQuery).toContain("a.url LIKE 'https://www.cnsa.gov.cn/%/index.html'");
+    expect(db.lastQuery).toContain("s.type = 'official_page'");
+    expect(db.lastQuery).toContain("ABS((julianday(a.published_at) - julianday(a.created_at)) * 86400) < 300");
     expect(db.lastQuery).toContain('ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC');
     expect(db.lastValues).toEqual([50]);
   });

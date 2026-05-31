@@ -130,6 +130,8 @@ describe('topic queries', () => {
     expect(db.queries[1]).toContain('AS companiesJson');
     expect(db.queries[1]).toContain("s.key = 'cnsa-news'");
     expect(db.queries[1]).toContain("a.url LIKE 'https://www.cnsa.gov.cn/%/index.html'");
+    expect(db.queries[1]).toContain("s.type = 'official_page'");
+    expect(db.queries[1]).toContain("ABS((julianday(a.published_at) - julianday(a.created_at)) * 86400) < 300");
     expect(db.queries[2]).not.toContain('weight,');
     expect(db.values).toEqual([['reusable-rockets'], [topic.id], [topic.slug]]);
   });
