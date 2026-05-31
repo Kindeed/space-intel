@@ -65,6 +65,8 @@ describe('home ranking queries', () => {
     await listRankedHomeArticles(db, 100);
 
     expect(db.lastQuery).toContain('COALESCE(MAX(c.weight), 0) AS curationWeight');
+    expect(db.lastQuery).toContain("s.key = 'cnsa-news'");
+    expect(db.lastQuery).toContain("a.url LIKE 'https://www.cnsa.gov.cn/%/index.html'");
     expect(db.lastQuery).toContain('ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC');
     expect(db.lastValues).toEqual([50]);
   });

@@ -25,7 +25,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   try {
     const configuredSources = parseSourcesConfig(sourcesConfig);
     const metadataByKey = new Map(configuredSources.map((source) => [source.key, source]));
-    const enabledSources = await listEnabledSources(env.DB);
+    const configuredEnabledKeys = new Set(configuredSources.filter((source) => source.enabled).map((source) => source.key));
+    const enabledSources = (await listEnabledSources(env.DB)).filter((source) => configuredEnabledKeys.has(source.key));
     const items = enabledSources.map((source) => {
       const configured = metadataByKey.get(source.key);
       const metadata = configured

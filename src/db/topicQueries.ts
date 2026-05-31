@@ -4,6 +4,7 @@ import {
   articleTranslationSelectFields,
   isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
+  publicArticleVisibilityCondition,
   toArticleSummary,
   type ArticleSummaryDbRow,
   type ArticleSummaryRow,
@@ -113,7 +114,7 @@ export async function getTopicBySlug(db: SqlDatabase, slug: string): Promise<Top
       FROM articles a
       JOIN article_tags at ON at.article_id = a.id
       JOIN sources s ON s.id = a.source_id
-      WHERE at.tag_id = ?
+      WHERE at.tag_id = ? AND ${publicArticleVisibilityCondition}
       ORDER BY a.published_at DESC, a.id DESC
       LIMIT 20`,
       )

@@ -4,6 +4,7 @@ import {
   articleTranslationSelectFields,
   isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
+  publicArticleVisibilityCondition,
   toArticleSummary,
   type ArticleSummaryDbRow,
   type ArticleSummaryRow,
@@ -58,6 +59,7 @@ export async function listRankedHomeArticles(db: SqlDatabase, limit = 20): Promi
       FROM articles a
       JOIN sources s ON s.id = a.source_id
       LEFT JOIN curations c ON c.item_url = a.url AND c.enabled = 1 AND c.target_type IN ('home', 'pinned')
+      WHERE ${publicArticleVisibilityCondition}
       GROUP BY a.id
       ORDER BY curationWeight DESC, a.published_at DESC, sourceCredibility DESC, a.id DESC
       LIMIT ?`,

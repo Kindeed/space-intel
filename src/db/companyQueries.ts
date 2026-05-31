@@ -4,6 +4,7 @@ import {
   articleTranslationSelectFields,
   isMissingArticlePublisherColumnError,
   isMissingArticleTranslationColumnError,
+  publicArticleVisibilityCondition,
   toArticleSummary,
   type ArticleSummaryDbRow,
   type ArticleSummaryRow,
@@ -114,7 +115,7 @@ export async function getCompanyBySlug(db: SqlDatabase, slug: string): Promise<C
       FROM articles a
       JOIN article_companies ac ON ac.article_id = a.id
       JOIN sources s ON s.id = a.source_id
-      WHERE ac.company_id = ?
+      WHERE ac.company_id = ? AND ${publicArticleVisibilityCondition}
       ORDER BY a.published_at DESC, a.id DESC
       LIMIT 20`,
       )
