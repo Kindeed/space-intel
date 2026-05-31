@@ -78,6 +78,9 @@ describe('public article serializers', () => {
   });
 
   it('normalizes public category filter labels to stored category filters', () => {
+    expect(publicArticleCategoryFilter(' 官方 ')).toBe('official');
+    expect(publicArticleCategoryFilter('官方信息')).toBe('official');
+    expect(publicArticleCategoryFilter('Official')).toBe('official');
     expect(publicArticleCategoryFilter(' 政策监管 ')).toBe('policy');
     expect(publicArticleCategoryFilter('政策   监管')).toBe('policy');
     expect(publicArticleCategoryFilter('政策')).toBe('policy');

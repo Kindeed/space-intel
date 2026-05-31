@@ -478,6 +478,25 @@
       "dedupe_strategy": "url_title_source"
     },
     {
+      "key": "cnsa-policy",
+      "name": "国家航天局政策公告",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.cnsa.gov.cn/n6758823/n6758839/index.html",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Track CNSA policy, regulation, standards, and major commercial-space notices from the public official list.",
+      "expected_content": "Official policy and notice metadata, publication dates when available, and original links.",
+      "risk_notes": "Public official list only; store metadata, generated summaries, and source links without reproducing full policy bodies.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "official",
+      "access_domestic": "direct",
+      "access_global": "direct",
+      "default_tags": [
+        "policy-and-regulation"
+      ]
+    },
+    {
       "key": "miit-news",
       "name": "工业和信息化部新闻",
       "type": "official_page",
@@ -547,6 +566,46 @@
       "expected_content": "Public procurement listing metadata, notice titles, dates when available, and original notice links.",
       "risk_notes": "Public listing page only; do not bypass login, CAPTCHA, robots controls, or store full tender documents.",
       "dedupe_strategy": "url_title_source",
+      "default_tags": [
+        "space-procurement",
+        "policy-and-regulation"
+      ]
+    },
+    {
+      "key": "ccgp-local-procurement",
+      "name": "中国政府采购网地方公告",
+      "type": "procurement_page",
+      "region": "cn",
+      "url": "https://www.ccgp.gov.cn/cggg/dfgg/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Monitor local government procurement notices for satellite, remote-sensing, measurement-control, space-information, and aerospace-related projects.",
+      "expected_content": "Public local procurement listing metadata, notice titles, dates when available, buyer region, and original notice links.",
+      "risk_notes": "Public listing page only; filter strictly by aerospace procurement terms, do not bypass login/CAPTCHA controls, and do not store tender-document bodies.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "notice",
+      "access_domestic": "direct",
+      "access_global": "direct",
+      "default_tags": [
+        "space-procurement",
+        "policy-and-regulation"
+      ]
+    },
+    {
+      "key": "national-public-resource-space-procurement",
+      "name": "全国公共资源交易平台航天公告",
+      "type": "procurement_page",
+      "region": "cn",
+      "url": "https://www.ggzy.gov.cn/",
+      "credibility": 5,
+      "enabled": true,
+      "purpose": "Monitor national public-resource transaction notices for commercial-space facilities, satellite applications, remote-sensing, and aerospace project tenders.",
+      "expected_content": "Public transaction listing metadata, notice titles, dates when available, and original links.",
+      "risk_notes": "Broad national portal; filter strictly by aerospace procurement terms and keep only public metadata and source links.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "notice",
+      "access_domestic": "direct",
+      "access_global": "direct",
       "default_tags": [
         "space-procurement",
         "policy-and-regulation"
@@ -1022,6 +1081,107 @@
       ],
       "default_companies": [
         "长光卫星"
+      ]
+    },
+    {
+      "key": "satbb-satellite-news",
+      "name": "卫星通信观察",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.satbb.com/",
+      "credibility": 3,
+      "enabled": true,
+      "purpose": "Track public Chinese-language satellite communication, direct-to-device, constellation, and space-connectivity industry updates.",
+      "expected_content": "Public article-list metadata, titles, dates when available, short summaries, and original links.",
+      "risk_notes": "Industry media site; RSS feed is closed, so use only the public homepage/list markup and label as media, not official policy.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "media",
+      "access_domestic": "direct",
+      "access_global": "direct",
+      "default_tags": [
+        "satellite-internet",
+        "commercial-remote-sensing"
+      ],
+      "include_terms": [
+        "卫星",
+        "星座",
+        "星链",
+        "低轨",
+        "卫星互联网",
+        "卫星通信",
+        "遥感",
+        "地理空间",
+        "D2D",
+        "NTN",
+        "Starlink",
+        "SpaceX"
+      ]
+    },
+    {
+      "key": "future-space-dynamics",
+      "name": "未来天玑动态",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://futurephecda.com/",
+      "credibility": 3,
+      "enabled": true,
+      "purpose": "Track public commercial-space industry dynamics, launch, company, investment, and policy-adjacent updates from Future Space's public site.",
+      "expected_content": "Public article-list metadata, titles, dates when available, short summaries, tags, and original links.",
+      "risk_notes": "Industry data and media site; store only metadata and links, and do not treat reports or indices as official records.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "media",
+      "access_domestic": "direct",
+      "access_global": "direct",
+      "default_tags": [
+        "domestic-private-launch",
+        "satellite-internet"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "火箭",
+        "发射",
+        "卫星",
+        "星座",
+        "卫星互联网",
+        "遥感",
+        "空天",
+        "太空军",
+        "SpaceX",
+        "FAA"
+      ]
+    },
+    {
+      "key": "zcaia-news",
+      "name": "中关村商业航天联盟",
+      "type": "official_page",
+      "region": "cn",
+      "url": "https://www.zcaia.org.cn/",
+      "credibility": 4,
+      "enabled": true,
+      "purpose": "Track public updates, notices, industry observations, and event information from the commercial-space industry alliance.",
+      "expected_content": "Public organization news metadata, titles, dates when available, and original links.",
+      "risk_notes": "Industry organization source, not a government policy source; classify as organization and avoid mixing event notices with official policy unless tags clearly match.",
+      "dedupe_strategy": "url_title_source",
+      "public_category": "organization",
+      "access_domestic": "direct",
+      "access_global": "direct",
+      "default_tags": [
+        "domestic-private-launch",
+        "satellite-internet"
+      ],
+      "include_terms": [
+        "商业航天",
+        "航天",
+        "火箭",
+        "卫星",
+        "空间应用",
+        "论坛",
+        "大会",
+        "联盟",
+        "产业",
+        "政策",
+        "行动计划"
       ]
     },
     {

@@ -406,7 +406,17 @@ export async function listArticles(db: SqlDatabase, filters: ArticleListFilters 
       values.push(companyFilter, companyFilter, companyFilter);
     }
 
-    if (filters.category === 'policy') {
+    if (filters.category === 'official') {
+      conditions.push(
+        `s.type IN ('official_page', 'procurement_page')
+        AND EXISTS (
+          SELECT 1 FROM article_tags at_official
+          JOIN tags t_official ON t_official.id = at_official.tag_id
+          WHERE at_official.article_id = a.id AND t_official.slug IN (?, ?)
+        )`,
+      );
+      values.push('policy-and-regulation', 'space-procurement');
+    } else if (filters.category === 'policy') {
       conditions.push(
         `EXISTS (
           SELECT 1 FROM article_tags at_policy

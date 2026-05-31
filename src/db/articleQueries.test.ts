@@ -218,6 +218,17 @@ describe('article queries', () => {
     expect(db.lastValues).toEqual(['policy-and-regulation', 81, 0]);
   });
 
+  it('filters official articles to official and procurement source records', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [article];
+
+    await listArticles(db, { category: 'official' });
+
+    expect(db.lastQuery).toContain("s.type IN ('official_page', 'procurement_page')");
+    expect(db.lastQuery).toContain('t_official.slug IN (?, ?)');
+    expect(db.lastValues).toEqual(['policy-and-regulation', 'space-procurement', 81, 0]);
+  });
+
   it('falls back to legacy article list queries when translation columns are missing', async () => {
     const db = new FakeDatabase();
     db.failTranslationColumns = true;

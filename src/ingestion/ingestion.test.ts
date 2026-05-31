@@ -2050,7 +2050,7 @@ describe('procurement page collector', () => {
               <ul>
                 <li>
                   <a href="./general.htm">节能降碳产品政府采购制度意见</a>
-                  <a href="./space.htm">某卫星遥感数据采购项目中标公告</a>
+                  <span>2026-05-08</span><a href="./space.htm">某卫星遥感数据采购项目中标公告</a>
                 </li>
               </ul>
             </body>
@@ -2062,7 +2062,7 @@ describe('procurement page collector', () => {
     expect(items.map((item) => item.title)).toEqual(['某卫星遥感数据采购项目中标公告']);
   });
 
-  it('falls back to collection time when procurement page dates are invalid', async () => {
+  it('skips procurement page candidates when dates are invalid', async () => {
     const [source] = parseSourcesConfig({
       sources: [
         {
@@ -2097,10 +2097,7 @@ describe('procurement page collector', () => {
         ),
     });
 
-    expect(items[0]).toMatchObject({
-      title: '某卫星遥感数据采购项目中标公告',
-      publishedAt: '2026-05-09T00:00:00.000Z',
-    });
+    expect(items).toEqual([]);
   });
 
   it('removes leading source dates from procurement page public titles', async () => {

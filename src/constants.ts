@@ -6,7 +6,7 @@ export const primaryNav: MissionNavItem[] = [
   { label: '总览', to: '/', icon: Home, signal: '最新' },
   { label: '资讯', to: '/articles', icon: Newspaper, signal: '聚合' },
   { label: '发射', to: '/launches', icon: Rocket, signal: '窗口' },
-  { label: '政策', to: '/policy', icon: FileText, signal: '官方' },
+  { label: '官方', to: '/official', icon: FileText, signal: '政策' },
 ];
 
 export const secondaryNav: MissionNavItem[] = [
@@ -20,5 +20,5 @@ export const channelChips = [
   ['全部', '/articles'],
   ['国内', '/articles?region=cn'],
   ['国际', '/articles?region=global'],
-  ['政策', '/articles?category=policy'],
+  ['官方', '/articles?category=official'],
 ];

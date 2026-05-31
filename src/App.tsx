@@ -29,6 +29,7 @@ export function AppRoutes() {
             <Route path="/companies/:slug" element={<CompanyDetailPage />} />
             <Route path="/launches" element={<LaunchesPage />} />
             <Route path="/launches/:slug" element={<LaunchDetailPage />} />
+            <Route path="/official" element={<PolicyPage />} />
             <Route path="/policy" element={<PolicyPage />} />
             <Route path="/topics" element={<TopicsPage />} />
             <Route path="/topics/:slug" element={<TopicDetailPage />} />
