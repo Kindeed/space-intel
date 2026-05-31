@@ -1,4 +1,5 @@
 import { getTopicBySlug } from '../../../src/db';
+import { publicTopicDetail } from '../_topics';
 import { logApiError, publicError } from '../_response';
 
 type Env = {
@@ -11,10 +12,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const topic = await getTopicBySlug(env.DB, slug ?? '');
 
     if (!topic) {
-      return Response.json({ error: 'Topic not found' }, { status: 404 });
+      return publicError('专题不存在或已更新。', 404);
     }
 
-    return Response.json(topic);
+    return Response.json(publicTopicDetail(topic));
   } catch (error) {
     logApiError('Failed to load topic', error);
     return publicError();

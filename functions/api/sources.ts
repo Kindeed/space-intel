@@ -1,18 +1,32 @@
 import sourcesConfig from '../../config/sources.generated.json';
-import { listEnabledSources, listEnabledSourceTypeStats } from '../../src/db';
+import { listEnabledSources } from '../../src/db';
 import { parseSourcesConfig, type SourceAccessStatus, type SourcePublicCategory } from '../../src/ingestion';
-import { sourceDisplayMetadata, sourceDisplayName } from '../../src/sourceDisplay';
+import {
+  accessStatusLabel,
+  accessStatusRank,
+  compareDisplayText,
+  publicCategoryRank,
+  sourceAccessSummaryLabel,
+  sourceDisplayMetadata,
+  sourceDisplayName,
+  stripAggregatorPrefix,
+} from '../../src/sourceDisplay';
 import { logApiError, publicError } from './_response';
 
 type Env = {
   DB: D1Database;
 };
 
+function fallbackSourceDisplayName(name: string): string {
+  return stripAggregatorPrefix(name) || '来源';
+}
+
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   try {
     const configuredSources = parseSourcesConfig(sourcesConfig);
     const metadataByKey = new Map(configuredSources.map((source) => [source.key, source]));
-    const items = (await listEnabledSources(env.DB)).map((source) => {
+    const enabledSources = await listEnabledSources(env.DB);
+    const items = enabledSources.map((source) => {
       const configured = metadataByKey.get(source.key);
       const metadata = configured
         ? sourceDisplayMetadata(configured)
@@ -26,13 +40,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
           };
 
       return {
-        ...source,
-        name: configured ? sourceDisplayName(configured) : source.name,
-        ...metadata,
+        name: configured ? sourceDisplayName(configured) : fallbackSourceDisplayName(source.name),
+        publicCategory: metadata.publicCategory,
+        publicCategoryLabel: metadata.publicCategoryLabel,
+        domesticAccessLabel: accessStatusLabel(metadata.accessDomestic),
+        globalAccessLabel: accessStatusLabel(metadata.accessGlobal),
+        accessNote: metadata.accessNote,
+        publicBadge: metadata.publicBadge,
+        accessDomestic: metadata.accessDomestic,
       };
     });
-    const stats = await listEnabledSourceTypeStats(env.DB);
-    const publicStats = items.reduce<
+    const publicStatsWithCounts = items.reduce<
       Array<{
         category: SourcePublicCategory;
         label: string;
@@ -74,19 +92,45 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 
       return acc;
     }, []);
-    const accessStats = items.reduce<Array<{ status: SourceAccessStatus; count: number }>>((acc, source) => {
+    const publicStats = publicStatsWithCounts
+      .sort((left, right) => publicCategoryRank(left.category) - publicCategoryRank(right.category))
+      .map(({ directCount, limitedCount, blockedCount, unknownCount, ...source }) => ({
+        label: source.label,
+        count: source.count,
+        accessSummaryLabel: sourceAccessSummaryLabel({
+          directCount,
+          limitedCount,
+          blockedCount,
+          unknownCount,
+        }),
+      }));
+    const accessStatsWithStatus = items.reduce<Array<{ status: SourceAccessStatus; label: string; count: number }>>((acc, source) => {
+      const label = accessStatusLabel(source.accessDomestic);
       const existing = acc.find((item) => item.status === source.accessDomestic);
 
       if (existing) {
         existing.count += 1;
       } else {
-        acc.push({ status: source.accessDomestic, count: 1 });
+        acc.push({ status: source.accessDomestic, label, count: 1 });
       }
 
       return acc;
     }, []);
+    const accessStats = accessStatsWithStatus
+      .sort((left, right) => accessStatusRank(left.status) - accessStatusRank(right.status))
+      .map(({ label, count }) => ({ label, count }));
+    const publicItems = items
+      .sort((left, right) => publicCategoryRank(left.publicCategory) - publicCategoryRank(right.publicCategory) || compareDisplayText(left.name, right.name))
+      .map((source) => ({
+        name: source.name,
+        categoryLabel: source.publicCategoryLabel,
+        domesticAccessLabel: source.domesticAccessLabel,
+        globalAccessLabel: source.globalAccessLabel,
+        accessNote: source.accessNote,
+        publicBadge: source.publicBadge,
+      }));
 
-    return Response.json({ items, stats, publicStats, accessStats });
+    return Response.json({ items: publicItems, publicStats, accessStats });
   } catch (error) {
     logApiError('Failed to list sources', error);
     return publicError();

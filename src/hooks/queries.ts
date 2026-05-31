@@ -17,6 +17,7 @@ const autoRefreshInterval = 5 * 60_000;
 type ApiQueryOptions = {
   staleTime?: number;
   refetchInterval?: number | false;
+  retry?: boolean | number;
 };
 
 export async function fetchJson<T>(path: string): Promise<T> {
@@ -38,6 +39,7 @@ export function useApiQuery<T>(key: readonly unknown[], path: string | null, opt
     gcTime: 5 * 60_000,
     refetchInterval: options.refetchInterval ?? false,
     refetchOnWindowFocus: false,
+    retry: options.retry,
   });
 }
 
@@ -70,7 +72,7 @@ export function useLaunchDetailQuery(slug: string) {
 }
 
 export function useSourcesQuery() {
-  return useApiQuery<ApiSourceListResult>(['sources'], '/api/sources', { staleTime: 15 * 60_000 });
+  return useApiQuery<ApiSourceListResult>(['sources'], '/api/sources', { staleTime: 15 * 60_000, retry: false });
 }
 
 export function useTopicsQuery() {

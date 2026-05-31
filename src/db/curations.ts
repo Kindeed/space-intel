@@ -1,4 +1,5 @@
 import type { CurationConfigRecord } from '../curations/config';
+import { runDbStatements, sumRunChanges } from './statements';
 import type { SqlDatabase } from './types';
 
 export type PersistCurationsResult = {
@@ -11,20 +12,17 @@ export async function replaceConfiguredCurations(
 ): Promise<PersistCurationsResult> {
   await db.prepare("DELETE FROM curations WHERE target_type IN ('home', 'pinned', 'topic')").run();
 
-  let inserted = 0;
-
-  for (const record of records) {
-    const result = await db
+  const statements = records.map((record) =>
+    db
       .prepare(
         `INSERT INTO curations (
           target_type, target_key, item_url, weight, note, enabled
         ) VALUES (?, ?, ?, ?, ?, ?)`,
       )
       .bind(record.targetType, record.targetKey, record.itemUrl, record.weight, record.note, record.enabled)
-      .run();
-
-    inserted += result.meta?.changes ?? 0;
-  }
+  );
+  const results = await runDbStatements(db, statements);
+  const inserted = sumRunChanges(results);
 
   return { inserted };
 }

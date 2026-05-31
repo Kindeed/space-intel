@@ -1,3 +1,4 @@
+import { normalizeBoundedPositiveInteger, normalizePositiveInteger } from '../number';
 import type { SqlDatabase } from './types';
 
 export type LaunchRow = {
@@ -33,23 +34,67 @@ const defaultLimit = 20;
 const maxLimit = 50;
 
 function normalizePage(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return 1;
-  }
-
-  return Math.floor(value);
+  return normalizePositiveInteger(value, 1);
 }
 
 function normalizeLimit(value: number | undefined): number {
-  if (!value || !Number.isFinite(value) || value < 1) {
-    return defaultLimit;
-  }
-
-  return Math.min(Math.floor(value), maxLimit);
+  return normalizeBoundedPositiveInteger(value, defaultLimit, maxLimit);
 }
 
 function likeValue(value: string): string {
   return `%${value.trim().toLowerCase()}%`;
+}
+
+function statusFilterCondition(status: string): { clause: string; values: string[] } {
+  const normalized = status.trim().toLowerCase();
+
+  if (normalized === 'go') {
+    return {
+      clause:
+        "((LOWER(status) = ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ?) AND LOWER(status) NOT LIKE ? AND LOWER(status) NOT LIKE ?)",
+      values: ['go', 'go %', '% go', '% go %', '%no go%', '%no-go%'],
+    };
+  }
+
+  if (normalized === 'success') {
+    return {
+      clause: '((LOWER(status) LIKE ? OR LOWER(status) LIKE ?) AND LOWER(status) NOT LIKE ? AND LOWER(status) NOT LIKE ?)',
+      values: ['%success%', '%成功%', '%unsuccess%', '%不成功%'],
+    };
+  }
+
+  if (normalized === 'fail') {
+    return {
+      clause: '(LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ?)',
+      values: ['%fail%', '%unsuccess%', '%不成功%', '%失败%', '%异常%'],
+    };
+  }
+
+  if (normalized === 'hold') {
+    return {
+      clause: '(LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ?)',
+      values: ['%hold%', '%no go%', '%no-go%', '%等待%'],
+    };
+  }
+
+  if (normalized === 'confirm') {
+    return {
+      clause: '(LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ? OR LOWER(status) LIKE ?)',
+      values: ['%confirm%', '%tbc%', '%tbd%', '%to be determined%', '%to be confirmed%', '%待确认%', '%确认%'],
+    };
+  }
+
+  if (normalized === 'review') {
+    return {
+      clause: '(LOWER(status) LIKE ? OR LOWER(status) LIKE ?)',
+      values: ['%review%', '%评审%'],
+    };
+  }
+
+  return {
+    clause: 'LOWER(status) LIKE ?',
+    values: [likeValue(status)],
+  };
 }
 
 export async function listLaunches(db: SqlDatabase, filters: LaunchListFilters = {}): Promise<LaunchListResult> {
@@ -65,13 +110,14 @@ export async function listLaunches(db: SqlDatabase, filters: LaunchListFilters =
   }
 
   if (filters.status) {
-    conditions.push('status = ?');
-    values.push(filters.status);
+    const statusCondition = statusFilterCondition(filters.status);
+    conditions.push(statusCondition.clause);
+    values.push(...statusCondition.values);
   }
 
   if (filters.provider) {
-    conditions.push('provider = ?');
-    values.push(filters.provider);
+    conditions.push('LOWER(provider) LIKE ?');
+    values.push(likeValue(filters.provider));
   }
 
   if (filters.query?.trim()) {
@@ -114,12 +160,15 @@ export async function listLaunches(db: SqlDatabase, filters: LaunchListFilters =
 }
 
 export async function getLaunchByIdOrExternalId(db: SqlDatabase, idOrExternalId: string): Promise<LaunchRow | null> {
-  if (!idOrExternalId.trim()) {
+  const normalizedId = idOrExternalId.trim();
+
+  if (!normalizedId) {
     return null;
   }
 
-  const numericId = Number(idOrExternalId);
-  const isNumericId = Number.isInteger(numericId) && numericId > 0;
+  const numericId = normalizePositiveInteger(normalizedId, 0);
+  const isNumericId = numericId > 0;
+  const lookupValue = isNumericId ? numericId : normalizedId.toLowerCase();
 
   return db
     .prepare(
@@ -134,8 +183,8 @@ export async function getLaunchByIdOrExternalId(db: SqlDatabase, idOrExternalId:
         status,
         raw_url AS rawUrl
       FROM launches
-      WHERE ${isNumericId ? 'id = ?' : 'external_id = ?'}`,
+      WHERE ${isNumericId ? 'id = ?' : 'LOWER(external_id) = ?'}`,
     )
-    .bind(isNumericId ? numericId : idOrExternalId)
+    .bind(lookupValue)
     .first<LaunchRow>();
 }

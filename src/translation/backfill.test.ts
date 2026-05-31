@@ -92,6 +92,31 @@ describe('translation backfill', () => {
     ]);
   });
 
+  it('rejects decimal backfill limits', async () => {
+    const db = new FakeTranslationDatabase();
+    await backfillArticleTranslations(
+      db,
+      {
+        TRANSLATION_ENABLED: 'true',
+        TRANSLATION_API_URL: 'https://translate.example.com/v1/chat/completions',
+        TRANSLATION_API_TOKEN: 'test-token',
+      },
+      {
+        now: () => new Date('2026-05-09T00:00:00Z'),
+        fetch: vi.fn(async () =>
+          new Response(
+            JSON.stringify({
+              choices: [{ message: { content: '{"title":"中文标题","summary":"中文摘要"}' } }],
+            }),
+          ),
+        ),
+      },
+      5.9,
+    );
+
+    expect(db.lastValues).toEqual([20]);
+  });
+
   it('skips gracefully when production D1 is missing translation columns', async () => {
     const db = new FakeTranslationDatabase();
     db.queryError = new Error('D1_ERROR: no such column: translation_status');

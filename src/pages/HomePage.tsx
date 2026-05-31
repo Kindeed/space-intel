@@ -5,7 +5,7 @@ import { MissionNav } from '../components/MissionNav';
 import { SectionTitle } from '../components/SectionTitle';
 import { SkeletonFeed } from '../components/SkeletonFeed';
 import { useHomeQuery } from '../hooks/queries';
-import { articleFromApi, safeLoadMessage } from '../utils';
+import { articleFromApi, safeLoadMessage, shouldShowEmptyState } from '../utils';
 
 export function HomePage() {
   const home = useHomeQuery();
@@ -24,7 +24,7 @@ export function HomePage() {
         <div className="timeline-feed">
           {featured ? <ArticleCard item={featured} feature /> : null}
           {feed.slice(1).map((item) => <ArticleCard key={item.slug} item={item} />)}
-          {!home.isLoading && !feed.length ? <div className="empty-state">暂无可展示线索。</div> : null}
+          {shouldShowEmptyState(home.isLoading, home.error, feed.length) ? <div className="empty-state">暂无可展示线索。</div> : null}
         </div>
       </section>
       <LiveHud stats={home.data?.stats} />

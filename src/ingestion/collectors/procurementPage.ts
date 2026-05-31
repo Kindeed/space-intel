@@ -1,5 +1,5 @@
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
-import { extractDate as extractHtmlDate, extractHtmlListLinks } from '../htmlList';
+import { extractDate as extractHtmlDate, extractHtmlListLinks, stripLeadingDatePrefix } from '../htmlList';
 
 const domainTerms = [
   '航天',
@@ -41,8 +41,11 @@ function titleTags(title: string): string[] {
   return [...tags];
 }
 
-function hasSpaceProcurementSignal(text: string): boolean {
-  return domainTerms.some((term) => text.includes(term)) && procurementTerms.some((term) => text.includes(term));
+function hasSpaceProcurementSignal(title: string, contextText: string): boolean {
+  const hasDomainSignal = domainTerms.some((term) => title.includes(term));
+  const hasProcurementSignal = procurementTerms.some((term) => `${title} ${contextText}`.includes(term));
+
+  return hasDomainSignal && hasProcurementSignal;
 }
 
 export const procurementPageCollector: SourceCollector = {
@@ -62,6 +65,7 @@ export const procurementPageCollector: SourceCollector = {
     const html = await response.text();
     const seen = new Set<string>();
     const items: NormalizedItem[] = [];
+    const maxItems = source.max_items ?? 30;
 
     for (const link of extractHtmlListLinks(html, source.url)) {
       if (seen.has(link.url)) {
@@ -70,17 +74,19 @@ export const procurementPageCollector: SourceCollector = {
 
       const signalText = `${link.title} ${link.contextText}`;
 
-      if (!hasSpaceProcurementSignal(signalText)) {
+      if (!hasSpaceProcurementSignal(link.title, link.contextText)) {
         continue;
       }
 
       seen.add(link.url);
+      const title = stripLeadingDatePrefix(link.title);
       items.push({
         sourceKey: source.key,
         sourceName: source.name,
         publisherName: source.name,
-        title: link.title,
-        summary: `采购公告：${link.title}`,
+        title,
+        ...(title === link.title ? {} : { originalTitle: link.title }),
+        summary: `采购公告：${title}`,
         url: link.url,
         publishedAt: extractDate(signalText, context.now()),
         language: 'zh',
@@ -91,7 +97,7 @@ export const procurementPageCollector: SourceCollector = {
         tags: [...new Set([...(source.default_tags ?? []), ...titleTags(signalText)])],
       });
 
-      if (items.length >= 30) {
+      if (items.length >= maxItems) {
         break;
       }
     }

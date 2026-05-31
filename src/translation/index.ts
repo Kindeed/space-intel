@@ -1,5 +1,6 @@
 import type { IngestionRecord } from '../ingestion/run';
 import type { CollectorContext, NormalizedItem } from '../ingestion/types';
+import { normalizePositiveInteger } from '../number';
 
 export type TranslationStatus = 'translated' | 'skipped' | 'failed';
 
@@ -64,8 +65,7 @@ function configured(env: TranslationEnv | undefined): env is TranslationEnv & {
 }
 
 function positiveInteger(value: string | undefined, fallback: number): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+  return normalizePositiveInteger(value, fallback);
 }
 
 export function translationMaxItemsPerSource(env: TranslationEnv | undefined): number {

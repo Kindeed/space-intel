@@ -1,5 +1,7 @@
 import Parser from 'rss-parser';
+import { normalizeHttpUrl } from '../../config/url';
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
+import { collectorDisplayText, collectorPublishedAt, stripHtml } from './metadata';
 
 type GoogleNewsItemFields = {
   isoDate?: string;
@@ -10,37 +12,37 @@ type GoogleNewsItemFields = {
 
 const parser = new Parser<Record<string, unknown>, GoogleNewsItemFields>();
 
-function stripHtml(value: string): string {
-  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
 function parseGoogleNewsTitle(title: string): { title: string; publisherName: string | null } {
-  const match = title.match(/^(.*?)\s+-\s+([^-]+)$/);
+  const separatorIndex = title.lastIndexOf(' - ');
 
-  if (!match) {
-    return { title: title.trim(), publisherName: null };
+  if (separatorIndex < 0) {
+    return { title: collectorDisplayText(title, ''), publisherName: null };
   }
 
+  const itemTitle = title.slice(0, separatorIndex);
+  const publisherName = title.slice(separatorIndex + 3);
+
   return {
-    title: match[1].trim(),
-    publisherName: match[2].trim() || null,
+    title: collectorDisplayText(itemTitle, ''),
+    publisherName: collectorDisplayText(publisherName, '') || null,
   };
 }
 
-function canonicalGoogleNewsUrl(value: string): string {
+function canonicalGoogleNewsUrl(value: string): string | null {
   try {
     const url = new URL(value);
     const nestedUrl = url.searchParams.get('url') ?? url.searchParams.get('q');
+    const normalizedNestedUrl = nestedUrl ? normalizeHttpUrl(nestedUrl) : null;
 
-    if (nestedUrl?.startsWith('http')) {
-      return nestedUrl;
+    if (normalizedNestedUrl) {
+      return normalizedNestedUrl;
     }
 
     url.search = '';
     url.hash = '';
-    return url.toString();
+    return normalizeHttpUrl(url.toString());
   } catch {
-    return value;
+    return null;
   }
 }
 
@@ -50,6 +52,7 @@ export const googleNewsRssCollector: SourceCollector = {
     const response = await context.fetch(source.url, {
       headers: {
         accept: 'application/rss+xml, application/xml, text/xml',
+        'user-agent': 'SpaceIntelBot/1.0 (+https://space.bytebaud.com)',
       },
     });
 
@@ -58,29 +61,36 @@ export const googleNewsRssCollector: SourceCollector = {
     }
 
     const feed = await parser.parseString(await response.text());
+    const maxItems = source.max_items ?? 50;
 
     return feed.items
       .filter((item) => item.title && item.link)
-      .map((item) => {
+      .flatMap((item) => {
         const parsedTitle = parseGoogleNewsTitle(item.title ?? '');
         const url = canonicalGoogleNewsUrl(item.link ?? '');
+        const language: NormalizedItem['language'] = 'zh';
+
+        if (!url || !parsedTitle.title) {
+          return [];
+        }
 
         return {
           sourceKey: source.key,
           sourceName: source.name,
           publisherName: parsedTitle.publisherName ?? source.name,
           title: parsedTitle.title,
-          originalTitle: item.title ?? '',
+          originalTitle: collectorDisplayText(item.title, ''),
           summary: stripHtml(item.contentSnippet ?? item.summary ?? item.content ?? ''),
           url,
-          publishedAt: item.isoDate ?? context.now().toISOString(),
-          language: 'zh',
+          publishedAt: collectorPublishedAt(item.isoDate, context),
+          language,
           region: source.region,
           rawId: item.guid ?? url,
           relatedLaunchIds: [],
           companies: [],
           tags: [],
         };
-      });
+      })
+      .slice(0, maxItems);
   },
 };

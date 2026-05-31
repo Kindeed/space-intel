@@ -480,7 +480,7 @@ sources:
     risk_notes: Public government listing page; store only metadata, generated summaries, and links.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 火箭, 空天, 卫星互联网, 公共试验平台, 产业基金, 重大项目]
+    include_terms: [商业航天, 航天, 卫星, 火箭, 空天, 卫星互联网, 公共试验平台]
   - key: beijing-jxj-notices
     name: 北京市经信局通知公告
     type: official_page
@@ -493,7 +493,7 @@ sources:
     risk_notes: Public government listing page; do not download attachments beyond linking to source pages.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 火箭, 空天, 试验平台, 申报, 通知, 公示]
+    include_terms: [商业航天, 航天, 卫星, 火箭, 空天, 卫星互联网, 公共试验平台]
   - key: shanghai-gov-news
     name: 上海市政府要闻
     type: official_page
@@ -519,7 +519,7 @@ sources:
     risk_notes: Public government listing page; PDF and attachment links are linked, not parsed as full text.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 空间信息, 卫星互联网, 北斗, 遥感, 行动计划]
+    include_terms: [商业航天, 航天, 卫星, 空间信息, 卫星互联网, 北斗, 遥感]
   - key: guangdong-gov-policy
     name: 广东省政府政策文件
     type: official_page
@@ -532,7 +532,7 @@ sources:
     risk_notes: Broad government listing page; filter with aerospace policy terms and store metadata only.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 火箭, 低轨, 卫星互联网, 空天, 行动方案, 政策措施]
+    include_terms: [商业航天, 航天, 卫星, 火箭, 低轨, 卫星互联网, 空天]
   - key: guangdong-drc-policy
     name: 广东省发改委政策文件
     type: official_page
@@ -545,18 +545,22 @@ sources:
     risk_notes: Public government listing page; do not scrape attachment bodies.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 空天, 低轨, 卫星互联网, 政策措施]
+    include_terms: [商业航天, 航天, 卫星, 空天, 低轨, 卫星互联网]
   - key: hainan-gov-news
     name: 海南省政府今日海南
     type: official_page
     region: cn
     url: https://www.hainan.gov.cn/hainan/5309/
     credibility: 5
-    enabled: true
+    enabled: false
     purpose: Track Hainan government news, interviews, and leadership signals around Wenchang International Aerospace City and commercial launch facilities.
     expected_content: Official news metadata, dates when available, and original links.
-    risk_notes: Public government listing page; filter broad provincial news with aerospace-specific terms.
+    risk_notes: Public government listing page currently returns HTTP 403 from the Cloudflare/cloud execution path; keep disabled until a stable accessible listing is confirmed.
     dedupe_strategy: url_title_source
+    access_domestic: unknown
+    access_global: blocked
+    access_note: 云端采集访问受限，待确认可稳定访问的海南新闻列表页。
+    public_badge: 云端访问受限
     default_tags: [policy-and-regulation]
     include_terms: [文昌, 航天城, 商业航天, 航天发射, 卫星, 火箭, 访谈, 讲话]
   - key: hainan-wenchang-space-special
@@ -565,11 +569,15 @@ sources:
     region: cn
     url: https://www.hainan.gov.cn/hainan/wcgjhtczc/list_sljrdscjzfbh.shtml
     credibility: 5
-    enabled: true
+    enabled: false
     purpose: Track Hainan official press-conference material and interview records related to Wenchang International Aerospace City.
     expected_content: Official press-conference metadata and original links.
-    risk_notes: Public special-topic page; store metadata and links only.
+    risk_notes: Public special-topic page is a dated single-event page and does not expose a reusable article list for the current official-page collector; keep disabled until a current list source is confirmed.
     dedupe_strategy: url_title_source
+    access_domestic: direct
+    access_global: direct
+    access_note: 旧专题单页，不作为持续采集来源。
+    public_badge: 旧专题停采
     default_tags: [policy-and-regulation]
     include_terms: [文昌, 航天城, 商业航天, 发射场, 卫星, 火箭, 招商, 政策]
   - key: sichuan-gov-policy
@@ -578,11 +586,15 @@ sources:
     region: cn
     url: https://www.sc.gov.cn/10462/zfwjts/
     credibility: 5
-    enabled: true
+    enabled: false
     purpose: Track Sichuan official policy documents including commercial space action plans and future-industry measures.
     expected_content: Official policy metadata and original links.
-    risk_notes: Public government listing page; PDF links are linked, not parsed as full text.
+    risk_notes: Public government listing page currently returns HTTP 403 from the Cloudflare/cloud execution path; keep disabled until a stable accessible policy listing is confirmed.
     dedupe_strategy: url_title_source
+    access_domestic: unknown
+    access_global: blocked
+    access_note: 云端采集访问受限，待确认可稳定访问的政策列表页。
+    public_badge: 云端访问受限
     default_tags: [policy-and-regulation]
     include_terms: [商业航天, 航天, 卫星, 火箭, 西部商业航天港, 空天, 行动计划, 未来产业]
   - key: sichuan-gov-news
@@ -591,11 +603,15 @@ sources:
     region: cn
     url: https://www.sc.gov.cn/10462/10464/13298/13299/
     credibility: 5
-    enabled: true
+    enabled: false
     purpose: Track Sichuan government news and leadership activity around commercial space industry clusters and policy implementation.
     expected_content: Official news metadata, dates when available, and original links.
-    risk_notes: Public government listing page; filter broad provincial news with aerospace-specific terms.
+    risk_notes: Public government listing page currently returns HTTP 403 from the Cloudflare/cloud execution path; keep disabled until a stable accessible news listing is confirmed.
     dedupe_strategy: url_title_source
+    access_domestic: unknown
+    access_global: blocked
+    access_note: 云端采集访问受限，待确认可稳定访问的新闻列表页。
+    public_badge: 云端访问受限
     default_tags: [policy-and-regulation]
     include_terms: [商业航天, 航天, 卫星, 火箭, 西部商业航天港, 空天, 产业大会, 领导]
   - key: wuxi-gov-news
@@ -623,7 +639,7 @@ sources:
     risk_notes: Broad district homepage; filter with strict aerospace and satellite terms.
     dedupe_strategy: url_title_source
     default_tags: [policy-and-regulation]
-    include_terms: [商业航天, 航天, 卫星, 空天, 星联体, 产业园, 卫星互联网]
+    include_terms: [商业航天, 航天, 卫星, 空天, 星联体, 空天产业园, 商业航天产业园, 卫星互联网]
   - key: spacechina-news
     name: 中国航天科技集团新闻
     type: official_page

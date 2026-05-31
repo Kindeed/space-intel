@@ -62,10 +62,16 @@ class MemoryDatabase implements SqlDatabase {
   readonly articleCompanies: Array<{ articleId: number; company: string }> = [];
   readonly articleLaunches: Array<{ articleId: number; launchExternalId: string }> = [];
   readonly logs: LogRow[] = [];
+  readonly batchSizes: number[] = [];
   failTranslationColumns = false;
 
   prepare(query: string): DbStatement {
     return new MemoryStatement(this, query);
+  }
+
+  async batch(statements: DbStatement[]): Promise<unknown[]> {
+    this.batchSizes.push(statements.length);
+    return Promise.all(statements.map((statement) => statement.run()));
   }
 
   run(query: string, values: unknown[]): DbRunResult {
@@ -264,8 +270,61 @@ describe('D1 persistence flow', () => {
     expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
     expect(db.articleCompanies).toEqual([{ articleId: 1, company: 'rocket-lab' }]);
     expect(db.articleLaunches).toEqual([{ articleId: 1, launchExternalId: 'launch-1' }]);
+    expect(db.batchSizes).toEqual([3, 3]);
     expect(db.logs).toHaveLength(2);
     expect(db.logs[1]).toMatchObject({ successCount: 0, failureCount: 0 });
+  });
+
+  it('normalizes related launch ids before linking articles', async () => {
+    const db = new MemoryDatabase();
+    const registry = createCollectorRegistry([
+      {
+        ...collector,
+        async collect() {
+          return [
+            {
+              ...(await collector.collect(source, { fetch, now: () => new Date('2026-05-09T00:00:00Z') }))[0],
+              relatedLaunchIds: [' LAUNCH-1 ', 'launch-1', '   '],
+            },
+          ];
+        },
+      },
+    ]);
+
+    await runSourceIngestion(db, source, registry, {
+      fetch,
+      now: () => new Date('2026-05-09T00:00:00Z'),
+    });
+
+    expect(db.articleLaunches).toEqual([{ articleId: 1, launchExternalId: 'launch-1' }]);
+  });
+
+  it('normalizes article tag and company relation lookups before linking articles', async () => {
+    const db = new MemoryDatabase();
+    const registry = createCollectorRegistry([
+      {
+        ...collector,
+        async collect() {
+          return [
+            {
+              ...(await collector.collect(source, { fetch, now: () => new Date('2026-05-09T00:00:00Z') }))[0],
+              relatedLaunchIds: [],
+              tags: [' Reusable-Rockets ', 'reusable-rockets', '   '],
+              companies: [' Rocket Lab ', 'rocket lab', '   '],
+            },
+          ];
+        },
+      },
+    ]);
+
+    await runSourceIngestion(db, source, registry, {
+      fetch,
+      now: () => new Date('2026-05-09T00:00:00Z'),
+    });
+
+    expect(db.articleTags).toEqual([{ articleId: 1, tag: 'reusable-rockets' }]);
+    expect(db.articleCompanies).toEqual([{ articleId: 1, company: 'rocket lab' }]);
+    expect(db.batchSizes).toEqual([2]);
   });
 
   it('updates source catalog fields on repeat ingestion', async () => {

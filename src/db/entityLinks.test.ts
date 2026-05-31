@@ -33,10 +33,16 @@ class EntityLinkDatabase implements SqlDatabase {
   readonly companyLinks: Array<{ articleId: number; slug: string }> = [];
   readonly tagLinks: Array<{ articleId: number; slug: string }> = [];
   readonly deletes: string[] = [];
+  readonly batchSizes: number[] = [];
   failTranslationColumns = false;
 
   prepare(query: string): DbStatement {
     return new EntityLinkStatement(this, query);
+  }
+
+  async batch(statements: DbStatement[]): Promise<DbRunResult[]> {
+    this.batchSizes.push(statements.length);
+    return Promise.all(statements.map((statement) => statement.run()));
   }
 
   run(query: string, values: unknown[]): DbRunResult {
@@ -122,10 +128,29 @@ describe('entity link persistence', () => {
     expect(result).toEqual({ articleCount: 1, companyLinks: 1, tagLinks: 1 });
     expect(second).toEqual({ articleCount: 1, companyLinks: 0, tagLinks: 0 });
     expect(db.deletes).toEqual([]);
+    expect(db.batchSizes).toEqual([2, 2]);
     expect(db.tagLinks).toEqual([
       { articleId: 1, slug: 'source-default-tag' },
       { articleId: 1, slug: 'reusable-rockets' },
     ]);
+  });
+
+  it('normalizes matched entity slugs before building relation statements', async () => {
+    const db = new EntityLinkDatabase();
+    const matches: ArticleEntityMatch[] = [
+      {
+        articleId: 1,
+        companySlugs: [' Rocket-Lab ', 'rocket-lab', '   '],
+        topicSlugs: [' Reusable-Rockets ', 'reusable-rockets', '   '],
+      },
+    ];
+
+    const result = await upsertConfiguredEntityLinks(db, matches);
+
+    expect(result).toEqual({ articleCount: 1, companyLinks: 1, tagLinks: 1 });
+    expect(db.batchSizes).toEqual([2]);
+    expect(db.companyLinks).toEqual([{ articleId: 1, slug: 'rocket-lab' }]);
+    expect(db.tagLinks).toEqual([{ articleId: 1, slug: 'reusable-rockets' }]);
   });
 
   it('falls back to legacy article fields when translation columns are missing', async () => {

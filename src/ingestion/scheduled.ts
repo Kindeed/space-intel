@@ -5,9 +5,11 @@ import {
   officialPageCollector,
   procurementPageCollector,
   rssCollector,
+  rsshubCollector,
   runLaunchIngestion,
   runSourceIngestion,
   spaceflightNewsCollector,
+  assertValidSourceDefaultReferences,
 } from './index';
 import { parseCompaniesConfig, parseTopicsConfig } from '../catalog';
 import { parseCurationsConfig, parseCurationsYaml } from '../curations/config';
@@ -82,7 +84,7 @@ export type ScheduledSourceRunResult =
 export type ScheduledMaintenanceResult =
   | {
       staleIngestionLogsClosed: number;
-      retention: RetentionCleanupResult;
+      retention: RetentionCleanupResult | null;
       failures: 0;
     }
   | {
@@ -101,7 +103,7 @@ function shouldRunLaunchIngestion(now: Date): boolean {
 }
 
 function concurrencyForSource(source: SourceConfig): number {
-  if (source.type === 'rss' || source.type === 'official_page' || source.type === 'procurement_page') {
+  if (source.type === 'rss' || source.type === 'rsshub' || source.type === 'official_page' || source.type === 'procurement_page') {
     return 4;
   }
 
@@ -174,7 +176,7 @@ async function runLaunchSourceSafely(
   }
 }
 
-async function runDailyMaintenanceSafely(db: SqlDatabase, now: Date): Promise<ScheduledMaintenanceResult> {
+async function runScheduledMaintenanceSafely(db: SqlDatabase, now: Date, options: { runRetention: boolean }): Promise<ScheduledMaintenanceResult> {
   try {
     const staleBefore = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
 
@@ -183,7 +185,7 @@ async function runDailyMaintenanceSafely(db: SqlDatabase, now: Date): Promise<Sc
         finishedAt: now.toISOString(),
         staleBefore,
       }),
-      retention: await cleanupRetainedData(db, { now }),
+      retention: options.runRetention ? await cleanupRetainedData(db, { now }) : null,
       failures: 0,
     };
   } catch (error) {
@@ -252,6 +254,17 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
       )),
     );
 
+    const rsshubRegistry = createCollectorRegistry([rsshubCollector]);
+    sourceRuns.push(
+      ...(await runSourceGroup(
+        input.sources.filter((item) => item.type === 'rsshub' && item.enabled),
+        (source) => () =>
+          runArticleSourceSafely(source, () =>
+            runSourceIngestion(input.db, source, rsshubRegistry, input.context, { timeoutMs, translationEnv: input.translationEnv }),
+          ),
+      )),
+    );
+
     const officialPageRegistry = createCollectorRegistry([officialPageCollector]);
     sourceRuns.push(
       ...(await runSourceGroup(
@@ -278,6 +291,10 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
   if (input.kind === 'daily') {
     const companies = parseCompaniesConfig(input.companiesConfig);
     const topics = parseTopicsConfig(input.topicsConfig);
+    assertValidSourceDefaultReferences(input.sources, {
+      topicSlugs: topics.map((topic) => topic.slug),
+      companyIdentifiers: companies.flatMap((company) => [company.slug, company.name, company.englishName].filter(Boolean)),
+    });
 
     if (input.companiesConfig || input.topicsConfig) {
       catalogSync = await syncConfiguredCatalog(input.db, {
@@ -292,7 +309,11 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
       );
     }
 
-    maintenance = await runDailyMaintenanceSafely(input.db, input.context.now());
+    maintenance = await runScheduledMaintenanceSafely(input.db, input.context.now(), { runRetention: true });
+  }
+
+  if (input.kind === 'hourly') {
+    maintenance = await runScheduledMaintenanceSafely(input.db, input.context.now(), { runRetention: false });
   }
 
   const curationsInserted =

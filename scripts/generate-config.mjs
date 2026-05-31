@@ -16,9 +16,7 @@ async function generatedJsonFromYaml(yamlFile) {
   return `${JSON.stringify(parse(yamlText) ?? {}, null, 2)}\n`;
 }
 
-let hasDrift = false;
-
-for (const [yamlFile, jsonFile] of configPairs) {
+async function processConfigPair([yamlFile, jsonFile]) {
   const jsonPath = resolve(configDir, jsonFile);
   const generated = await generatedJsonFromYaml(yamlFile);
 
@@ -26,17 +24,30 @@ for (const [yamlFile, jsonFile] of configPairs) {
     const current = await readFile(jsonPath, 'utf8');
 
     if (current !== generated) {
-      console.error(`${jsonFile} is out of sync with ${yamlFile}`);
-      hasDrift = true;
+      return { drift: true, message: `${jsonFile} is out of sync with ${yamlFile}` };
     }
 
-    continue;
+    return { drift: false, message: null };
   }
 
   await writeFile(jsonPath, generated);
-  console.log(`generated ${jsonFile}`);
+  return { drift: false, message: `generated ${jsonFile}` };
 }
 
-if (hasDrift) {
+const results = await Promise.all(configPairs.map(processConfigPair));
+
+for (const result of results) {
+  if (!result.message) {
+    continue;
+  }
+
+  if (result.drift) {
+    console.error(result.message);
+  } else {
+    console.log(result.message);
+  }
+}
+
+if (results.some((result) => result.drift)) {
   process.exitCode = 1;
 }

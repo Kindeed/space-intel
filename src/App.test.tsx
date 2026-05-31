@@ -28,6 +28,7 @@ describe('App', () => {
     expect(html).not.toContain('来源透明');
     expect(html).not.toContain('Mission Feed');
     expect(html).not.toContain('Mission Control');
+    expect(html).not.toContain('Ctrl K');
     expect(html).not.toContain('不存全文');
     expect(html).not.toContain('Content Policy');
   });
@@ -42,10 +43,10 @@ describe('App', () => {
     expect(html).not.toContain('打开原文链接');
   });
 
-  it('uses user-facing empty state copy in the launch HUD', () => {
+  it('uses user-facing loading state copy in the launch HUD', () => {
     const html = renderAt();
 
-    expect(html).toContain('暂无发射记录。');
+    expect(html).toContain('发射记录加载中。');
     expect(html).not.toContain('暂无发射缓存。');
   });
 

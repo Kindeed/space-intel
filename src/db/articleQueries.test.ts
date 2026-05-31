@@ -126,6 +126,8 @@ describe('article queries', () => {
     expect(db.lastQuery).toContain('LOWER(a.title) LIKE ?');
     expect(db.lastQuery).toContain('JOIN tags t');
     expect(db.lastQuery).toContain('JOIN companies c');
+    expect(db.lastQuery).toContain('LOWER(t.slug) = ?');
+    expect(db.lastQuery).toContain('LOWER(c.slug) = ?');
     expect(db.lastQuery).toContain('AS tagsJson');
     expect(db.lastQuery).toContain('AS companiesJson');
     expect(db.lastValues).toEqual([
@@ -136,10 +138,44 @@ describe('article queries', () => {
       '%rocket%',
       '%rocket%',
       'reusable-rockets',
+      'reusable-rockets',
+      'rocket-lab',
+      'rocket-lab',
       'rocket-lab',
       5,
       1,
     ]);
+  });
+
+  it('matches article entity filters by public display names', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [article];
+
+    await listArticles(db, {
+      tag: ' 可回收火箭 ',
+      company: ' Rocket Lab ',
+      limit: 1,
+    });
+
+    expect(db.lastQuery).toContain('LOWER(t.name) = ?');
+    expect(db.lastQuery).toContain('LOWER(c.name) = ?');
+    expect(db.lastQuery).toContain('LOWER(c.english_name) = ?');
+    expect(db.lastValues).toEqual(['可回收火箭', '可回收火箭', 'rocket lab', 'rocket lab', 'rocket lab', 5, 0]);
+  });
+
+  it('matches article entity slug filters case-insensitively', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [article];
+
+    await listArticles(db, {
+      tag: ' Reusable-Rockets ',
+      company: ' Rocket-Lab ',
+      limit: 1,
+    });
+
+    expect(db.lastQuery).toContain('LOWER(t.slug) = ?');
+    expect(db.lastQuery).toContain('LOWER(c.slug) = ?');
+    expect(db.lastValues).toEqual(['reusable-rockets', 'reusable-rockets', 'rocket-lab', 'rocket-lab', 'rocket-lab', 5, 0]);
   });
 
   it('keeps pagination available when clustering leaves more visible stories in the fetched window', async () => {
@@ -154,6 +190,17 @@ describe('article queries', () => {
 
     expect(result.items.map((item) => item.id)).toEqual([1, 2]);
     expect(result.hasMore).toBe(true);
+  });
+
+  it('rejects decimal pagination inputs at the query layer', async () => {
+    const db = new FakeDatabase();
+    db.allResults = [article];
+
+    const result = await listArticles(db, { page: 2.5, limit: 3.9 });
+
+    expect(result.page).toBe(1);
+    expect(result.limit).toBe(20);
+    expect(db.lastValues).toEqual([81, 0]);
   });
 
   it('filters policy articles by policy tag across source types', async () => {
@@ -194,10 +241,10 @@ describe('article queries', () => {
         {
           ...article,
           id: 2,
-      sourceKey: 'google-news-cn-commercial-space',
-      sourceName: 'Google News - 商业航天',
-      publisherName: '新华社',
-      title: 'Reusable rocket milestone',
+          sourceKey: 'google-news-cn-commercial-space',
+          sourceName: 'Google News - 商业航天',
+          publisherName: '新华社',
+          title: 'Reusable rocket milestone',
           publishedAt: '2026-05-09T01:00:00Z',
         },
         {
@@ -218,6 +265,105 @@ describe('article queries', () => {
     });
   });
 
+  it('deduplicates clustered related sources after public label cleanup', () => {
+    const clustered = clusterArticleRows(
+      [
+        article,
+        {
+          ...article,
+          id: 2,
+          sourceName: 'spaceflight news api',
+          publisherName: 'spaceflight news api',
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T01:00:00Z',
+        },
+        {
+          ...article,
+          id: 3,
+          sourceName: 'Google News RSS - Spaceflight News API',
+          publisherName: 'Google News RSS - Spaceflight News API',
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T02:00:00Z',
+        },
+        {
+          ...article,
+          id: 4,
+          sourceName: 'Google News - 商业航天',
+          publisherName: '新华社',
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T03:00:00Z',
+        },
+      ],
+      10,
+    );
+
+    expect(clustered).toHaveLength(1);
+    expect(clustered[0]).toMatchObject({
+      id: 4,
+      relatedSourceCount: 2,
+      relatedSources: ['Spaceflight News API', '新华社'],
+    });
+  });
+
+  it('preserves entity links across clustered duplicate story rows', () => {
+    const clustered = clusterArticleRows(
+      [
+        {
+          ...article,
+          tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+          companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
+        },
+        {
+          ...article,
+          id: 2,
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T01:00:00Z',
+          tags: [{ slug: 'launch-market', name: '发射市场' }],
+          companies: [],
+        },
+      ],
+      10,
+    );
+
+    expect(clustered).toHaveLength(1);
+    expect(clustered[0]).toMatchObject({
+      id: 2,
+      tags: [
+        { slug: 'reusable-rockets', name: '可回收火箭' },
+        { slug: 'launch-market', name: '发射市场' },
+      ],
+      companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
+    });
+  });
+
+  it('uses later entity labels when clustered duplicates first provide blank names', () => {
+    const clustered = clusterArticleRows(
+      [
+        {
+          ...article,
+          tags: [{ slug: ' reusable-rockets ', name: '   ' }],
+          companies: [{ slug: ' rocket-lab ', name: '   ' }],
+        },
+        {
+          ...article,
+          id: 2,
+          title: 'Reusable rocket milestone',
+          publishedAt: '2026-05-09T01:00:00Z',
+          tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+          companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
+        },
+      ],
+      10,
+    );
+
+    expect(clustered).toHaveLength(1);
+    expect(clustered[0]).toMatchObject({
+      id: 2,
+      tags: [{ slug: 'reusable-rockets', name: '可回收火箭' }],
+      companies: [{ slug: 'rocket-lab', name: 'Rocket Lab' }],
+    });
+  });
+
   it('returns article detail by id', async () => {
     const db = new FakeDatabase();
     db.firstResult = {
@@ -235,6 +381,7 @@ describe('article queries', () => {
     });
     expect(result && 'dedupeHash' in result).toBe(false);
     expect(db.lastQuery).toContain('FROM article_launches al');
+    expect(db.lastQuery).toContain('LOWER(l.external_id) = LOWER(al.launch_external_id)');
     expect(db.lastValues).toEqual([1]);
   });
 

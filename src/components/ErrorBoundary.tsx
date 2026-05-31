@@ -1,5 +1,13 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
+export function ErrorBoundaryFallback() {
+  return (
+    <div className="inline-status inline-status--danger" role="alert">
+      页面暂不可用，请稍后重试。
+    </div>
+  );
+}
+
 export class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   state = { error: null };
 
@@ -13,11 +21,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: s
 
   render() {
     if (this.state.error) {
-      return (
-        <div className="inline-status inline-status--danger">
-          页面暂不可用，请稍后重试。
-        </div>
-      );
+      return <ErrorBoundaryFallback />;
     }
 
     return this.props.children;

@@ -1,5 +1,5 @@
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
-import { extractDate, extractHtmlListLinks } from '../htmlList';
+import { absoluteUrl, extractDate, extractHtmlListLinks, stripLeadingDatePrefix } from '../htmlList';
 
 const relevantPolicyTerms = [
   '航天',
@@ -41,22 +41,58 @@ const relevantPolicyTerms = [
   '6g',
   '北斗',
   '测控',
-  '重大项目',
-  '产业基金',
-  '产业园',
-  '领导调研',
-  '新闻发布会',
-  '规划',
-  '通知',
-  '意见',
-  '行动方案',
+  '空天产业园',
+  '航天产业园',
+  '商业航天产业园',
+  '卫星产业园',
 ];
 
 const defaultExcludeTerms = ['文旅', '旅游', '教育', '医疗', '生态环境', '食品安全', '天气', '体育赛事'];
+const navigationTitles = new Set([
+  '首页',
+  '新闻动态',
+  '时政要闻',
+  '工作动态',
+  '空间科学',
+  '专题报道',
+  '政务公开',
+  '政府信息公开',
+  '机构设置',
+  '政策法规',
+  '办事服务',
+  '互动交流',
+  '咨询建议',
+  '意见征集',
+  '联系我们',
+  '网站地图',
+  '搜索',
+  '更多',
+  'home',
+  'about',
+  'contact',
+  'sitemap',
+  'search',
+  'more',
+]);
 
 function containsAny(text: string, terms: string[]): boolean {
   const normalized = text.toLowerCase();
   return terms.some((term) => normalized.includes(term.toLowerCase()));
+}
+
+function isNavigationTitle(title: string): boolean {
+  return navigationTitles.has(title.replace(/\s+/g, '').toLowerCase());
+}
+
+function scriptRedirectUrl(html: string, baseUrl: string): string | null {
+  const match = html.match(/window\.location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/i);
+  const redirectedUrl = match ? absoluteUrl(match[1], baseUrl) : null;
+
+  if (!redirectedUrl || redirectedUrl === baseUrl) {
+    return null;
+  }
+
+  return new URL(redirectedUrl).origin === new URL(baseUrl).origin ? redirectedUrl : null;
 }
 
 function isRelevant(source: SourceConfig, text: string): boolean {
@@ -103,6 +139,10 @@ function itemTags(source: SourceConfig, title: string): string[] {
   return [...new Set([...defaults, ...topicTagsForTitle(title)])];
 }
 
+function publicTitle(title: string): string {
+  return stripLeadingDatePrefix(title);
+}
+
 export const officialPageCollector: SourceCollector = {
   type: 'official_page',
   async collect(source: SourceConfig, context: CollectorContext): Promise<NormalizedItem[]> {
@@ -117,12 +157,37 @@ export const officialPageCollector: SourceCollector = {
       throw new Error(`Official page request failed for ${source.key} with HTTP ${response.status}`);
     }
 
-    const html = await response.text();
+    let html = await response.text();
+    let effectiveUrl = source.url;
+    let links = extractHtmlListLinks(html, effectiveUrl);
+    const redirectedUrl = scriptRedirectUrl(html, effectiveUrl);
+
+    if (!links.length && redirectedUrl) {
+      const redirectedResponse = await context.fetch(redirectedUrl, {
+        headers: {
+          accept: 'text/html, application/xhtml+xml',
+          'user-agent': 'SpaceIntelBot/1.0 (+https://space.bytebaud.com)',
+        },
+      });
+
+      if (!redirectedResponse.ok) {
+        throw new Error(`Official page redirect request failed for ${source.key} with HTTP ${redirectedResponse.status}`);
+      }
+
+      html = await redirectedResponse.text();
+      effectiveUrl = redirectedUrl;
+      links = extractHtmlListLinks(html, effectiveUrl);
+    }
+
     const seen = new Set<string>();
     const items: NormalizedItem[] = [];
     const maxItems = source.max_items ?? 20;
 
-    for (const link of extractHtmlListLinks(html, source.url)) {
+    for (const link of links) {
+      if (isNavigationTitle(link.title)) {
+        continue;
+      }
+
       const signalText = `${link.title} ${link.contextText} ${link.url}`;
 
       if (seen.has(link.url) || !isRelevant(source, signalText)) {
@@ -130,13 +195,14 @@ export const officialPageCollector: SourceCollector = {
       }
 
       seen.add(link.url);
+      const title = publicTitle(link.title);
       items.push({
         sourceKey: source.key,
         sourceName: source.name,
         publisherName: source.name,
-        title: link.title,
+        title,
         originalTitle: link.title,
-        summary: `官方发布：${link.title}`,
+        summary: `官方发布：${title}`,
         url: link.url,
         publishedAt: extractDate(signalText) ?? context.now().toISOString(),
         language: source.region === 'cn' ? 'zh' : 'en',

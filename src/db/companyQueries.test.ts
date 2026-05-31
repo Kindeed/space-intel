@@ -21,8 +21,10 @@ class FakeStatement implements DbStatement {
   }
 
   async first<T = unknown>(): Promise<T | null> {
+    this.database.firstQuery = this.query;
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
+    this.database.values.push(this.values);
     return this.database.firstResult as T | null;
   }
 
@@ -30,6 +32,7 @@ class FakeStatement implements DbStatement {
     this.database.lastQuery = this.query;
     this.database.lastValues = this.values;
     this.database.queries.push(this.query);
+    this.database.values.push(this.values);
 
     if (this.query.includes('FROM companies c') && !this.query.includes('WHERE c.slug')) {
       return { results: this.database.companyResults as T[] };
@@ -44,8 +47,10 @@ class FakeStatement implements DbStatement {
 }
 
 class FakeCompanyDatabase implements SqlDatabase {
+  firstQuery = '';
   lastQuery = '';
   lastValues: unknown[] = [];
+  values: unknown[][] = [];
   queries: string[] = [];
   failTranslationColumns = false;
   companyResults: CompanyRow[] = [];
@@ -118,6 +123,25 @@ describe('company queries', () => {
     expect(db.lastQuery).toContain('AS tagsJson');
     expect(db.lastQuery).toContain('AS companiesJson');
     expect(db.lastValues).toEqual([company.id]);
+  });
+
+  it('trims company slugs before querying detail records', async () => {
+    const db = new FakeCompanyDatabase();
+    db.firstResult = company;
+
+    await getCompanyBySlug(db, ' rocket-lab ');
+
+    expect(db.values[0]).toEqual(['rocket-lab']);
+  });
+
+  it('matches company detail slugs case-insensitively', async () => {
+    const db = new FakeCompanyDatabase();
+    db.firstResult = company;
+
+    await getCompanyBySlug(db, ' Rocket-Lab ');
+
+    expect(db.firstQuery).toContain('LOWER(c.slug) = ?');
+    expect(db.values[0]).toEqual(['rocket-lab']);
   });
 
   it('falls back to legacy company article queries when translation columns are missing', async () => {

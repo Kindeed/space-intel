@@ -1,10 +1,13 @@
 import { z } from 'zod';
+import { normalizeHttpUrl } from '../../config/url';
 import type { CollectorContext, NormalizedItem, SourceCollector, SourceConfig } from '../types';
+import { apiRequestLimit } from './apiLimit';
+import { collectorDisplayText, collectorPublishedAt, stripHtml } from './metadata';
 
 const snapiArticleSchema = z.object({
   id: z.number(),
   title: z.string(),
-  url: z.string().url(),
+  url: z.string(),
   news_site: z.string(),
   summary: z.string().nullable(),
   published_at: z.string(),
@@ -29,11 +32,13 @@ export const spaceflightNewsCollector: SourceCollector = {
     }
 
     const url = new URL(source.url);
-    url.searchParams.set('limit', url.searchParams.get('limit') ?? '25');
+    const maxItems = apiRequestLimit(source, url);
+    url.searchParams.set('limit', String(maxItems));
 
     const response = await context.fetch(url.toString(), {
       headers: {
         accept: 'application/json',
+        'user-agent': 'space-intel/0.1 (+https://space.bytebaud.com)',
       },
     });
 
@@ -43,21 +48,33 @@ export const spaceflightNewsCollector: SourceCollector = {
 
     const payload = snapiResponseSchema.parse(await response.json());
 
-    return payload.results.map((article) => ({
-      sourceKey: source.key,
-      sourceName: article.news_site || source.name,
-      publisherName: article.news_site || source.name,
-      title: article.title,
-      originalTitle: article.title,
-      summary: article.summary ?? '',
-      url: article.url,
-      publishedAt: article.published_at,
-      language: 'en',
-      region: 'global',
-      rawId: String(article.id),
-      relatedLaunchIds: article.launches.map((launch) => launch.launch_id),
-      companies: [],
-      tags: [],
-    }));
+    const items: NormalizedItem[] = payload.results.flatMap((article) => {
+      const title = collectorDisplayText(article.title, '');
+      const articleUrl = normalizeHttpUrl(article.url);
+      const sourceName = collectorDisplayText(article.news_site, source.name);
+
+      if (!articleUrl || !title) {
+        return [];
+      }
+
+      return {
+        sourceKey: source.key,
+        sourceName,
+        publisherName: sourceName,
+        title,
+        originalTitle: title,
+        summary: stripHtml(article.summary ?? ''),
+        url: articleUrl,
+        publishedAt: collectorPublishedAt(article.published_at, context),
+        language: 'en',
+        region: 'global',
+        rawId: String(article.id),
+        relatedLaunchIds: article.launches.map((launch) => launch.launch_id),
+        companies: [],
+        tags: [],
+      };
+    });
+
+    return items.slice(0, maxItems);
   },
 };

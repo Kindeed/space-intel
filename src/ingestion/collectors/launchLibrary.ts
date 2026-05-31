@@ -1,10 +1,13 @@
 import { z } from 'zod';
+import { normalizeHttpUrl } from '../../config/url';
 import type { CollectorContext, SourceCollector, SourceConfig } from '../types';
+import { apiRequestLimit } from './apiLimit';
+import { collectorDisplayText, collectorOptionalDisplayText, collectorOptionalIsoDate } from './metadata';
 
 const launchSchema = z.object({
   id: z.string(),
   name: z.string(),
-  url: z.string().url().nullable().optional(),
+  url: z.string().nullable().optional(),
   net: z.string().nullable().optional(),
   status: z
     .object({
@@ -63,8 +66,8 @@ export type LaunchLibraryCollectorResult = SourceCollector & {
 };
 
 function launchSite(launch: z.infer<typeof launchSchema>): string | null {
-  const pad = launch.pad?.name;
-  const location = launch.pad?.location?.name;
+  const pad = collectorOptionalDisplayText(launch.pad?.name);
+  const location = collectorOptionalDisplayText(launch.pad?.location?.name);
 
   if (pad && location) {
     return `${pad}, ${location}`;
@@ -79,7 +82,8 @@ async function collectLaunches(source: SourceConfig, context: CollectorContext):
   }
 
   const url = new URL(source.url);
-  url.searchParams.set('limit', url.searchParams.get('limit') ?? '25');
+  const maxItems = apiRequestLimit(source, url);
+  url.searchParams.set('limit', String(maxItems));
 
   const response = await context.fetch(url.toString(), {
     headers: {
@@ -94,16 +98,18 @@ async function collectLaunches(source: SourceConfig, context: CollectorContext):
 
   const payload = launchLibraryResponseSchema.parse(await response.json());
 
-  return payload.results.map((launch) => ({
+  const launches = payload.results.map((launch) => ({
     externalId: launch.id,
-    mission: launch.name,
-    rocket: launch.rocket?.configuration?.full_name ?? null,
-    provider: launch.launch_service_provider?.name ?? null,
-    windowStart: launch.net ?? null,
+    mission: collectorDisplayText(launch.name, 'Launch'),
+    rocket: collectorOptionalDisplayText(launch.rocket?.configuration?.full_name),
+    provider: collectorOptionalDisplayText(launch.launch_service_provider?.name),
+    windowStart: collectorOptionalIsoDate(launch.net),
     site: launchSite(launch),
-    status: launch.status?.name ?? 'unknown',
-    rawUrl: launch.url ?? null,
+    status: collectorDisplayText(launch.status?.name, 'unknown'),
+    rawUrl: launch.url ? normalizeHttpUrl(launch.url) : null,
   }));
+
+  return launches.slice(0, maxItems);
 }
 
 export const launchLibraryCollector: LaunchLibraryCollectorResult = {

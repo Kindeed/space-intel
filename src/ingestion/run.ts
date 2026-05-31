@@ -22,7 +22,7 @@ export async function collectSource(
   return Promise.all(
     items.map(async (item) => ({
       item,
-      dedupeHash: await createDedupeHash(item),
+      dedupeHash: await createDedupeHash(item, source.dedupe_strategy),
     })),
   );
 }
