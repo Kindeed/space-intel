@@ -15,7 +15,7 @@ function sourceAccessText(source: { label: string; count: number; accessSummaryL
 }
 
 function sourceCategoryPath(label: string): string {
-  return label === '官方机构' || label === '公告信息' ? '/articles?category=policy' : '/articles';
+  return label === '官方机构' || label === '公告信息' ? '/articles?category=official' : '/articles';
 }
 
 function LaunchStrip({ launch, index }: { launch: ApiLaunch; index: number }) {
@@ -51,7 +51,7 @@ function PolicyBrief({ item }: { item: ApiArticleSummary }) {
 
 export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
   const launches = useLaunchesQuery('/api/launches?limit=4');
-  const policy = useArticlesQuery('/api/articles?category=policy&limit=4');
+  const policy = useArticlesQuery('/api/articles?category=official&limit=4');
   const sources = useSourcesQuery();
   const sourceStats = sources.data?.publicStats ?? stats?.enabledSourceCategories ?? [];
   const launchItems = launches.data?.items ?? [];
@@ -70,12 +70,12 @@ export function LiveHud({ stats }: { stats?: ApiHomeStats }) {
       </section>
 
       <section className="panel">
-        <SectionTitle icon={FileText} title="政策动态" kicker="官方来源" />
+        <SectionTitle icon={FileText} title="官方信息" kicker="政策与公告" />
         <ul className="compact-list">
           {policyItems.length ? policyItems.slice(0, 4).map((item) => <PolicyBrief key={item.id} item={item} />) : null}
-          {policy.isLoading && !policyItems.length ? <li>政策信息加载中。</li> : null}
-          {policy.error && !policyItems.length ? <li>政策信息暂不可用。</li> : null}
-          {!policy.isLoading && !policy.error && !policyItems.length ? <li>暂无政策信息。</li> : null}
+          {policy.isLoading && !policyItems.length ? <li>官方信息加载中。</li> : null}
+          {policy.error && !policyItems.length ? <li>官方信息暂不可用。</li> : null}
+          {!policy.isLoading && !policy.error && !policyItems.length ? <li>暂无官方信息。</li> : null}
         </ul>
       </section>
 

@@ -36,6 +36,7 @@ const articleSourceByKey = new Map(articleSources.map((source) => [source.key, s
 const articleSourceMetadataByKey = new Map(articleSources.map((source) => [source.key, sourceDisplayMetadata(source)]));
 const domesticRegionFilters = new Set(['cn', 'china', 'domestic', '中国', '国内']);
 const globalRegionFilters = new Set(['global', 'international', 'intl', 'overseas', 'foreign', '国际', '国外']);
+const officialCategoryFilters = new Set(['official', '官方', '官方信息']);
 const policyCategoryFilters = new Set(['policy', '政策', '政策监管', '官方机构', '公告信息']);
 
 function trimmedText(value: string): string {
@@ -228,6 +229,10 @@ export function publicArticleCategoryFilter(value: string | undefined): string |
 
   if (!normalized) {
     return undefined;
+  }
+
+  if (publicFilterMatches(officialCategoryFilters, normalized)) {
+    return 'official';
   }
 
   return publicFilterMatches(policyCategoryFilters, normalized) ? 'policy' : normalized;

@@ -17,7 +17,7 @@ describe('App', () => {
 
     expect(html).toContain('今日重点');
     expect(html).toContain('发射时间线');
-    expect(html).toContain('政策动态');
+    expect(html).toContain('官方信息');
     expect(html).toContain('来源状态');
     expect(html).not.toContain('资本市场内容仅作信息聚合');
     expect(html).not.toContain('资本快讯');
@@ -54,6 +54,7 @@ describe('App', () => {
     const html = [
       '/',
       '/articles',
+      '/official',
       '/policy',
       '/topics',
       '/topics/reusable-rockets',

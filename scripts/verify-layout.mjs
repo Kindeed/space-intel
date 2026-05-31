@@ -87,7 +87,7 @@ if (!process.env.PLAYWRIGHT_TARGET_URL) {
 
 const preview = process.env.PLAYWRIGHT_TARGET_URL ? null : await startPreviewServer();
 const targetUrl = process.env.PLAYWRIGHT_TARGET_URL ?? preview.url;
-const policyUrl = new URL('/policy', targetUrl).toString();
+const officialUrl = new URL('/official', targetUrl).toString();
 const browser = await chromium.launch();
 
 try {
@@ -101,7 +101,7 @@ try {
     const commandPaletteClosed = (await page.locator('.command-palette').count()) === 0;
 
     const hasHighlights = (await page.locator('text=今日重点').count()) > 0;
-    const hasPolicySignal = (await page.locator('a[href="/policy"]').count()) > 0;
+    const hasOfficialSignal = (await page.locator('a[href="/official"]').count()) > 0;
     const hasHorizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );
@@ -134,15 +134,15 @@ try {
     await page.waitForTimeout(250);
     const launchBody = await page.textContent('body');
     const hasLaunchPage = launchBody?.includes('发射时间线') ?? false;
-    await page.goto(policyUrl, { waitUntil: 'networkidle' });
+    await page.goto(officialUrl, { waitUntil: 'networkidle' });
     await page.waitForTimeout(250);
-    const hasPolicyPage = (await page.locator('form[action="/policy"], [aria-label="政策分页"]').count()) > 0;
+    const hasOfficialPage = (await page.locator('form[action="/official"], [aria-label="官方分页"]').count()) > 0;
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
     await page.screenshot({ path: `test-results/${viewport.name}.png`, fullPage: true });
 
-    if (!hasCommandPalette || !commandPaletteClosed || !hasHighlights || !hasPolicySignal || hasHorizontalOverflow || !hasArticleDetail || articleDetailHasDesignNotes || !hasLaunchPage || !hasPolicyPage) {
+    if (!hasCommandPalette || !commandPaletteClosed || !hasHighlights || !hasOfficialSignal || hasHorizontalOverflow || !hasArticleDetail || articleDetailHasDesignNotes || !hasLaunchPage || !hasOfficialPage) {
       throw new Error(
-        `${viewport.name} layout check failed: commandPalette=${hasCommandPalette}, commandPaletteClosed=${commandPaletteClosed}, highlights=${hasHighlights}, policySignal=${hasPolicySignal}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, articleDetailHasDesignNotes=${articleDetailHasDesignNotes}, launchPage=${hasLaunchPage}, policyPage=${hasPolicyPage}`,
+        `${viewport.name} layout check failed: commandPalette=${hasCommandPalette}, commandPaletteClosed=${commandPaletteClosed}, highlights=${hasHighlights}, officialSignal=${hasOfficialSignal}, horizontalOverflow=${hasHorizontalOverflow}, articleDetail=${hasArticleDetail}, articleDetailHasDesignNotes=${articleDetailHasDesignNotes}, launchPage=${hasLaunchPage}, officialPage=${hasOfficialPage}`,
       );
     }
 

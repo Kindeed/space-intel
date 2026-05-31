@@ -78,12 +78,12 @@ describe('LiveHud', () => {
     const html = renderHud();
 
     expect(html).toContain('发射记录加载中。');
-    expect(html).toContain('政策信息加载中。');
+    expect(html).toContain('官方信息加载中。');
     expect(html).toContain('来源状态加载中。');
     expect(html).toContain('aria-label="实时概览"');
     expect(html).not.toContain('实时情报 HUD');
     expect(html).not.toContain('暂无发射记录。');
-    expect(html).not.toContain('暂无政策信息。');
+    expect(html).not.toContain('暂无官方信息。');
     expect(html).not.toContain('来源状态暂不可用。');
   });
 
@@ -95,7 +95,7 @@ describe('LiveHud', () => {
     const html = renderHud();
 
     expect(html).toContain('暂无发射记录。');
-    expect(html).toContain('暂无政策信息。');
+    expect(html).toContain('暂无官方信息。');
     expect(html).toContain('暂无来源状态。');
     expect(html).not.toContain('加载中');
     expect(html).not.toContain('暂不可用');
@@ -109,10 +109,10 @@ describe('LiveHud', () => {
     const html = renderHud();
 
     expect(html).toContain('发射记录暂不可用。');
-    expect(html).toContain('政策信息暂不可用。');
+    expect(html).toContain('官方信息暂不可用。');
     expect(html).toContain('来源状态暂不可用。');
     expect(html).not.toContain('暂无发射记录。');
-    expect(html).not.toContain('暂无政策信息。');
+    expect(html).not.toContain('暂无官方信息。');
     expect(html).not.toContain('暂无来源状态。');
   });
 
@@ -179,7 +179,7 @@ describe('LiveHud', () => {
     expect(html).not.toContain('直连 1 / 可能受限 1');
   });
 
-  it('links policy source categories to the policy article filter only when the category is precise', () => {
+  it('links official source categories to the official article filter only when the category is precise', () => {
     mockUseLaunchesQuery.mockReturnValue(queryState({ data: { items: [], page: 1, limit: 4, hasMore: false } }) as unknown as ReturnType<typeof useLaunchesQuery>);
     mockUseArticlesQuery.mockReturnValue(queryState({ data: { items: [], page: 1, limit: 4, hasMore: false } }) as unknown as ReturnType<typeof useArticlesQuery>);
     mockUseSourcesQuery.mockReturnValue(
@@ -198,8 +198,8 @@ describe('LiveHud', () => {
 
     const html = renderHud();
 
-    expect(html).toContain('href="/articles?category=policy"');
-    expect(html.match(/href="\/articles\?category=policy"/g)).toHaveLength(2);
+    expect(html).toContain('href="/articles?category=official"');
+    expect(html.match(/href="\/articles\?category=official"/g)).toHaveLength(2);
     expect(html).toContain('href="/articles"');
   });
 

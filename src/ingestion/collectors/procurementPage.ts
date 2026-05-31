@@ -19,10 +19,6 @@ const domainTerms = [
 
 const procurementTerms = ['招标', '采购', '中标', '成交', '公告', '公示', '项目'];
 
-function extractDate(input: string, fallback: Date): string {
-  return extractHtmlDate(input) ?? fallback.toISOString();
-}
-
 function titleTags(title: string): string[] {
   const tags = new Set<string>(['space-procurement']);
 
@@ -73,8 +69,9 @@ export const procurementPageCollector: SourceCollector = {
       }
 
       const signalText = `${link.title} ${link.contextText}`;
+      const publishedAt = extractHtmlDate(signalText);
 
-      if (!hasSpaceProcurementSignal(link.title, link.contextText)) {
+      if (!publishedAt || !hasSpaceProcurementSignal(link.title, link.contextText)) {
         continue;
       }
 
@@ -88,7 +85,7 @@ export const procurementPageCollector: SourceCollector = {
         ...(title === link.title ? {} : { originalTitle: link.title }),
         summary: `采购公告：${title}`,
         url: link.url,
-        publishedAt: extractDate(signalText, context.now()),
+        publishedAt,
         language: 'zh',
         region: source.region,
         rawId: link.url,

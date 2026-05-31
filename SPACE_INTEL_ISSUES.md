@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-05-31 - SI-ISSUE-352 - Official column and public source coverage are too narrow
+
+- Priority: P2
+- Status: VERIFIED
+- Area: ingestion | frontend | api | sources | docs
+- Found In: user report and local source/navigation review
+- Evidence: User reported that information sources were still too few, crawler coverage was too weak, local government space-policy/procurement content was sparse, and the page name should become “航天信息”. Local review confirmed the visible fourth navigation entry was still “政策”, `/api/articles?category=policy` mixed policy-tagged RSS/media with official records, procurement collection still fell back to crawl time for invalid dates, and source governance wording could be read as over-restricting public forums/websites.
+- Fix: Renamed public brand surfaces to “航天信息”, added `/official` while keeping `/policy` compatible, added `category=official` for official-page/procurement records with policy/procurement tags, updated the Live HUD and navigation to “官方”, expanded `config/sources.yaml` with public official/procurement/industry sources, rewrote source governance to allow public RSS, webpage, forum/community, RSSHub, and search-aggregation sources with risk tiers, and changed procurement collection to skip candidates without real source dates.
+- Regression Check: Verified with targeted `.\node_modules\.bin\vitest.cmd run functions\api\_articles.test.ts src\db\articleQueries.test.ts src\pages\PolicyPage.test.tsx src\constants.test.ts src\components\LiveHud.test.tsx src\ingestion\ingestion.test.ts` passing 6 files / 116 tests, `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, full `.\node_modules\.bin\vitest.cmd run` passing 60 files / 440 tests, `.\node_modules\.bin\vite.cmd build`, `node scripts\verify-layout.mjs`, local Playwright mobile check of `http://127.0.0.1:4173/official`, `git diff --check`, and added-line sensitive-pattern scan returning no matches.
+- Notes: RSSHub/forum/social sources remain supported by governance but should stay lower-trust trend inputs unless route health and compliance are reviewed.
+
 ### 2026-05-31 - SI-ISSUE-351 - Official-page news uses crawl time and links to home or section pages
 
 - Priority: P1

@@ -59,9 +59,9 @@ export function SiteHeader() {
 
   return (
     <header className="site-header">
-      <Link to="/" className="brand" aria-label="商业航天情报站首页">
+      <Link to="/" className="brand" aria-label="航天信息首页">
         <Rocket size={26} aria-hidden="true" />
-        <span>商业航天情报</span>
+        <span>航天信息</span>
       </Link>
       <form action="/articles" className="command-search" role="search" onSubmit={handleSearchSubmit}>
         <Search size={16} aria-hidden="true" />
