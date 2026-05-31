@@ -102,6 +102,19 @@ export const publicArticleVisibilityCondition = `NOT (
           '国家遥感数据与应用服务平台'
         )
       )
+    )
+    AND NOT (
+      s.type = 'official_page'
+      AND (
+        a.url LIKE '%/'
+        OR a.url LIKE '%/index.html'
+        OR a.url LIKE '%/index.htm'
+        OR a.url LIKE '%/index.shtml'
+        OR a.url LIKE '%/default.html'
+        OR a.url LIKE '%/default.htm'
+        OR a.url LIKE '%/default.shtml'
+        OR ABS((julianday(a.published_at) - julianday(a.created_at)) * 86400) < 300
+      )
     )`;
 
 export const articleRelationSelectFields = `

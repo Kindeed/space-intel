@@ -382,21 +382,35 @@ export function extractDate(value: string): string | null {
     }
   }
 
+  for (const match of value.matchAll(/\b(\d{1,2})\s+(\d{1,2})\s*月\s+(20\d{2})\b/g)) {
+    const [, day, month, year] = match;
+    const date = normalizedDate(year, month, day);
+
+    if (date) {
+      return date;
+    }
+  }
+
   return null;
 }
 
 export function stripLeadingDatePrefix(title: string): string {
-  const match = title.match(
+  const leadingMatch = title.match(
     /^(?:(?:\[\s*|【\s*|\(\s*|（\s*)?)(20\d{2}\s*[-/.年]\s*\d{1,2}\s*[-/.月]\s*\d{1,2}(?:\s*日)?|\d{1,2}\/\d{1,2}\/20\d{2})(?:[T\s]\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)?(?:(?:\s*\]|\s*】|\s*\)|\s*）))?\s*[-–—:：]?\s*/,
   );
+  let cleaned = title;
 
-  if (!match || !extractDate(match[1])) {
-    return title;
+  if (leadingMatch && extractDate(leadingMatch[1])) {
+    cleaned = title.slice(leadingMatch[0].length).trim() || title;
   }
 
-  const cleaned = title.slice(match[0].length).trim();
+  const trailingMatch = cleaned.match(/\s+(\d{1,2}\s+\d{1,2}\s*月\s+20\d{2})$/);
 
-  return cleaned || title;
+  if (trailingMatch && extractDate(trailingMatch[1])) {
+    return cleaned.slice(0, trailingMatch.index).trim() || cleaned;
+  }
+
+  return cleaned;
 }
 
 function listBlocks(html: string): string[] {

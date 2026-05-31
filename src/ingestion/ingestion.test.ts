@@ -1287,8 +1287,8 @@ describe('official page collector', () => {
         new Response(
           `<html>
             <body>
-              <a href="/news/health-park.html">区领导调研无锡美丽健康产业园</a>
-              <a href="/news/space-park.html">空天产业园卫星制造项目完成阶段建设</a>
+              <a href="/news/health-park.html">2026-05-08 区领导调研无锡美丽健康产业园</a>
+              <a href="/news/space-park.html">2026-05-08 空天产业园卫星制造项目完成阶段建设</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1331,7 +1331,7 @@ describe('official page collector', () => {
               <a href="/xwzx/kjkx/">空间科学</a>
               <a href="/xwzx/ztbd/">专题报道</a>
               <a href="/xwdt/gzdt/">工作动态</a>
-              <a href="/n6758967/n6758973/c10750640/content.html">国家航天局发布卫星互联网应用试点通知</a>
+              <a href="/n6758967/n6758973/c10750640/content.html">2026-05-08 国家航天局发布卫星互联网应用试点通知</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1367,8 +1367,8 @@ describe('official page collector', () => {
         new Response(
           `<html>
             <body>
-              <a href="/n6758823/n6758838/index.html">国家航天局商业航天服务入口</a>
-              <a href="/n6758823/n6758838/c10750640/content.html">国家航天局发布商业航天政策通知</a>
+              <a href="/n6758823/n6758838/index.html">2026-05-08 国家航天局商业航天服务入口</a>
+              <a href="/n6758823/n6758838/c10750640/content.html">2026-05-08 国家航天局发布商业航天政策通知</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1409,10 +1409,10 @@ describe('official page collector', () => {
         new Response(
           `<html>
             <body>
-              <a href="/n6758823/n6758838/c10750640/content.html">神舟二十二号载人飞船顺利撤离空间站组合体</a>
+              <a href="/n6758823/n6758838/c10750640/content.html">2026-05-08 神舟二十二号载人飞船顺利撤离空间站组合体</a>
               <a href="https://www.miit.gov.cn/">中华人民共和国工业和信息化部</a>
               <a href="http://www.spacechina.com/n25/index.html">中国航天科技集团有限公司</a>
-              <a href="https://mp.weixin.qq.com/s/example">引力一号实现第二次海上发射</a>
+              <a href="https://mp.weixin.qq.com/s/example">2026-05-08 引力一号实现第二次海上发射</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1459,12 +1459,12 @@ describe('official page collector', () => {
             <body>
               <ul>
                 <li>
-                  <a href="./politics.html">李强主持召开国务院常务会议 研究促进创业投资发展的有关举措等</a>
-                  <a href="./auto.html">2024世界智能网联汽车大会新闻发布会在京召开</a>
-                  <a href="./project.html">关于开展重大项目申报工作的通知</a>
+                  <a href="./politics.html">2026-05-08 李强主持召开国务院常务会议 研究促进创业投资发展的有关举措等</a>
+                  <a href="./auto.html">2026-05-08 2024世界智能网联汽车大会新闻发布会在京召开</a>
+                  <a href="./project.html">2026-05-08 关于开展重大项目申报工作的通知</a>
                 </li>
                 <li>
-                  <a href="./space.html">商业航天新闻发布会发布卫星互联网行动方案</a>
+                  <a href="./space.html">2026-05-08 商业航天新闻发布会发布卫星互联网行动方案</a>
                 </li>
               </ul>
             </body>
@@ -1605,7 +1605,7 @@ describe('official page collector', () => {
         new Response(
           `<html>
             <body>
-              <a href="/news/demo">引力一号完成海上发射任务</a>
+              <a href="/news/demo">2026-05-08 引力一号完成海上发射任务</a>
             </body>
           </html>`,
           { headers: { 'content-type': 'text/html' } },
@@ -1659,6 +1659,127 @@ describe('official page collector', () => {
       summary: '官方发布：引力一号实现第二次海上发射，率先满足规模化低轨星座组网发射需求',
       publishedAt: '2025-10-11T00:00:00Z',
     });
+  });
+
+  it('uses trailing Chinese source dates for company news without keeping them in public titles', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'landspace-news',
+          name: '蓝箭航天新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://www.landspace.com/site/',
+          credibility: 4,
+          enabled: true,
+          purpose: 'Company announcements.',
+          expected_content: 'Company news metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['domestic-private-launch'],
+          default_companies: ['蓝箭航天'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="/site/news-detail.html?itemid=67">蓝箭航天成功进行多星堆叠及卫星组合体试验 06 02月 2026</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items[0]).toMatchObject({
+      title: '蓝箭航天成功进行多星堆叠及卫星组合体试验',
+      originalTitle: '蓝箭航天成功进行多星堆叠及卫星组合体试验 06 02月 2026',
+      summary: '官方发布：蓝箭航天成功进行多星堆叠及卫星组合体试验',
+      publishedAt: '2026-02-06T00:00:00Z',
+    });
+  });
+
+  it('drops official page candidates without a real source date instead of using crawl time', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'casic-news',
+          name: '中国航天科工集团新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'http://www.casic.com.cn/',
+          credibility: 5,
+          enabled: true,
+          purpose: 'Company news.',
+          expected_content: 'Company news metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['domestic-private-launch'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="https://www.e-casic.com/">航天科工集中采购平台</a>
+              <a href="/news/demo.html">航天科工发布商业航天合作动态</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items).toEqual([]);
+  });
+
+  it('drops official page section URLs even when they have relevant titles and dates', async () => {
+    const [source] = parseSourcesConfig({
+      sources: [
+        {
+          key: 'cmse-news',
+          name: '中国载人航天工程新闻',
+          type: 'official_page',
+          region: 'cn',
+          url: 'https://www.cmse.gov.cn/xwzx/',
+          credibility: 5,
+          enabled: true,
+          purpose: 'Official crewed-space program news.',
+          expected_content: 'Official news metadata and original links.',
+          risk_notes: 'Official page metadata only.',
+          dedupe_strategy: 'url_title_source',
+          default_tags: ['policy-and-regulation'],
+        },
+      ],
+    });
+
+    const items = await officialPageCollector.collect(source, {
+      now: () => new Date('2026-05-09T00:00:00Z'),
+      fetch: async () =>
+        new Response(
+          `<html>
+            <body>
+              <a href="/kjkx/kjkxyjyyy/">2026-05-08 空间科学研究与应用</a>
+              <a href="/xwzx/2026-05-08-demo.html">2026-05-08 载人航天工程任务取得新进展</a>
+            </body>
+          </html>`,
+          { headers: { 'content-type': 'text/html' } },
+        ),
+    });
+
+    expect(items.map((item) => ({ title: item.title, url: item.url }))).toEqual([
+      {
+        title: '载人航天工程任务取得新进展',
+        url: 'https://www.cmse.gov.cn/xwzx/2026-05-08-demo.html',
+      },
+    ]);
   });
 
   it('removes bracketed leading source dates from official page public titles', async () => {
@@ -1751,7 +1872,7 @@ describe('official page collector', () => {
     ]);
   });
 
-  it('falls back to collection time when official page dates are invalid', async () => {
+  it('drops official page candidates when source dates are invalid', async () => {
     const [source] = parseSourcesConfig({
       sources: [
         {
@@ -1787,10 +1908,7 @@ describe('official page collector', () => {
         ),
     });
 
-    expect(items[0]).toMatchObject({
-      title: '商业航天公共试验平台申报通知',
-      publishedAt: '2026-05-09T00:00:00.000Z',
-    });
+    expect(items).toEqual([]);
   });
 
   it('drops non-web Launch Library source URLs while keeping launch metadata', async () => {

@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-05-31 - SI-ISSUE-351 - Official-page news uses crawl time and links to home or section pages
+
+- Priority: P1
+- Status: VERIFIED
+- Area: ingestion | api | data-quality | sources
+- Found In: user report and production article/home API checks
+- Evidence: Production `/api/articles?limit=20` and `/api/home` showed top items from official/company pages sharing crawl-time timestamps such as `2026-05-31 01:01:43`, while titles contained older source dates like `17 05月 2025`. Some top rows linked to non-news pages such as `https://www.e-casic.com/`, `https://www.cmse.gov.cn/kjkx/kjkxyjyyy/`, and other section/homepage URLs.
+- Fix: Official-page ingestion now requires a real source date before emitting an item, rejects homepage/section/index/default URLs, parses trailing Chinese source dates such as `06 02月 2026`, removes that date chrome from public titles, and public queries hide historical official-page rows where crawl time was stored as article time.
+- Regression Check: Verified with targeted `.\node_modules\.bin\vitest.cmd run src\ingestion\ingestion.test.ts src\ingestion\htmlList.test.ts src\db\articleQueries.test.ts src\db\homeQueries.test.ts src\db\companyQueries.test.ts src\db\topicQueries.test.ts` passing 6 files / 118 tests, `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, full `.\node_modules\.bin\vitest.cmd run` passing 60 files / 438 tests, `.\node_modules\.bin\vite.cmd build`, `git diff --check`, and added-line sensitive-pattern scan returning no matches.
+- Notes: This is a broader follow-up to `SI-ISSUE-350`; the previous CNSA-specific cleanup was not sufficient for company and official pages with weak date/link structure.
+
 ### 2026-05-31 - SI-ISSUE-350 - Latest feed is polluted by CNSA navigation pages and stale sources
 
 - Priority: P1
