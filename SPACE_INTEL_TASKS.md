@@ -17,7 +17,7 @@
 
 当前任务：
 
-- IN_PROGRESS：发射规划中国火箭覆盖修复正在闭环。已针对 `SI-ISSUE-354` 确认上游 Launch Library 2 当前包含长征、捷龙、星云等中国发射记录，但生产 `/api/launches` 缺失；本轮改为每小时刷新 launch cache，提高 LL2 拉取数量，增加公开 health 的 launch cache 统计和最近 launch ingestion 脱敏状态，并让 admin logs 支持按 `launch-library-2` 过滤。同步补充中国载人航天、航天科技/中国商火和长城公司发射机会等官方规划源声明，后续需要专门 extractor 把“规划/机会”与精确发射事件分层建模。配置检查、目标测试、完整回归、类型检查、lint、构建和 diff check 已通过，仍需部署后生产复查。
+- IN_PROGRESS：发射规划中国火箭覆盖修复正在闭环。已针对 `SI-ISSUE-354` 确认上游 Launch Library 2 当前包含长征、捷龙、星云等中国发射记录，但生产 `/api/launches` 缺失；本轮改为每小时刷新 launch cache，提高 LL2 拉取数量，增加公开 health 的 launch cache 统计和最近 launch ingestion 脱敏状态，并让 admin logs 支持按 `launch-library-2` 过滤。同步补充中国载人航天、航天科技/中国商火和长城公司发射机会等官方规划源声明，后续需要专门 extractor 把“规划/机会”与精确发射事件分层建模。配置检查、目标测试、完整回归、类型检查、lint、构建、diff check、PR #28 CI 和 scheduled Worker 部署已通过；生产复查显示最新 Launch Library 2 采集为 `http_error`，仍需 admin token 手动重跑或等待下一次 hourly launch ingestion 复查。
 - IN_PROGRESS：国内来源采集诊断能力改进正在闭环。已针对 `SI-ISSUE-353` 增加公开 `/api/health` 的脱敏错误分类和耗时字段，并新增受保护的单源采集重跑入口与受保护的最近失败采集日志入口，避免只能看到 `hasError: true` 而无法定位超时、HTTP、解析或 D1 问题；目标测试、完整回归、配置检查、类型检查、lint、构建和 diff check 已通过，仍需部署后生产复查。
 - DONE：站点品牌、官方栏目和公开来源扩展已完成。站点名统一为“航天信息”，第 4 个主入口改为“官方”并新增 `/official`，旧 `/policy` 保持兼容；公开 API 支持 `category=official`，仅筛选官方页和采购公告中带政策/采购标签的记录；来源治理已改写为“扩大公开来源、分级管理风险”，新增 CNSA 政策公告、中国政府采购网地方公告、全国公共资源交易平台航天公告、卫星通信观察、未来天玑动态和中关村商业航天联盟等公开来源；采购公告采集不再用采集时间兜底发布日期。目标测试、配置检查、类型检查、lint、完整回归、构建、布局验证、本地 `/official` mobile 检查、diff check 和新增行敏感信息扫描已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-352`。
 - DONE：官方页新闻时间和链接质量修复已完成。生产复查确认首页/资讯页顶部存在用采集时间冒充发布时间的官方页记录，并包含公司主页、采购平台首页、栏目页等非新闻链接；本轮已要求官方页候选必须带真实来源日期，过滤首页/栏目/index/default URL，解析蓝箭等公司页尾部中文日期，并屏蔽历史 crawl-time 官方页脏数据。目标测试、配置检查、类型检查、lint、完整回归、构建、diff check 和新增行敏感信息扫描已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-351`。
