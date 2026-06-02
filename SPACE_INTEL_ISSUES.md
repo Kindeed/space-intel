@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-06-02 - SI-ISSUE-353 - Domestic latest feed is uneven because scheduled ingestion times out or fails on several domestic sources
+
+- Priority: P1
+- Status: FIXED
+- Area: ingestion | operations | data-quality
+- Found In: user report and production API/health checks
+- Evidence: Production `/api/articles?region=cn&limit=20` returned current domestic rows including `2026-06-02` CASIC and `2026-06-01` CNSA items, so the public article query itself is working. Production `/api/health` on 2026-06-02 reported `latestSuccessfulIngestionAt: 2026-06-02T06:02:54.663Z` and `openIngestionLogCount: 0`, but recent failures included `国家航天局政策公告` with a 25.18s run matching the 25s source timeout, `Spaceflight News` closed as a stale 2-hour log, and fast failures for `中国政府采购网中央公告`, `中国政府采购网地方公告`, and `全国公共资源交易平台航天公告`. Public source-filter checks showed several newly added domestic sources still have no production articles, including `中国政府采购网中央公告`, `中国政府采购网地方公告`, `全国公共资源交易平台航天公告`, `未来天玑动态`, and `中关村商业航天联盟`.
+- Fix: Added safe ingestion diagnostics for public `/api/health`, including `durationMs` and a sanitized `errorCategory` such as `timeout`, `http_error`, `db_error`, `parse_error`, `aborted`, or `ingestion_error` without exposing raw error text or internal source keys. Added protected `/api/admin/ingest/logs` for admin-only recent failure inspection with raw error text, and protected `/api/admin/ingest/source?key=...` for manually rerunning a single enabled article source such as `cnsa-policy`, `casic-news`, or procurement sources.
+- Regression Check: Verified locally with targeted `.\node_modules\.bin\vitest.cmd run functions\api\health.test.ts functions\api\_admin.test.ts functions\api\admin\ingest\source.test.ts functions\api\admin\ingest\logs.test.ts functions\api\admin\ingest\rss.test.ts functions\api\admin\ingest\_sources.test.ts src\ingestion\scheduled.test.ts` passing 7 files / 29 tests, follow-up targeted diagnostics tests passing 3 files / 9 tests, `node scripts\generate-config.mjs --check`, `.\node_modules\.bin\tsc.cmd -b --noEmit`, full `.\node_modules\.bin\vitest.cmd run` passing 62 files / 446 tests, `.\node_modules\.bin\eslint.cmd .`, `.\node_modules\.bin\vite.cmd build`, and `git diff --check`. Production recheck remains pending until deployment.
+- Notes: PR #26 and the scheduled Worker deploy both completed successfully on 2026-05-31, so this is not explained by an unmerged PR or skipped scheduled Worker deployment. Local collect-only reproduction on 2026-06-02 showed `cnsa-news`, `cnsa-policy`, `casic-news`, and `zcaia-news` can be parsed from the current network environment, while the procurement pages currently yielded zero relevant items locally. Wrangler log inspection was blocked locally because `CLOUDFLARE_API_TOKEN` is not set.
+
 ### 2026-05-31 - SI-ISSUE-352 - Official column and public source coverage are too narrow
 
 - Priority: P2
