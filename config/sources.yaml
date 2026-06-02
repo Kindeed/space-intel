@@ -21,13 +21,14 @@ sources:
     url: https://ll.thespacedevs.com/2.2.0/launch/upcoming/
     credibility: 5
     enabled: true
-    purpose: Upcoming launch and event cache for launch pages and article relations.
+    purpose: Primary upcoming launch and event cache for launch pages and article relations, including Chinese state and commercial launch providers when present upstream.
     expected_content: Mission, provider, vehicle, site, window, and status metadata.
-    risk_notes: Public API; cache event metadata only.
+    risk_notes: Public API; cache event metadata only. Use official Chinese human-spaceflight, CASC/China Rocket, and CGWIC planning pages as source-quality cross-checks when Chinese launch coverage appears stale or incomplete.
     dedupe_strategy: external_id
     public_category: data
     access_domestic: limited
     access_global: direct
+    max_items: 100
     public_badge: 国内访问可能受限
   - key: google-news-cn-commercial-space
     name: 商业航天来源
@@ -819,6 +820,70 @@ sources:
     access_global: direct
     default_tags: [domestic-private-launch, satellite-internet]
     include_terms: [商业航天, 航天, 火箭, 发射, 卫星, 星座, 卫星互联网, 遥感, 空天, 太空军, SpaceX, FAA]
+  - key: cmse-flight-missions
+    name: 中国载人航天飞行任务
+    type: official_page
+    region: cn
+    url: https://www.cmse.gov.cn/fxrw/
+    credibility: 5
+    enabled: true
+    purpose: Track official Chinese human-spaceflight mission pages with task names, launch time, launch site, and mission overview for Shenzhou and Tianzhou records.
+    expected_content: Official mission cards with launch time, launch site, mission name, and source links.
+    risk_notes: Official CMSE source. Treat as authoritative for human-spaceflight mission history and near-term notices, but keep it separate from LL2 global launch cache until a launch-planning extractor is added.
+    dedupe_strategy: url_title_source
+    public_category: official
+    access_domestic: direct
+    access_global: direct
+    default_tags: [domestic-private-launch]
+    include_terms: [任务名称, 发射时间, 发射地点, 神舟, 天舟, 载人飞行任务, 货运补给任务]
+  - key: cmse-official-announcements
+    name: 中国载人航天官方公告
+    type: official_page
+    region: cn
+    url: https://www.cmse.gov.cn/gfgg/
+    credibility: 5
+    enabled: true
+    purpose: Track official CMSE announcements that publish mission badges, station parameters, task notices, and human-spaceflight planning signals.
+    expected_content: Official announcement titles, publication dates, source links, and mission-related notices.
+    risk_notes: Official CMSE source; announcement pages are not always launch records, so use them as planning and verification signals rather than direct launch-cache replacement.
+    dedupe_strategy: url_title_source
+    public_category: official
+    access_domestic: direct
+    access_global: direct
+    default_tags: [domestic-private-launch, policy-and-regulation]
+    include_terms: [飞行任务, 任务标识, 发射, 轨道参数, 神舟, 天舟, 空间站]
+  - key: spacechina-commercial-launch-opportunities
+    name: 航天科技商业火箭发射机会
+    type: official_page
+    region: cn
+    url: https://www.spacechina.com/n25/n2014789/n2014809/c4583479/content.html
+    credibility: 5
+    enabled: true
+    purpose: Track CASC/China Rocket public 2026-2027 Long March rideshare and piggyback launch opportunity planning.
+    expected_content: Official planning article metadata, available launch opportunity windows, launch vehicle references, and source link.
+    risk_notes: Official group article with planning windows instead of precise launch events; do not merge into scheduled launch records until a dedicated launch-planning extractor models approximate windows.
+    dedupe_strategy: url_title_source
+    public_category: official
+    access_domestic: direct
+    access_global: direct
+    default_tags: [domestic-private-launch]
+    include_terms: [运载火箭, 搭载, 拼车, 发射机会, 发射窗口, 长征]
+  - key: cgwic-launch-opportunities
+    name: 长城公司发射机会
+    type: official_page
+    region: cn
+    url: https://www.cgwic.com/Launchservice/piggyback.html
+    credibility: 4
+    enabled: true
+    purpose: Track CGWIC public launch opportunity and piggyback launch service information for Chinese international commercial launch services.
+    expected_content: Launch opportunity service pages, vehicle references, customer launch-service context, and source links.
+    risk_notes: Official company service page, often static and opportunity-focused rather than dated mission schedule. Use as planning context and source-quality cross-check.
+    dedupe_strategy: url_title_source
+    public_category: official
+    access_domestic: direct
+    access_global: direct
+    default_tags: [domestic-private-launch]
+    include_terms: [Launch Opportunities, piggyback, launch service, Long March, rideshare]
   - key: zcaia-news
     name: 中关村商业航天联盟
     type: official_page

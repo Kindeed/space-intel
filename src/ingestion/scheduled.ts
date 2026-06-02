@@ -98,10 +98,6 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function shouldRunLaunchIngestion(now: Date): boolean {
-  return now.getUTCHours() % 6 === 0;
-}
-
 function concurrencyForSource(source: SourceConfig): number {
   if (source.type === 'rss' || source.type === 'rsshub' || source.type === 'official_page' || source.type === 'procurement_page') {
     return 4;
@@ -222,7 +218,7 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
 
     const launchSource = input.sources.find((source) => source.key === 'launch-library-2');
 
-    if (launchSource?.enabled && shouldRunLaunchIngestion(input.context.now())) {
+    if (launchSource?.enabled) {
       sourceRuns.push(
         await runLaunchSourceSafely(launchSource, () =>
           runLaunchIngestion(input.db, launchSource, launchLibraryCollector, input.context, {

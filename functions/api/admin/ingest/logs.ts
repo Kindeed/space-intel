@@ -15,6 +15,10 @@ function limitFromRequest(request: Request): number {
   return parseOptionalPositiveInteger(new URL(request.url).searchParams.get('limit')) ?? 20;
 }
 
+function sourceKeyFromRequest(request: Request): string | null {
+  return new URL(request.url).searchParams.get('sourceKey')?.trim() || null;
+}
+
 function publicAdminLog(row: IngestionLogDiagnosticRow) {
   return {
     sourceKey: row.sourceKey,
@@ -37,7 +41,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   }
 
   try {
-    const result = await env.DB.prepare(
+    const sourceKey = sourceKeyFromRequest(request);
+    const whereClause = sourceKey
+      ? 'WHERE source_key = ?'
+      : "WHERE failure_count > 0 OR (error IS NOT NULL AND error != '')";
+    const statement = env.DB.prepare(
       `SELECT
         source_key AS sourceKey,
         started_at AS startedAt,
@@ -46,11 +54,13 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
         failure_count AS failureCount,
         error
       FROM ingestion_logs
-      WHERE failure_count > 0 OR (error IS NOT NULL AND error != '')
+      ${whereClause}
       ORDER BY COALESCE(finished_at, started_at) DESC, id DESC
       LIMIT ?`,
-    )
-      .bind(limitFromRequest(request))
+    );
+    const values = sourceKey ? [sourceKey, limitFromRequest(request)] : [limitFromRequest(request)];
+    const result = await statement
+      .bind(...values)
       .all?.<IngestionLogDiagnosticRow>();
 
     return Response.json({ items: result?.results.map(publicAdminLog) ?? [] });

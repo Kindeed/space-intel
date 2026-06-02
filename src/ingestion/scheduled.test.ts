@@ -562,7 +562,7 @@ describe('scheduled ingestion', () => {
     expect(db.logs[0]).toMatchObject({ sourceKey: 'rsshub-weibo-space-keyword', successCount: 1 });
   });
 
-  it('skips Launch Library ingestion outside the six-hour cadence', async () => {
+  it('runs Launch Library ingestion during each hourly ingestion', async () => {
     const db = new MemoryScheduledDatabase();
     let fetchCount = 0;
     const launchSource = sources.find((source) => source.key === 'launch-library-2');
@@ -578,15 +578,35 @@ describe('scheduled ingestion', () => {
         now: () => new Date('2026-05-09T01:00:00Z'),
         fetch: async () => {
           fetchCount += 1;
-          return new Response('{}');
+          return new Response(JSON.stringify({
+            results: [
+              {
+                id: 'long-march-demo',
+                name: 'Long March 8 | Demo Payload',
+                url: 'https://ll.thespacedevs.com/2.2.0/launch/long-march-demo/',
+                net: '2026-06-05T06:30:00Z',
+                status: { name: 'To Be Confirmed' },
+                rocket: { configuration: { full_name: 'Long March 8' } },
+                launch_service_provider: { name: 'China Aerospace Science and Technology Corporation' },
+                pad: { name: 'Unknown Pad', location: { name: "Wenchang Space Launch Site, People's Republic of China" } },
+              },
+            ],
+          }));
         },
       },
       kind: 'hourly',
     });
 
-    expect(fetchCount).toBe(0);
-    expect(result.sourceRuns).toEqual([]);
-    expect(db.logs).toEqual([]);
+    expect(fetchCount).toBe(1);
+    expect(result.sourceRuns).toEqual([
+      expect.objectContaining({
+        sourceKey: 'launch-library-2',
+        failures: 0,
+        upserted: 1,
+      }),
+    ]);
+    expect(db.logs).toHaveLength(1);
+    expect(db.logs[0]).toMatchObject({ sourceKey: 'launch-library-2', successCount: 1 });
   });
 
   it('skips disabled API sources even when they have dedicated scheduled collectors', async () => {
