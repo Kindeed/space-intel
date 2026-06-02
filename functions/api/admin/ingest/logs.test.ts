@@ -6,7 +6,11 @@ class FakeLogStatement {
   constructor(private readonly query: string) {}
 
   bind(...values: unknown[]): FakeLogStatement {
-    expect(values).toEqual([5]);
+    if (this.query.includes('source_key = ?')) {
+      expect(values).toEqual(['launch-library-2', 3]);
+    } else {
+      expect(values).toEqual([5]);
+    }
     return this;
   }
 
@@ -21,6 +25,21 @@ class FakeLogStatement {
   async all<T = unknown>(): Promise<{ results: T[] }> {
     expect(this.query).toContain('FROM ingestion_logs');
     expect(this.query).toContain('LIMIT ?');
+
+    if (this.query.includes('source_key = ?')) {
+      return {
+        results: [
+          {
+            sourceKey: 'launch-library-2',
+            startedAt: '2026-06-02T06:00:00.000Z',
+            finishedAt: '2026-06-02T06:00:03.000Z',
+            successCount: 25,
+            failureCount: 0,
+            error: null,
+          } as T,
+        ],
+      };
+    }
 
     return {
       results: [
@@ -47,6 +66,14 @@ function adminRequest(token = 'expected-token'): Request {
   return new Request('https://space.example.test/api/admin/ingest/logs?limit=5', {
     headers: {
       authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+function launchLogRequest(): Request {
+  return new Request('https://space.example.test/api/admin/ingest/logs?sourceKey=launch-library-2&limit=3', {
+    headers: {
+      authorization: 'Bearer expected-token',
     },
   });
 }
@@ -80,6 +107,29 @@ describe('admin ingestion logs API', () => {
           failureCount: 1,
           errorCategory: 'timeout',
           error: 'Source ingestion timed out after 25000ms',
+        },
+      ],
+    });
+  });
+
+  it('can filter logs by source key to inspect successful launch cache refreshes', async () => {
+    const response = await onRequestGet({
+      env: { DB: new FakeLogDatabase() as unknown as D1Database, ADMIN_TOKEN: 'expected-token' },
+      request: launchLogRequest(),
+    } as Parameters<typeof onRequestGet>[0]);
+
+    await expect(response.json()).resolves.toEqual({
+      items: [
+        {
+          sourceKey: 'launch-library-2',
+          sourceName: 'Launch Library 2',
+          startedAt: '2026-06-02T06:00:00.000Z',
+          finishedAt: '2026-06-02T06:00:03.000Z',
+          durationMs: 3000,
+          successCount: 25,
+          failureCount: 0,
+          errorCategory: null,
+          error: null,
         },
       ],
     });

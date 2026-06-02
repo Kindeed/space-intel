@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-06-02 - SI-ISSUE-354 - Launch planning misses Chinese rockets because launch cache refresh is too sparse and not observable enough
+
+- Priority: P1
+- Status: FIXED
+- Area: ingestion | operations | data-quality | sources
+- Found In: user report and production `/api/launches` / upstream Launch Library 2 checks
+- Evidence: Production `/api/launches?limit=50`, `/api/launches?provider=CASC&limit=20`, `/api/launches?query=Long%20March&limit=20`, and `/api/launches?query=China&limit=20` returned no Chinese launch records, while upstream Launch Library 2 `/launch/upcoming/?limit=25` returned current Chinese entries including `Long March 6A | Unknown Payload`, `Long March 8 | Unknown Payload`, `Smart Dragon 3 | Unknown Payload`, and `Long March 5 | Unknown Payload`. Production `/api/health` showed article ingestion continued at 08:00 and 09:00 UTC, but public diagnostics did not expose the latest `launch-library-2` run or launch cache count. Code review found launch ingestion only ran on UTC 0/6/12/18 because of `shouldRunLaunchIngestion`, and Launch Library 2 used the default API request limit unless configured.
+- Fix: Launch Library 2 ingestion now runs on every hourly scheduled ingestion instead of every six hours, `launch-library-2` is configured with `max_items: 100`, public `/api/health` reports `upcomingLaunchCount` and a sanitized `latestLaunchIngestionLog`, and protected `/api/admin/ingest/logs` supports `sourceKey=launch-library-2` to inspect raw success/failure logs. Added official Chinese launch-planning source declarations for CMSE flight missions, CMSE announcements, CASC/China Rocket launch opportunities, and CGWIC launch opportunities as planning/cross-check sources until a dedicated launch-planning extractor is added.
+- Regression Check: Verified locally with `node scripts\generate-config.mjs --check`, targeted `.\node_modules\.bin\vitest.cmd run functions\api\health.test.ts functions\api\admin\ingest\logs.test.ts src\ingestion\scheduled.test.ts src\ingestion\ingestion.test.ts` passing 4 files / 76 tests, full `.\node_modules\.bin\vitest.cmd run` passing 62 files / 447 tests, `.\node_modules\.bin\tsc.cmd -b --noEmit`, `.\node_modules\.bin\eslint.cmd .`, `.\node_modules\.bin\vite.cmd build`, and `git diff --check`. Production recheck remains pending until deployment and the next hourly launch ingestion, or an authenticated admin launch ingestion rerun.
+- Notes: `ADMIN_TOKEN` is the Cloudflare Pages Functions admin secret used in the `Authorization: Bearer ...` header for admin endpoints; it is not the GitHub token or `CLOUDFLARE_API_TOKEN`.
+
 ### 2026-06-02 - SI-ISSUE-353 - Domestic latest feed is uneven because scheduled ingestion times out or fails on several domestic sources
 
 - Priority: P1

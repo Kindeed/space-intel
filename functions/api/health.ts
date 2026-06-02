@@ -23,6 +23,8 @@ async function loadDiagnostics(db: D1Database | undefined) {
     return {
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
+      latestLaunchIngestionLog: null,
+      upcomingLaunchCount: 0,
       latestSuccessfulIngestionAt: null,
       recentFailedIngestionLogs: [],
       openIngestionLogCount: 0,
@@ -39,6 +41,10 @@ async function loadDiagnostics(db: D1Database | undefined) {
     const latestSuccessfulIngestionQuery = db
       .prepare('SELECT MAX(finished_at) AS latestSuccessfulIngestionAt FROM ingestion_logs WHERE finished_at IS NOT NULL AND failure_count = 0')
       .first<{ latestSuccessfulIngestionAt: string | null }>();
+    const upcomingLaunchCountQuery = db
+      .prepare('SELECT COUNT(*) AS upcomingLaunchCount FROM launches WHERE window_start >= ?')
+      .bind(new Date().toISOString())
+      .first<{ upcomingLaunchCount: number }>();
     const latestIngestionLogQuery = db
       .prepare(
         `SELECT
@@ -51,6 +57,22 @@ async function loadDiagnostics(db: D1Database | undefined) {
           error
         FROM ingestion_logs
         WHERE finished_at IS NOT NULL
+        ORDER BY finished_at DESC, id DESC
+        LIMIT 1`,
+      )
+      .first<IngestionLogDiagnosticRow>();
+    const latestLaunchIngestionLogQuery = db
+      .prepare(
+        `SELECT
+          source_key AS sourceKey,
+          started_at AS startedAt,
+          finished_at AS finishedAt,
+          success_count AS successCount,
+          failure_count AS failureCount,
+          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
+          error
+        FROM ingestion_logs
+        WHERE source_key = 'launch-library-2' AND finished_at IS NOT NULL
         ORDER BY finished_at DESC, id DESC
         LIMIT 1`,
       )
@@ -71,27 +93,41 @@ async function loadDiagnostics(db: D1Database | undefined) {
         LIMIT 5`,
       )
       .all?.<IngestionLogDiagnosticRow>();
-    const [latestArticle, openIngestionLogs, latestSuccessfulIngestion, latestIngestionLog, recentFailedIngestionLogs] = await Promise.all([
+    const [
+      latestArticle,
+      openIngestionLogs,
+      latestSuccessfulIngestion,
+      upcomingLaunchCount,
+      latestIngestionLog,
+      latestLaunchIngestionLog,
+      recentFailedIngestionLogs,
+    ] = await Promise.all([
       latestArticleQuery,
       openIngestionLogsQuery,
       latestSuccessfulIngestionQuery,
+      upcomingLaunchCountQuery,
       latestIngestionLogQuery,
+      latestLaunchIngestionLogQuery,
       recentFailedIngestionLogsQuery,
     ]);
 
     return {
       latestArticlePublishedAt: latestArticle?.latestArticlePublishedAt ?? null,
       openIngestionLogCount: openIngestionLogs?.openIngestionLogCount ?? 0,
+      upcomingLaunchCount: upcomingLaunchCount?.upcomingLaunchCount ?? 0,
       latestSuccessfulIngestionAt: latestSuccessfulIngestion?.latestSuccessfulIngestionAt ?? null,
       recentFailedIngestionLogs:
         recentFailedIngestionLogs?.results.map((row) => publicIngestionLog(row)) ?? [],
       latestIngestionLog: latestIngestionLog ? publicIngestionLog(latestIngestionLog) : null,
+      latestLaunchIngestionLog: latestLaunchIngestionLog ? publicIngestionLog(latestLaunchIngestionLog) : null,
     };
   } catch (error) {
     console.error('Failed to load health diagnostics', error);
     return {
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
+      latestLaunchIngestionLog: null,
+      upcomingLaunchCount: 0,
       latestSuccessfulIngestionAt: null,
       recentFailedIngestionLogs: [],
       openIngestionLogCount: 0,

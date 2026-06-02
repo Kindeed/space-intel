@@ -25,6 +25,22 @@ class FakeHealthStatement {
       return { latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z' } as T;
     }
 
+    if (this.query.includes('COUNT(*) AS upcomingLaunchCount')) {
+      return { upcomingLaunchCount: 12 } as T;
+    }
+
+    if (this.query.includes("source_key = 'launch-library-2'")) {
+      return {
+        sourceKey: 'launch-library-2',
+        startedAt: '2026-05-18T06:00:00Z',
+        finishedAt: '2026-05-18T06:00:03Z',
+        successCount: 25,
+        failureCount: 0,
+        hasError: 0,
+        error: null,
+      } as T;
+    }
+
     if (this.query.includes('FROM ingestion_logs') && this.query.includes('ORDER BY finished_at DESC')) {
       expect(this.query).toContain('finished_at IS NOT NULL');
       return {
@@ -87,6 +103,7 @@ describe('health API', () => {
       diagnostics: {
         latestArticlePublishedAt: '2026-05-18T08:00:00Z',
         openIngestionLogCount: 2,
+        upcomingLaunchCount: 12,
         latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z',
         recentFailedIngestionLogs: [
           {
@@ -110,6 +127,16 @@ describe('health API', () => {
           errorCategory: null,
           durationMs: 5000,
         },
+        latestLaunchIngestionLog: {
+          sourceName: 'Launch Library 2',
+          startedAt: '2026-05-18T06:00:00Z',
+          finishedAt: '2026-05-18T06:00:03Z',
+          successCount: 25,
+          failureCount: 0,
+          hasError: false,
+          errorCategory: null,
+          durationMs: 3000,
+        },
       },
     });
   });
@@ -127,6 +154,7 @@ describe('health API', () => {
     expect(payload).not.toContain('sourceKey');
     expect(payload).not.toContain('google-news-cn-commercial-space');
     expect(payload).not.toContain('demo-rss');
+    expect(payload).not.toContain('launch-library-2');
     expect(payload).not.toContain('Source ingestion timed out');
   });
 
