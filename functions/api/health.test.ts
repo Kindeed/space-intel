@@ -34,6 +34,7 @@ class FakeHealthStatement {
         successCount: 3,
         failureCount: 0,
         hasError: 0,
+        error: null,
       } as T;
     }
 
@@ -51,6 +52,7 @@ class FakeHealthStatement {
             successCount: 0,
             failureCount: 1,
             hasError: 1,
+            error: 'Source ingestion timed out after 25000ms',
           } as T,
         ],
       };
@@ -94,6 +96,8 @@ describe('health API', () => {
             successCount: 0,
             failureCount: 1,
             hasError: true,
+            errorCategory: 'timeout',
+            durationMs: 2000,
           },
         ],
         latestIngestionLog: {
@@ -103,6 +107,8 @@ describe('health API', () => {
           successCount: 3,
           failureCount: 0,
           hasError: false,
+          errorCategory: null,
+          durationMs: 5000,
         },
       },
     });
@@ -121,6 +127,7 @@ describe('health API', () => {
     expect(payload).not.toContain('sourceKey');
     expect(payload).not.toContain('google-news-cn-commercial-space');
     expect(payload).not.toContain('demo-rss');
+    expect(payload).not.toContain('Source ingestion timed out');
   });
 
   it('uses generic health check names instead of platform binding names', async () => {

@@ -1,20 +1,21 @@
-import sourcesConfig from '../../config/sources.generated.json';
-import { parseSourcesConfig } from '../../src/ingestion';
-import { sourceDisplayName } from '../../src/sourceDisplay';
+import {
+  ingestionDiagnosticSourceName,
+  ingestionDurationMs,
+  ingestionErrorCategory,
+  type IngestionLogDiagnosticRow,
+} from './_ingestionDiagnostics';
 
-type LatestIngestionLogRow = {
-  sourceKey: string;
-  startedAt: string;
-  finishedAt: string | null;
-  successCount: number;
-  failureCount: number;
-  hasError: number;
-};
-
-const healthSourceNameByKey = new Map(parseSourcesConfig(sourcesConfig).map((source) => [source.key, sourceDisplayName(source)]));
-
-function healthSourceName(sourceKey: string): string {
-  return healthSourceNameByKey.get(sourceKey) ?? '来源';
+function publicIngestionLog(row: IngestionLogDiagnosticRow) {
+  return {
+    sourceName: ingestionDiagnosticSourceName(row.sourceKey),
+    startedAt: row.startedAt,
+    finishedAt: row.finishedAt,
+    successCount: row.successCount,
+    failureCount: row.failureCount,
+    hasError: Boolean(row.hasError),
+    errorCategory: ingestionErrorCategory(row.error),
+    durationMs: ingestionDurationMs(row.startedAt, row.finishedAt),
+  };
 }
 
 async function loadDiagnostics(db: D1Database | undefined) {
@@ -46,13 +47,14 @@ async function loadDiagnostics(db: D1Database | undefined) {
           finished_at AS finishedAt,
           success_count AS successCount,
           failure_count AS failureCount,
-          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError
+          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
+          error
         FROM ingestion_logs
         WHERE finished_at IS NOT NULL
         ORDER BY finished_at DESC, id DESC
         LIMIT 1`,
       )
-      .first<LatestIngestionLogRow>();
+      .first<IngestionLogDiagnosticRow>();
     const recentFailedIngestionLogsQuery = db
       .prepare(
         `SELECT
@@ -61,13 +63,14 @@ async function loadDiagnostics(db: D1Database | undefined) {
           finished_at AS finishedAt,
           success_count AS successCount,
           failure_count AS failureCount,
-          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError
+          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
+          error
         FROM ingestion_logs
         WHERE failure_count > 0 OR (error IS NOT NULL AND error != '')
         ORDER BY COALESCE(finished_at, started_at) DESC, id DESC
         LIMIT 5`,
       )
-      .all?.<LatestIngestionLogRow>();
+      .all?.<IngestionLogDiagnosticRow>();
     const [latestArticle, openIngestionLogs, latestSuccessfulIngestion, latestIngestionLog, recentFailedIngestionLogs] = await Promise.all([
       latestArticleQuery,
       openIngestionLogsQuery,
@@ -81,24 +84,8 @@ async function loadDiagnostics(db: D1Database | undefined) {
       openIngestionLogCount: openIngestionLogs?.openIngestionLogCount ?? 0,
       latestSuccessfulIngestionAt: latestSuccessfulIngestion?.latestSuccessfulIngestionAt ?? null,
       recentFailedIngestionLogs:
-        recentFailedIngestionLogs?.results.map((row) => ({
-          sourceName: healthSourceName(row.sourceKey),
-          startedAt: row.startedAt,
-          finishedAt: row.finishedAt,
-          successCount: row.successCount,
-          failureCount: row.failureCount,
-          hasError: Boolean(row.hasError),
-        })) ?? [],
-      latestIngestionLog: latestIngestionLog
-        ? {
-            sourceName: healthSourceName(latestIngestionLog.sourceKey),
-            startedAt: latestIngestionLog.startedAt,
-            finishedAt: latestIngestionLog.finishedAt,
-            successCount: latestIngestionLog.successCount,
-            failureCount: latestIngestionLog.failureCount,
-            hasError: Boolean(latestIngestionLog.hasError),
-          }
-        : null,
+        recentFailedIngestionLogs?.results.map((row) => publicIngestionLog(row)) ?? [],
+      latestIngestionLog: latestIngestionLog ? publicIngestionLog(latestIngestionLog) : null,
     };
   } catch (error) {
     console.error('Failed to load health diagnostics', error);
