@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-06-04 - SI-ISSUE-355 - Mobile pagination controls are left aligned
+
+- Priority: P3
+- Status: VERIFIED
+- Area: frontend | layout
+- Found In: user report
+- Evidence: User reported the mobile webpage pagination controls for previous and next page were visually left aligned instead of centered.
+- Fix: Updated the shared `.pagination-row` style to center pagination controls across article, official, and launch list pages.
+- Regression Check: Verified the new `src/styles.test.ts` fails before the CSS fix and passes after the fix with `.\node_modules\.bin\vitest.cmd run src\styles.test.ts`; also passed `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm verify:layout`, and a 390px mobile Playwright check confirming `.pagination-row` has `justify-content: center` with a 0px center delta between the pagination row and the control group.
+- Notes: This is a visible layout-only change and does not alter pagination links, filtering, or API behavior.
+
 ### 2026-06-02 - SI-ISSUE-354 - Launch planning misses Chinese rockets because launch cache refresh is too sparse and not observable enough
 
 - Priority: P1
