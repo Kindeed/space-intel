@@ -120,12 +120,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   const detailed = request ? new URL(request.url).searchParams.get('diagnostics') === '1' : false;
   let databaseAvailable = false;
   try {
-    const probe = await env.DB?.prepare('SELECT 1 AS healthy').first<{ healthy: number }>();
-    databaseAvailable = probe?.healthy === 1;
+    if (env.DB) {
+      // Exercise an actual row read: a constant SELECT 1 may still succeed
+      // after D1's row-read allowance is exhausted. This primary-key walk
+      // visits at most one record, and an empty table is still reachable.
+      await env.DB.prepare('SELECT id FROM articles ORDER BY id DESC LIMIT 1').first<{ id: number }>();
+      databaseAvailable = true;
+    }
   } catch (error) {
     console.error('Database health probe failed', error);
   }
-  // Normal health requests never scan application tables. Detailed diagnostics
+  // Normal health requests read at most one application row. Detailed diagnostics
   // are explicit, count-bounded and require indexes instead of silently falling
   // back to full scans on an unmigrated production database.
   const diagnostics = databaseAvailable && detailed
