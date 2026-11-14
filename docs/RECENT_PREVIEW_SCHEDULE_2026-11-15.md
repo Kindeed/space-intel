@@ -2,6 +2,8 @@
 
 预览：https://recent-aggregation-preview.space-intel.pages.dev/recent
 
+完整实现保留为[草稿 PR #36](https://github.com/Kindeed/space-intel/pull/36)，未合并到生产。仅定时调度已通过 #35 合并。
+
 验证版本：`28736e6`，固定部署 https://53dc0fa5.space-intel.pages.dev/recent 。本记录使用北京时间；云端日志与快照时间使用 UTC。
 
 ## 已实现
