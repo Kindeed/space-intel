@@ -82,3 +82,4 @@ jobs:
         run: pnpm exec wrangler pages deploy site --cwd .recent/deploy --project-name space-intel --branch recent-aggregation-preview --commit-dirty=true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 10ac7759c7e55f60267f7550f95f6db6
