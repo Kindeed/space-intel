@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { runSpaceIntelScheduled, sourceCron } from './scheduled';
+import worker, { runSpaceIntelScheduled, sourceCron } from './scheduled';
 import { runScheduledIngestion, parseSourcesConfig } from '../ingestion';
 import sourcesConfig from '../../config/sources.generated.json';
 
@@ -13,6 +13,15 @@ vi.mock('../ingestion', async (importOriginal) => {
 });
 
 describe('scheduled Worker', () => {
+  it('rejects HTTP probes without throwing or triggering ingestion', async () => {
+    vi.mocked(runScheduledIngestion).mockClear();
+    const response = await worker.fetch();
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe('Not Found');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(runScheduledIngestion).not.toHaveBeenCalled();
+  });
+
   it('rotates all enabled sources exactly once without sharing invocation budgets', async () => {
     const enabled = parseSourcesConfig(sourcesConfig).filter((source) => source.enabled);
     const seen = new Set<string>();
