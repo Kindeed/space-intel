@@ -2,7 +2,7 @@ import sourcesConfig from '../../config/sources.generated.json';
 import companiesConfig from '../../config/companies.generated.json';
 import topicsConfig from '../../config/topics.generated.json';
 import curationsConfig from '../../config/curations.generated.json';
-import { parseSourcesConfig, runScheduledIngestion } from '../ingestion';
+import { parseSourcesConfig, runScheduledIngestion, type ScheduledIngestionResult } from '../ingestion';
 
 const configuredSources = parseSourcesConfig(sourcesConfig);
 export const sourceCron = '* * * * *';
@@ -19,7 +19,7 @@ type Env = {
   TRANSLATION_MAX_ITEMS_PER_SOURCE?: string;
 };
 
-export async function runSpaceIntelScheduled(cron: string, env: Env, scheduledTime?: number): Promise<unknown> {
+export async function runSpaceIntelScheduled(cron: string, env: Env, scheduledTime?: number): Promise<ScheduledIngestionResult> {
   if (![sourceCron, dailyCron, '0 * * * *'].includes(cron)) {
     throw new Error('Unsupported ingestion schedule');
   }
@@ -65,6 +65,25 @@ export default {
     });
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(runSpaceIntelScheduled(controller.cron, env, controller.scheduledTime));
+    ctx.waitUntil(runSpaceIntelScheduled(controller.cron, env, controller.scheduledTime).then((result) => {
+      // Record completed source outcomes without querying D1 again. A platform
+      // invocation can be "Ok" while a source failed before writing its log.
+      const summary = {
+        event: 'space_intel_ingestion',
+        cron: controller.cron,
+        scheduledTime: controller.scheduledTime,
+        durationMs: result.durationMs,
+        successfulSources: result.successSourceCount,
+        failedSources: result.failedSourceCount,
+        maintenanceFailures: result.maintenance?.failures ?? 0,
+        sources: result.sourceRuns.map((run) => ({
+          sourceKey: run.sourceKey,
+          failures: run.failures,
+          written: 'inserted' in run ? run.inserted : 'upserted' in run ? run.upserted : 0,
+        })),
+      };
+      if (result.failedSourceCount || result.maintenance?.failures) console.error(summary);
+      else console.info(summary);
+    }));
   },
 };

@@ -32,11 +32,22 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 - Hourly RSS and official-page sources run with bounded concurrency. API-style sources stay serial unless explicitly changed.
 - Daily runs synchronize configured sources, companies, and topics into D1, then sync curations.
 - Stale-log maintenance runs before source work at the top of each UTC hour, and daily maintenance also closes logs that have stayed open for more than two hours and prunes retained operational data in bounded batches.
+- Every scheduled invocation emits a `space_intel_ingestion` summary with the scheduled time, selected source keys, failed/successful counts and writes. Use these live logs to observe a rotation; a platform `Ok` alone does not prove persistence.
 - Retention defaults keep article metadata and article relation rows for 730 days, ingestion logs for 90 days, and launch cache rows for 730 days after `window_start`. Source, company, tag, and curation catalog rows are retained until config or editorial changes remove them.
 
 ## D1 Write Path
 
 Article writes remain dedupe-first through `dedupe_hash`. D1-capable connections batch inserts, identity resolution and relation updates in chunks of 40 records; duplicate records still receive updated tag/company/launch relations. Missing translation/publisher columns retain their compatibility retries. Adapters without batch/result support use sequential execution. Each D1 batch consumes one binding request; individual SQL statement/parameter limits still apply.
+
+## Read Budget And Health
+
+`GET /api/health` performs only `SELECT 1 AS healthy` and reports actual database connectivity; it does not read application tables. Missing/rejected database access returns uncached HTTP 503. The asset check reports binding presence only.
+
+Detailed diagnostics require `?diagnostics=1`. Ingestion timestamps and failures cover only the last 240 log IDs, stated in the response. Global open-log and upcoming-launch counts stop at 200; `*CountExact: false` means the actual count exceeds that cap. Their SQL explicitly requires the relevant indexes, preventing accidental full scans on an unmigrated database. Missing indexes produce unavailable diagnostics and HTTP 503 instead of synthetic zero totals. The default lightweight check remains independent of these indexes.
+
+Migration `0009_health_query_indexes.sql` adds the article date index, future-launch index and a partial index containing only unfinished logs. The partial index also supports stale-log maintenance. Do not build full-history log indexes or repeatedly run aggregate diagnostics during a Free recovery. Public unauthenticated JSON reads use a 120-second edge cache; health and admin remain uncached.
+
+Launch Library uses the supported 2.3.0 upcoming endpoint with normal metadata to preserve provider/rocket/site fields. The one-request-per-rotation cadence is unchanged; 429 is an upstream failure, not a signal to retry rapidly or use development data.
 
 ## Translation
 

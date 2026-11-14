@@ -34,15 +34,26 @@
 
 ## Current Issues
 
+### 2026-11-14 - SI-ISSUE-361 - D1 daily read exhaustion interrupts rollout verification
+
+- Priority: P1
+- Status: IN_PROGRESS
+- Area: database | observability | deployment | data-freshness
+- Found In: PR #31 / #32 production rotation observation
+- Evidence: At about 07:25–07:31 UTC, new source logs stopped closing, `/api/articles?limit=1` returned 500, and `/api/health` returned HTTP 200 with `diagnosticsAvailable: false`. The authenticated D1 console explicitly reported the Free daily row-read limit was exceeded. D1 query insights showed health queries scanning approximately 113k–227k rows per call; the minute health monitor added avoidable scan load and was stopped. Last successful coverage query showed 41 runs, 3 unfinished, latest finished at 07:24:50 UTC. Some quota failures occur before a source log can be created.
+- Fix: PR #33 now makes default health a single constant connectivity query. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration now covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed from this unmerged migration to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. Production index presence remains unverified until quota reset. No high-frequency health polling or paid plan.
+- Regression Check: Default health has exactly one constant query and no application reads. Real SQLite covers absent indexes, bounded primary-key reads, capped counts/exactness flags and idempotent partial-index migration; public errors remain safe. Scheduled result logging is regression-tested. Full local suite 68 files / 485 tests, typecheck, lint, config parity and Worker dry-run passed; current production build/deploy verification follows. Production migration is not applied and data recovery remains blocked. CPU counters alone do not establish database or data freshness recovery.
+- Notes: D1 limits reset at midnight UTC (08:00 Beijing the following day). Do not upgrade, bypass the quota, or treat unavailable diagnostics as zero failures. Daily maintenance and the remainder of the source rotation remain unverified.
+
 ### 2026-11-14 - SI-ISSUE-360 - Scheduled-only Worker throws on HTTP probes
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: worker | observability | deployment
 - Found In: PR #31 production rollout
 - Evidence: New version initially recorded an uncaught exception with sub-millisecond CPU time and no D1 source log. An HTTP GET to the public Worker URL reproduced HTTP 500 / Cloudflare 1101. The module exported a scheduled handler but no fetch handler.
 - Fix: Return an explicit uncached HTTP 404 for HTTP requests without running ingestion; the cron handler is unchanged.
-- Regression Check: Added HTTP response/no-ingestion regression coverage; full verification and production recheck pending.
+- Regression Check: Full suite (67 files / 480 tests), typecheck, lint, build, Worker dry-run and production CI passed. Final Worker `30de6bea` returns HTTP 404 with `Cache-Control: no-store`; no ingestion is triggered by the probe. Production verification passed.
 
 ### 2026-11-14 - SI-ISSUE-356 - Scheduled ingestion exceeds CPU budget and leaves partial source refreshes
 
@@ -52,7 +63,7 @@
 - Found In: user report and authenticated Cloudflare metrics
 - Evidence: Latest past-24-hour metrics: 24 invocations, 11 exceeded CPU time, zero uncaught exceptions and zero memory-limit errors. Active version is 97a5738f; Workers plan is Free. Public health shows 10 open ingestion logs and latest successful source completion at 2026-11-14T00:02:04.783Z. D1 logs show consecutive unfinished SNAPI runs and repeated subrequest-limit failures for later official/procurement sources. Worker and Pages share the space_intel D1 database.
 - Fix: Prepared minute-based single-source rotation using ScheduledController.scheduledTime, cached config parsing, maintenance before source work, bounded RSS normalization, lazy HTML context extraction and explicit resource/rate-limit diagnostic categories. Current 60 enabled sources each receive one invocation per 60-minute rotation. Account plan is unchanged.
-- Regression Check: Rotation coverage/delayed-delivery/invalid-schedule tests, maintenance ordering, full suite (67 files / 479 tests), typecheck, lint, build, config parity, scheduled Worker dry-run and Pages Functions compilation passed. Production recovery remains unverified until deployment and observation of a full rotation.
+- Regression Check: Rotation coverage/delayed-delivery/invalid-schedule tests, maintenance ordering, full suite (67 files / 479 tests), typecheck, lint, build, config parity, scheduled Worker dry-run and Pages Functions compilation passed. PR #31/#32 deployed. New-version CPU/memory/uncaught exception counters were zero during initial observation and SNAPI/news updates recovered, but D1 daily read exhaustion blocked full-rotation acceptance; see SI-ISSUE-361. Do not mark the overall ingestion recovery VERIFIED.
 - Notes: CPU hard termination cannot be caught in application code. Single-source jobs and daily maintenance can still exceed Free CPU limits; local success does not establish production recovery.
 
 ### 2026-11-14 - SI-ISSUE-357 - Article persistence uses several D1 binding requests per item
@@ -83,7 +94,8 @@
 - Found In: read-only production D1 log queries
 - Evidence: Query window starting 2026-11-13T00:00:00Z includes 23 failed Launch Library 2 runs with no successful run in that window; raw logs contain HTTP 429. ESA feed returns 404 and SpaceRef/Wuxi sources return 403. A single local public LL2 request returned 200; this does not prove availability from the Worker egress.
 - Fix: Isolate source failures and distinguish rate_limited/resource_limit diagnostics. Further work must verify the official feed endpoints, production Retry-After/rate-limit policy and launch cache freshness without bypassing upstream restrictions.
-- Regression Check: Error classification tests passed; upstream production recovery and cached launch accuracy are unverified.
+- Follow-up: Official LL2 documentation marks 2.2.0 unsupported and 2.3.0 supported. PR #33 migrates the configured source to `/2.3.0/launches/upcoming/` with normal metadata and recent-past launches hidden; source purpose and access risk are documented. Request cadence stays one per hourly rotation, with no immediate retries or stale development-data fallback. This does not establish that production 429 has cleared.
+- Regression Check: This rollout reproduced LL2 HTTP 429 at 07:01 UTC (zero updates, 126 cached future launches), ESA 404, SpaceRef 403, three Google News backup sources with HTTP 503 and the Zhongguancun alliance source with HTTP 526. Error isolation works for completed requests; upstream recovery and launch cache freshness remain unverified.
 
 ### 2026-06-04 - SI-ISSUE-355 - Mobile pagination controls are left aligned
 

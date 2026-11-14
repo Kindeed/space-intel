@@ -5,6 +5,10 @@ import {
   type IngestionLogDiagnosticRow,
 } from './_ingestionDiagnostics';
 
+const diagnosticCountLimit = 200;
+const diagnosticLogIdWindow = 240;
+type RecentLog = IngestionLogDiagnosticRow & { id: number };
+
 function publicIngestionLog(row: IngestionLogDiagnosticRow) {
   return {
     sourceName: ingestionDiagnosticSourceName(row.sourceKey),
@@ -21,33 +25,38 @@ function publicIngestionLog(row: IngestionLogDiagnosticRow) {
 async function loadDiagnostics(db: D1Database | undefined) {
   if (!db) {
     return {
+      diagnosticsAvailable: false,
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
       latestLaunchIngestionLog: null,
-      upcomingLaunchCount: 0,
+      upcomingLaunchCount: null,
       latestSuccessfulIngestionAt: null,
       recentFailedIngestionLogs: [],
-      openIngestionLogCount: 0,
+      openIngestionLogCount: null,
     };
   }
 
   try {
     const latestArticleQuery = db
-      .prepare('SELECT MAX(published_at) AS latestArticlePublishedAt FROM articles')
+      .prepare('SELECT MAX(published_at) AS latestArticlePublishedAt FROM articles INDEXED BY idx_articles_published_at')
       .first<{ latestArticlePublishedAt: string | null }>();
     const openIngestionLogsQuery = db
-      .prepare('SELECT COUNT(*) AS openIngestionLogCount FROM ingestion_logs WHERE finished_at IS NULL')
+      .prepare(`SELECT COUNT(*) AS openIngestionLogCount FROM (
+        SELECT 1 FROM ingestion_logs INDEXED BY idx_ingestion_logs_open_started
+        WHERE finished_at IS NULL LIMIT ${diagnosticCountLimit + 1}
+      )`)
       .first<{ openIngestionLogCount: number }>();
-    const latestSuccessfulIngestionQuery = db
-      .prepare('SELECT MAX(finished_at) AS latestSuccessfulIngestionAt FROM ingestion_logs WHERE finished_at IS NOT NULL AND failure_count = 0')
-      .first<{ latestSuccessfulIngestionAt: string | null }>();
     const upcomingLaunchCountQuery = db
-      .prepare('SELECT COUNT(*) AS upcomingLaunchCount FROM launches WHERE window_start >= ?')
+      .prepare(`SELECT COUNT(*) AS upcomingLaunchCount FROM (
+        SELECT 1 FROM launches INDEXED BY idx_launches_window_start
+        WHERE window_start >= ? LIMIT ${diagnosticCountLimit + 1}
+      )`)
       .bind(new Date().toISOString())
       .first<{ upcomingLaunchCount: number }>();
-    const latestIngestionLogQuery = db
+    const recentLogsQuery = db
       .prepare(
         `SELECT
+          id,
           source_key AS sourceKey,
           started_at AS startedAt,
           finished_at AS finishedAt,
@@ -56,68 +65,39 @@ async function loadDiagnostics(db: D1Database | undefined) {
           CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
           error
         FROM ingestion_logs
-        WHERE finished_at IS NOT NULL
-        ORDER BY finished_at DESC, id DESC
-        LIMIT 1`,
+        WHERE id > (SELECT COALESCE(MAX(id), 0) FROM ingestion_logs) - ${diagnosticLogIdWindow}
+        ORDER BY id DESC
+        LIMIT ${diagnosticLogIdWindow}`,
       )
-      .first<IngestionLogDiagnosticRow>();
-    const latestLaunchIngestionLogQuery = db
-      .prepare(
-        `SELECT
-          source_key AS sourceKey,
-          started_at AS startedAt,
-          finished_at AS finishedAt,
-          success_count AS successCount,
-          failure_count AS failureCount,
-          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
-          error
-        FROM ingestion_logs
-        WHERE source_key = 'launch-library-2' AND finished_at IS NOT NULL
-        ORDER BY finished_at DESC, id DESC
-        LIMIT 1`,
-      )
-      .first<IngestionLogDiagnosticRow>();
-    const recentFailedIngestionLogsQuery = db
-      .prepare(
-        `SELECT
-          source_key AS sourceKey,
-          started_at AS startedAt,
-          finished_at AS finishedAt,
-          success_count AS successCount,
-          failure_count AS failureCount,
-          CASE WHEN error IS NULL OR error = '' THEN 0 ELSE 1 END AS hasError,
-          error
-        FROM ingestion_logs
-        WHERE failure_count > 0 OR (error IS NOT NULL AND error != '')
-        ORDER BY COALESCE(finished_at, started_at) DESC, id DESC
-        LIMIT 5`,
-      )
-      .all?.<IngestionLogDiagnosticRow>();
+      .all<RecentLog>();
     const [
       latestArticle,
       openIngestionLogs,
-      latestSuccessfulIngestion,
       upcomingLaunchCount,
-      latestIngestionLog,
-      latestLaunchIngestionLog,
-      recentFailedIngestionLogs,
+      recentLogs,
     ] = await Promise.all([
       latestArticleQuery,
       openIngestionLogsQuery,
-      latestSuccessfulIngestionQuery,
       upcomingLaunchCountQuery,
-      latestIngestionLogQuery,
-      latestLaunchIngestionLogQuery,
-      recentFailedIngestionLogsQuery,
+      recentLogsQuery,
     ]);
+
+    const orderedLogs = recentLogs.results.sort((a, b) =>
+      Date.parse(b.finishedAt ?? b.startedAt) - Date.parse(a.finishedAt ?? a.startedAt) || b.id - a.id);
+    const completed = orderedLogs.filter((row) => row.finishedAt !== null);
+    const latestIngestionLog = completed[0];
+    const latestLaunchIngestionLog = completed.find((row) => row.sourceKey === 'launch-library-2');
 
     return {
       latestArticlePublishedAt: latestArticle?.latestArticlePublishedAt ?? null,
-      openIngestionLogCount: openIngestionLogs?.openIngestionLogCount ?? 0,
-      upcomingLaunchCount: upcomingLaunchCount?.upcomingLaunchCount ?? 0,
-      latestSuccessfulIngestionAt: latestSuccessfulIngestion?.latestSuccessfulIngestionAt ?? null,
-      recentFailedIngestionLogs:
-        recentFailedIngestionLogs?.results.map((row) => publicIngestionLog(row)) ?? [],
+      openIngestionLogCount: Math.min(openIngestionLogs?.openIngestionLogCount ?? 0, diagnosticCountLimit),
+      openIngestionLogCountExact: (openIngestionLogs?.openIngestionLogCount ?? 0) <= diagnosticCountLimit,
+      upcomingLaunchCount: Math.min(upcomingLaunchCount?.upcomingLaunchCount ?? 0, diagnosticCountLimit),
+      upcomingLaunchCountExact: (upcomingLaunchCount?.upcomingLaunchCount ?? 0) <= diagnosticCountLimit,
+      ingestionLogScope: 'recent_log_ids',
+      ingestionLogIdWindow: diagnosticLogIdWindow,
+      latestSuccessfulIngestionAt: completed.find((row) => row.failureCount === 0)?.finishedAt ?? null,
+      recentFailedIngestionLogs: orderedLogs.filter((row) => row.failureCount > 0 || row.hasError).slice(0, 5).map(publicIngestionLog),
       latestIngestionLog: latestIngestionLog ? publicIngestionLog(latestIngestionLog) : null,
       latestLaunchIngestionLog: latestLaunchIngestionLog ? publicIngestionLog(latestLaunchIngestionLog) : null,
     };
@@ -127,25 +107,40 @@ async function loadDiagnostics(db: D1Database | undefined) {
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
       latestLaunchIngestionLog: null,
-      upcomingLaunchCount: 0,
+      upcomingLaunchCount: null,
       latestSuccessfulIngestionAt: null,
       recentFailedIngestionLogs: [],
-      openIngestionLogCount: 0,
+      openIngestionLogCount: null,
       diagnosticsAvailable: false,
     };
   }
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
+  const detailed = request ? new URL(request.url).searchParams.get('diagnostics') === '1' : false;
+  let databaseAvailable = false;
+  try {
+    const probe = await env.DB?.prepare('SELECT 1 AS healthy').first<{ healthy: number }>();
+    databaseAvailable = probe?.healthy === 1;
+  } catch (error) {
+    console.error('Database health probe failed', error);
+  }
+  // Normal health requests never scan application tables. Detailed diagnostics
+  // are explicit, count-bounded and require indexes instead of silently falling
+  // back to full scans on an unmigrated production database.
+  const diagnostics = databaseAvailable && detailed
+    ? await loadDiagnostics(env.DB)
+    : { diagnosticsAvailable: false, diagnosticsRequested: detailed };
+  const healthy = databaseAvailable && (!detailed || diagnostics.diagnosticsAvailable !== false);
   return Response.json({
-    ok: true,
+    ok: healthy,
     service: 'space-intel',
     checks: {
-      database: Boolean(env.DB),
+      database: databaseAvailable,
       assets: Boolean(env.R2_ASSETS),
     },
-    diagnostics: await loadDiagnostics(env.DB),
-  });
+    diagnostics,
+  }, { status: healthy ? 200 : 503, headers: { 'Cache-Control': 'no-store' } });
 };
 
 type Env = {

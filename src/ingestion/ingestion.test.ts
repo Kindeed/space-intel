@@ -683,7 +683,7 @@ describe('Spaceflight News API collector', () => {
 });
 
 describe('Launch Library 2 collector', () => {
-  it('normalizes upcoming launch results without storing article bodies', async () => {
+  it('normalizes supported v2.3 upcoming launch results without storing article bodies', async () => {
     const [source] = parseSourcesConfig({
       sources: [
         {
@@ -691,7 +691,7 @@ describe('Launch Library 2 collector', () => {
           name: 'Launch Library 2',
           type: 'api',
           region: 'global',
-          url: 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/',
+          url: 'https://ll.thespacedevs.com/2.3.0/launches/upcoming/?mode=normal&hide_recent_previous=true',
           credibility: 5,
           enabled: true,
           purpose: 'Upcoming launch cache.',
@@ -711,7 +711,7 @@ describe('Launch Library 2 collector', () => {
               {
                 id: 'f596ad48-881e-47d6-806d-113c6dd97427',
                 name: ' Electron   | Commercial rideshare ',
-                url: 'https://ll.thespacedevs.com/2.2.0/launch/f596ad48-881e-47d6-806d-113c6dd97427/',
+                url: 'https://ll.thespacedevs.com/2.3.0/launches/f596ad48-881e-47d6-806d-113c6dd97427/',
                 net: 'Sun, 10 May 2026 12:00:00 GMT',
                 status: { name: ' Go   for Launch ' },
                 rocket: { configuration: { full_name: ' Electron ' } },
@@ -735,7 +735,7 @@ describe('Launch Library 2 collector', () => {
         windowStart: '2026-05-10T12:00:00.000Z',
         site: 'LC-1A, Mahia, New Zealand',
         status: 'Go for Launch',
-        rawUrl: 'https://ll.thespacedevs.com/2.2.0/launch/f596ad48-881e-47d6-806d-113c6dd97427/',
+        rawUrl: 'https://ll.thespacedevs.com/2.3.0/launches/f596ad48-881e-47d6-806d-113c6dd97427/',
       },
     ]);
   });
