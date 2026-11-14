@@ -8,8 +8,8 @@ import {isRecentDate} from '../src/recent/snapshot';
 const prefix='space-intel-assets/recent/preview/v1/';
 const wrangler=resolve('node_modules/wrangler/bin/wrangler.js');
 const runId=process.env.GITHUB_RUN_ID||`local-${Date.now()}`;
-const operation=process.argv.includes('prepare')?'prepare':process.argv.includes('publish')?'publish':null;
-if(!operation)throw new Error('Expected prepare or publish');
+const operation=process.argv.includes('prepare')?'prepare':process.argv.includes('publish')?'publish':process.argv.includes('finalize')?'finalize':null;
+if(!operation)throw new Error('Expected prepare, publish or finalize');
 await mkdir('.recent',{recursive:true});await mkdir('public/recent',{recursive:true});
 function remote(kind:'get'|'put',key:string,file:string,missing=false):boolean{
   if(!['control.json','current.json','previous.json'].includes(key))throw new Error('Object is outside preview scope');
@@ -27,18 +27,15 @@ if(operation==='prepare'){
   await writeFile('.recent/control.json',JSON.stringify(reservation.control));
   remote('put','control.json','.recent/control.json');
   await writeFile('.recent/reservation.json',JSON.stringify({runId,budget:reservation.budget,day:reservation.control.day}));
+  await writeFile('.recent/usage.json',JSON.stringify({runId,requests:0}));
   if(remote('get','current.json','.recent/previous.json',true)){
     const previous=recentSnapshotSchema.parse(JSON.parse(await readFile('.recent/previous.json','utf8')));
     await writeFile('public/recent/current.json',JSON.stringify(previous));
   }
   console.log(JSON.stringify({previewBudget:reservation.budget,runId,prefix:'recent/preview/v1/'}));
-}else{
+}else if(operation==='publish'){
   const current=recentSnapshotSchema.parse(JSON.parse(await readFile('public/recent/current.json','utf8')));
   const summary=JSON.parse(await readFile('.recent/run-summary.json','utf8')) as {requests:number;successful:number};
-  const reservation=JSON.parse(await readFile('.recent/reservation.json','utf8')) as {runId:string;budget:number};
-  if(reservation.runId!==runId)throw new Error('Reservation identity mismatch');
-  const control=controlSchema.parse(JSON.parse(await readFile('.recent/control.json','utf8')));
-  try{
     // An all-failed run cannot replace the published last-good data.
     const healthy=current.sources.some(source=>source.selected&&!source.skipped&&source.status==='ok');
     if(healthy){
@@ -51,8 +48,15 @@ if(operation==='prepare'){
       remote('put','current.json','public/recent/current.json');
       console.log(JSON.stringify({published:true,items:current.items.length,sources:current.sources.filter(source=>source.selected).length,requests:summary.requests}));
     }else console.log(JSON.stringify({published:false,reason:'No healthy sources completed; retained last-good snapshot',requests:summary.requests}));
-  }finally{
-    const completed=releaseUnused(control,runId,reservation.budget,summary.requests);
-    await writeFile('.recent/control.json',JSON.stringify(completed));remote('put','control.json','.recent/control.json');
-  }
+}else{
+  let reservation:{runId:string;budget:number};
+  try{reservation=JSON.parse(await readFile('.recent/reservation.json','utf8'));}
+  catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT'){console.log('No reservation was created.');process.exit(0);}throw error;}
+  if(reservation.runId!==runId)throw new Error('Reservation identity mismatch');
+  const control=controlSchema.parse(JSON.parse(await readFile('.recent/control.json','utf8')));
+  const usage=JSON.parse(await readFile('.recent/usage.json','utf8')) as {runId:string;requests:number};
+  if(usage.runId!==runId)throw new Error('Usage identity mismatch');
+  const completed=releaseUnused(control,runId,reservation.budget,usage.requests);
+  await writeFile('.recent/control.json',JSON.stringify(completed));remote('put','control.json','.recent/control.json');
+  console.log(JSON.stringify({dailyRequestsAccounted:completed.reserved,usedThisRun:usage.requests}));
 }

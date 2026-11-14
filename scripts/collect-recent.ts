@@ -18,7 +18,7 @@ const replay = replayArg ? JSON.parse(await readFile(`.recent/round-${replayArg}
 } : undefined;
 const now = replay ? new Date(replay.startedAt) : new Date();
 const roundArg = process.argv.find((arg) => arg.startsWith('--round='));
-const round = (roundArg?.split('=')[1] ?? now.toISOString().replaceAll(':', '-'));
+const round = (roundArg?.split('=')[1] ?? now.toISOString().replace(/[^a-zA-Z0-9_-]/g, '-'));
 if (!/^[a-zA-Z0-9_-]+$/.test(round)) throw new Error('Invalid round identifier');
 await mkdir('.recent', { recursive: true });
 await mkdir('public/recent', { recursive: true });
@@ -54,6 +54,17 @@ try {
   requestLimit=reservation.budget;
   budgetDay=reservation.day;
 }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
+if(process.argv.includes('--validate')){
+  console.log(JSON.stringify({valid:true,round,sources:candidates.length,facilities:facilities.length,requests:0}));
+  process.exit(0);
+}
+let usageQueue=Promise.resolve();
+const usageRunId=process.env.GITHUB_RUN_ID??'local';
+async function recordUsage(){
+  const count=requestCount;
+  usageQueue=usageQueue.then(()=>writeFile('.recent/usage.json',JSON.stringify({runId:usageRunId,requests:count})));
+  await usageQueue;
+}
 class Unchanged extends Error {}
 class RateLimited extends Error {constructor(readonly nextAttempt:string){super('rate_limited');}}
 
@@ -85,6 +96,7 @@ async function collect(source: SourceConfig) {
         for(;;){
           if (requestCount >= requestLimit || requests >= 2 || (budgetDay&&new Date().toISOString().slice(0,10)!==budgetDay)) throw new Error('request_budget');
           requestCount += 1; requests += 1;
+          await recordUsage();
           const headers=new Headers(init?.headers);
           if(target===source.url){if(old?.etag)headers.set('if-none-match',old.etag);if(old?.lastModified)headers.set('if-modified-since',old.lastModified);}
           response=await fetch(target,{...init,headers,signal:abort.signal,redirect:'manual'});
