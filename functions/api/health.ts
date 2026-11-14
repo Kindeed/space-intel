@@ -21,6 +21,7 @@ function publicIngestionLog(row: IngestionLogDiagnosticRow) {
 async function loadDiagnostics(db: D1Database | undefined) {
   if (!db) {
     return {
+      diagnosticsAvailable: false,
       latestArticlePublishedAt: null,
       latestIngestionLog: null,
       latestLaunchIngestionLog: null,
@@ -137,15 +138,17 @@ async function loadDiagnostics(db: D1Database | undefined) {
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
+  const diagnostics = await loadDiagnostics(env.DB);
+  const databaseAvailable = Boolean(env.DB) && diagnostics.diagnosticsAvailable !== false;
   return Response.json({
-    ok: true,
+    ok: databaseAvailable,
     service: 'space-intel',
     checks: {
-      database: Boolean(env.DB),
+      database: databaseAvailable,
       assets: Boolean(env.R2_ASSETS),
     },
-    diagnostics: await loadDiagnostics(env.DB),
-  });
+    diagnostics,
+  }, { status: databaseAvailable ? 200 : 503, headers: { 'Cache-Control': 'no-store' } });
 };
 
 type Env = {

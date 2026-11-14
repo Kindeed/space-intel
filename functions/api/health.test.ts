@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { onRequestGet } from './health';
 
 class FakeHealthStatement {
@@ -85,6 +85,26 @@ class FakeHealthDatabase {
 }
 
 describe('health API', () => {
+  it('returns 503 when D1 rejects diagnostics without exposing quota details', async () => {
+    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const response = await onRequestGet({ env: { DB: {
+        prepare() { throw new Error('Internal D1 daily row-read quota details'); },
+      } } } as unknown as Parameters<typeof onRequestGet>[0]);
+      expect(response.status).toBe(503);
+      expect(response.headers.get('Cache-Control')).toBe('no-store');
+      const payload = await response.json();
+      expect(payload).toMatchObject({ ok: false, checks: { database: false }, diagnostics: { diagnosticsAvailable: false } });
+      expect(JSON.stringify(payload)).not.toContain('quota details');
+    } finally { errorLog.mockRestore(); }
+  });
+
+  it('returns 503 when the database binding is absent', async () => {
+    const response = await onRequestGet({ env: {} } as Parameters<typeof onRequestGet>[0]);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ ok: false, checks: { database: false }, diagnostics: { diagnosticsAvailable: false } });
+  });
+
   it('returns safe ingestion diagnostics without internal error details', async () => {
     const response = await onRequestGet({
       env: {
