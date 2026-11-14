@@ -26,7 +26,9 @@ export default {
       const cache=typeof caches==='undefined'?undefined:(caches as CacheStorage&{default?:Cache}).default;
       return readPreviewSnapshot(request,env,context,cache);
     }
-    if(path==='/recent'||path.startsWith('/recent/'))return env.ASSETS.fetch(new Request(new URL('/index.html',request.url),request));
+    // Pages canonicalizes /index.html to /. Fetch the root asset directly so
+    // its canonical redirect cannot loop through our / -> /recent redirect.
+    if(path==='/recent'||path.startsWith('/recent/'))return env.ASSETS.fetch(new Request(new URL('/',request.url),request));
     if(path.startsWith('/assets/')||path==='/favicon.ico')return env.ASSETS.fetch(request);
     return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store'}});
   },

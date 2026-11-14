@@ -3,7 +3,7 @@ import worker,{readPreviewSnapshot,type RecentPreviewEnv} from './recentPreview'
 
 function environment(body='{"items":[]}'){
   const get=vi.fn(async()=>({size:body.length,httpEtag:'"revision-one"',body:new Response(body).body}));
-  const assets=vi.fn(async()=>new Response('<html>preview</html>',{headers:{'Content-Type':'text/html'}}));
+  const assets=vi.fn<(request:Request)=>Promise<Response>>(async()=>new Response('<html>preview</html>',{headers:{'Content-Type':'text/html'}}));
   return {env:{R2_ASSETS:{get},ASSETS:{fetch:assets}} as unknown as RecentPreviewEnv,get,assets};
 }
 const context={waitUntil:vi.fn(),passThroughOnException:vi.fn(),props:{}};
@@ -29,5 +29,17 @@ describe('isolated recent preview worker',()=>{
     await worker.fetch(new Request('https://preview.example/recent'),env,context as ExecutionContext);
     expect(assets).toHaveBeenCalledOnce();
     expect((await readPreviewSnapshot(new Request('https://preview.example/recent/current.json',{method:'POST'}),env,context)).status).toBe(405);
+  });
+  it('serves the shell without entering the Pages index.html canonical redirect loop',async()=>{
+    const {env,assets}=environment();
+    assets.mockImplementation(async(request:Request)=>new URL(request.url).pathname==='/index.html'
+      ?Response.redirect('https://preview.example/',308)
+      :new Response('<html>preview</html>',{headers:{'Content-Type':'text/html'}}));
+    for(const path of ['/recent','/recent/']){
+      const response=await worker.fetch(new Request(`https://preview.example${path}`),env,context as ExecutionContext);
+      expect(response.status).toBe(200);
+      expect(await response.text()).toContain('<html>preview</html>');
+    }
+    expect(assets.mock.calls.every(([request])=>new URL(request.url).pathname==='/')).toBe(true);
   });
 });

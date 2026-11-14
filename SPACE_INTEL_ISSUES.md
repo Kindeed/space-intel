@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-369 - Pages canonical redirect loops on the recent preview route
+
+- Priority: P1
+- Status: FIXED
+- Area: recent-preview | deployment | routing
+- Found In: clean remote Chrome acceptance against deployment e091db33
+- Evidence: `/recent` returned 308 to `/`; the preview worker redirects `/` back to `/recent`. The asset subrequest to `/index.html` triggered Pages canonicalization, although JSON publication and deployment steps had succeeded.
+- Fix: Fetch the root HTML through the ASSETS binding directly, bypassing the public worker's root redirect. Add a regression that models Pages canonical redirects for `/index.html`.
+- Regression Check: Targeted tests and a new hosted browser acceptance are required before VERIFIED.
+- Notes: This affects only the isolated preview. Production routes and D1 are unchanged.
+
 ### 2026-11-14 - SI-ISSUE-367 - Public government XML lists and approval notices are under-collected
 
 - Priority: P2

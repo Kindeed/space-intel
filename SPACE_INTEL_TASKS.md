@@ -17,6 +17,8 @@
 
 当前任务：
 
+- IN_PROGRESS：远程浏览器验收发现预览 `/recent` 与 Pages `/index.html` 规范跳转形成循环（SI-ISSUE-369）；修复 ASSETS 请求路径并增加托管环境回归，完成后再交付预览。JSON 采集/发布正常，未切换生产。
+
 - DONE：PR #35 已合并，独立预览工作流每日北京时间 08:17/12:17/18:17/22:17 运行；代码取 `codex/recent-aggregation-preview`，R2 仅写 `recent/preview/v1/`，仅部署 Pages 预览分支，无 D1 绑定。云端两轮 43612284933 / 43612337494 已完成采集、发布、预算收尾和部署，资讯从 239 增至 243。预览地址 `https://recent-aggregation-preview.space-intel.pages.dev/recent`；未替换生产主页。
 
 - DONE：扩充至 149 个预览跟踪入口（含 34 个保留实际发布方的补充报道线索源），另有 31 个省级政府导航入口。增加 7 个发射场/母港/规划跟踪对象和遥测/测运控筛选；公示、拟批复、批复、招采、中标候选及结果分别标注。云端快照现为 243 条，其中国内 186。继续 Free，无生产 D1/health 调用。
