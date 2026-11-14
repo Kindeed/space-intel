@@ -145,7 +145,10 @@
     "cn-region-discovery-30",
     "cn-ttc-discovery",
     "cn-spaceport-discovery",
-    "cn-company-discovery"
+    "cn-company-discovery",
+    "shandong-industry-notices",
+    "shandong-industry-policy",
+    "yantai-eia-notices"
   ],
   "validation": "Expanded preview trial; source states distinguish parsed, quiet, blocked and directory-only entries. No production ingestion."
 }

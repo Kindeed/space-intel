@@ -80,6 +80,7 @@ export function classifyItem(
 
 export function milestoneFromTitle(title:string):RecentItem['milestone'] {
   if(/不予批准|撤销|终止|取消.{0,8}招标/.test(title)) return 'withdrawn';
+  if(/中标候选|成交候选/.test(title))return 'award_candidate';
   if(/中标|成交|定标/.test(title)) return 'award';
   if(/招标|采购|询价|遴选|比选/.test(title)) return 'tender';
   if(/环评|环境影响/.test(title)) return /拟|受理|征求意见|报批前/.test(title)?'eia_notice':/批复|审批决定|准予许可/.test(title)?'eia_approved':'eia_notice';

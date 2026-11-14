@@ -19,6 +19,7 @@ describe('public approval listings',()=>{
     expect(milestoneFromTitle('商业发射场环境影响报告书批复公示')).toBe('eia_approved');
     expect(milestoneFromTitle('商业发射场建设工程招标公告')).toBe('tender');
     expect(milestoneFromTitle('商业发射场建设工程中标公告')).toBe('award');
+    expect(milestoneFromTitle('商业发射场建设工程中标候选人公示')).toBe('award_candidate');
     expect(milestoneFromTitle('商业发射场项目取消招标公告')).toBe('withdrawn');
   });
 });

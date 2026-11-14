@@ -4,25 +4,25 @@ facilities:
     province: 海南
     kind: 商业发射场
     aliases: [海南商业航天发射场, 海南国际商业航天发射, 海南商发]
-    sourceUrls: [https://wenchang.hainan.gov.cn/, https://plan.hainan.gov.cn/]
+    sourceUrls: [https://wenchang.hainan.gov.cn/wenchang/0400/list3.shtml?ddtab=true, https://plan.hainan.gov.cn/sfgw/xmsp/list3.shtml]
   - id: dongfang-spaceport
     name: 东方航天港
     province: 山东
     kind: 海上发射母港及配套项目
     aliases: [东方航天港, 海阳海上发射, 海阳航天港]
-    sourceUrls: [https://www.haiyang.gov.cn/, https://hbj.yantai.gov.cn/]
+    sourceUrls: [https://www.haiyang.gov.cn/col/col14046/index.html, https://hbj.yantai.gov.cn/col/col23569/index.html]
   - id: dongfeng-commercial-area
     name: 东风商业航天创新试验区
     province: 未明确
     kind: 商业发射相关试验区，项目属地待核对
     aliases: [东风商业航天创新试验区, 东风商业航天试验区]
-    sourceUrls: [https://www.jiuquan.gov.cn/, https://sthj.jiuquan.gov.cn/]
+    sourceUrls: [https://www.jiuquan.gov.cn/jiuquan/c100033/news_list.shtml, https://sthj.jiuquan.gov.cn/sthjj/c107101/xxgk_list.shtml]
   - id: ningbo-launch-project
     name: 宁波象山发射相关项目
     province: 浙江
     kind: 规划与报批信息跟踪
     aliases: [宁波国际商业航天发射中心, 象山商业航天, 宁波商业航天发射]
-    sourceUrls: [https://www.xiangshan.gov.cn/, https://sthjj.ningbo.gov.cn/, https://zgj.ningbo.gov.cn/]
+    sourceUrls: [https://sthjj.ningbo.gov.cn/col/col1229194563/index.html, https://zgj.ningbo.gov.cn/col/col1229036810/index.html, https://www.xiangshan.gov.cn/col/col1229045051/index.html]
   - id: wenchang-national-launch-services
     name: 文昌航天发射场商业任务
     province: 海南

@@ -6,7 +6,7 @@ import { recentSnapshotSchema, type RecentSnapshot } from './types';
 import './recent.css';
 
 const labels = { news: '新闻动态', policy: '政策公告', company: '企业动态', procurement: '采购公告', approval:'报批公示' };
-const stageLabels={planning_notice:'规划公示',eia_notice:'环评受理／公示',eia_approved:'环评批复',land_notice:'用地／选址信息',tender:'招采公告',award:'中标／成交',construction_update:'建设动态',operational_update:'运行／任务动态',withdrawn:'终止／撤销信息'};
+const stageLabels={planning_notice:'规划公示',eia_notice:'环评受理／公示',eia_approved:'环评批复',land_notice:'用地／选址信息',tender:'招采公告',award_candidate:'中标候选人公示',award:'中标／成交',construction_update:'建设动态',operational_update:'运行／任务动态',withdrawn:'终止／撤销信息'};
 const dateLabel = (value: string, dateOnly = false) => new Intl.DateTimeFormat('zh-CN', { month:'2-digit',day:'2-digit',...(dateOnly?{}:{hour:'2-digit',minute:'2-digit'}),hour12:false,timeZone:'Asia/Shanghai' }).format(new Date(value));
 
 export function RecentPage() {

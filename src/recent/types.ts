@@ -4,7 +4,7 @@ import { normalizeHttpUrl } from '../config/url';
 const publicUrl = z.string().url().refine((value) => normalizeHttpUrl(value) !== null, 'Expected a public http(s) URL');
 
 export const recentCategories = ['news', 'policy', 'company', 'procurement', 'approval'] as const;
-export const milestones = ['planning_notice','eia_notice','eia_approved','land_notice','tender','award','construction_update','operational_update','withdrawn'] as const;
+export const milestones = ['planning_notice','eia_notice','eia_approved','land_notice','tender','award_candidate','award','construction_update','operational_update','withdrawn'] as const;
 export type RecentCategory = typeof recentCategories[number];
 export const recentItemSchema = z.object({
   id: z.string(), title: z.string().min(1), url: publicUrl,

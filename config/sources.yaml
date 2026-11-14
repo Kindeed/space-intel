@@ -5202,3 +5202,84 @@ sources:
       candidate: true
       category: news
       cadence: four
+
+  - key: shandong-industry-notices
+    name: 山东工信通知公告
+    type: official_page
+    region: cn
+    url: http://gxt.shandong.gov.cn/col/col15190/index.html
+    credibility: 5
+    enabled: false
+    purpose: 跟踪商业航天产业扶持及发射场/地面设施相关项目公示。
+    expected_content: 有真实日期的政策、申报、公示与项目公告。
+    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。
+    dedupe_strategy: canonical_url_title
+    max_items: 30
+    include_terms:
+      - 航天
+      - 卫星
+      - 火箭
+      - 发射场
+      - 测控
+      - 遥测
+      - 空天
+      - 北斗
+    exclude_terms: []
+    recent:
+      candidate: true
+      category: policy
+      publisher_region: 山东
+
+  - key: shandong-industry-policy
+    name: 山东工信政策文件
+    type: official_page
+    region: cn
+    url: http://gxt.shandong.gov.cn/col/col103863/index.html?number=SD0202
+    credibility: 5
+    enabled: false
+    purpose: 跟踪商业航天产业扶持及发射场/地面设施相关项目公示。
+    expected_content: 有真实日期的政策、申报、公示与项目公告。
+    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。
+    dedupe_strategy: canonical_url_title
+    max_items: 30
+    include_terms:
+      - 航天
+      - 卫星
+      - 火箭
+      - 发射场
+      - 测控
+      - 遥测
+      - 空天
+      - 北斗
+    exclude_terms: []
+    recent:
+      candidate: true
+      category: policy
+      publisher_region: 山东
+
+  - key: yantai-eia-notices
+    name: 烟台生态环境环评公示
+    type: official_page
+    region: cn
+    url: https://hbj.yantai.gov.cn/col/col23569/index.html
+    credibility: 5
+    enabled: false
+    purpose: 跟踪商业航天产业扶持及发射场/地面设施相关项目公示。
+    expected_content: 有真实日期的政策、申报、公示与项目公告。
+    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。
+    dedupe_strategy: canonical_url_title
+    max_items: 30
+    include_terms:
+      - 航天
+      - 卫星
+      - 火箭
+      - 发射场
+      - 测控
+      - 遥测
+      - 空天
+      - 北斗
+    exclude_terms: []
+    recent:
+      candidate: true
+      category: approval
+      publisher_region: 山东
