@@ -158,7 +158,9 @@ async function collect(source: SourceConfig) {
     status.errorCategory = error instanceof RateLimited?'rate_limited':/budget/.test(message) ? 'budget' : abort.signal.aborted ? 'timeout'
       : /HTTP \d+/.test(message) ? 'http_error' : /parse|xml|charset/i.test(message) ? 'parse_error' : 'network_error';
     evidence.push({sourceId:source.key,items:[],error:message.slice(0,300)});
-    status.nextAttemptAt=error instanceof RateLimited?error.nextAttempt:retryAt(null,now);
+    // A local budget deferral is not an upstream failure: allow the next slot
+    // to pick it up, rather than repeatedly starving lower-priority sources.
+    status.nextAttemptAt=status.errorCategory==='budget'?undefined:error instanceof RateLimited?error.nextAttempt:retryAt(null,now);
   } finally {
     clearTimeout(timeout); status.requests = requests; status.durationMs = Date.now()-started; statuses.push(status);
     console.log(JSON.stringify({source:source.key,status:status.status,parsed:status.collected,recent:status.recentCount,requests,ms:status.durationMs}));

@@ -31,4 +31,9 @@ describe('preview scheduler and budget',()=>{
     expect(retryAt('Sat, 14 Nov 2026 12:17:00 GMT',now)).toBe('2026-11-14T12:17:00.000Z');
     expect(sourceDue(source,{...previous,nextAttemptAt:'2026-11-15T00:00:00Z'},now,true)).toBe(false);
   });
+  it('retries a locally budget-deferred news source at the next slot without a six-hour upstream backoff',()=>{
+    const news={...source,recent:{candidate:true as const,category:'news' as const}};
+    const deferred={...previous,status:'error' as const,errorCategory:'budget' as const,checkedSlot:'2026-11-14:0'};
+    expect(sourceDue(news,deferred,new Date('2026-11-14T04:17:00Z'))).toBe(true);
+  });
 });

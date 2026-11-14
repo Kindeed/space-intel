@@ -164,7 +164,7 @@ export function RecentPage() {
 
     {snapshot && view==='sources' && <section className="recent-directory"><div className="recent-directory-heading"><h2>来源目录</h2><span>官方、公司与专业媒体</span></div>
       <div className="recent-source-grid">{snapshot.sources.map((source)=><article className="recent-source" key={source.id}>
-        <div><a href={source.url} target="_blank" rel="noreferrer">{source.name}<ArrowUpRight size={15}/></a><span className={`recent-source-status ${source.status==='error'?'is-delayed':''}`}>{source.status==='directory'?'来源入口':source.status==='error'?'暂时不可用':source.status==='empty'?'待核验':source.recentCount?'有近期动态':'近期暂无更新'}</span></div>
+        <div><a href={source.url} target="_blank" rel="noreferrer">{source.name}<ArrowUpRight size={15}/></a><span className={`recent-source-status ${source.status==='error'?'is-delayed':''}`}>{source.status==='directory'?'来源入口':source.errorCategory==='budget'?'本轮延后':source.status==='error'?'暂时不可用':source.status==='empty'?'待核验':source.recentCount?'有近期动态':'近期暂无更新'}</span></div>
         <p>{source.publisherRegion || (source.region==='cn'?'国内':'国外')} · {labels[source.category]}</p>
         <small>{source.lastSuccessAt?`上次成功 ${dateLabel(source.lastSuccessAt)}`:'尚未确认成功更新'} · 本轮 {source.recentCount} 条近期资讯</small>
       </article>)}</div></section>}
