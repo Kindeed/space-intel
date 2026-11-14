@@ -25,18 +25,18 @@ Production scheduled ingestion is handled by a dedicated Cloudflare Worker, not 
 
 - `wrangler.toml` configures the Pages app, API Functions, D1 binding, and R2 binding.
 - `wrangler.scheduled.toml` configures the `space-intel-scheduled` Worker, its D1 binding, and Cron Triggers.
-- `src/workers/scheduled.ts` maps hourly cron events to source ingestion and the daily cron event to curation sync.
+- `src/workers/scheduled.ts` maps the minute cron (`* * * * *`) to one enabled source per invocation and the daily cron event to catalog/curation maintenance. Selection uses the scheduled event minute, not delivery time. With 60 enabled sources, each source is selected once per 60-minute cycle; the cycle length follows the enabled source count. The historical hourly cron is recognized for compatibility but is no longer configured in production source code.
 - GitHub Actions deploys the scheduled Worker after `main` branch verification succeeds. This requires the `CLOUDFLARE_API_TOKEN` GitHub Secret.
 - Use `pnpm deploy:scheduled` as the manual fallback after changing cron config, Worker code, ingestion orchestration, source config imports, or D1 bindings.
-- Hourly runs isolate failures per source. One failed feed or API records a failed source result but does not stop the remaining sources.
+- Scheduled source invocations isolate hard CPU terminations as well as caught source failures. One failed source cannot prevent the next minute's source invocation. This reduces per-invocation work but does not guarantee that every single source fits the Workers Free CPU budget.
 - Hourly RSS and official-page sources run with bounded concurrency. API-style sources stay serial unless explicitly changed.
 - Daily runs synchronize configured sources, companies, and topics into D1, then sync curations.
-- Daily maintenance closes ingestion logs that have stayed open for more than two hours and prunes retained operational data in bounded batches.
+- Stale-log maintenance runs before source work at the top of each UTC hour, and daily maintenance also closes logs that have stayed open for more than two hours and prunes retained operational data in bounded batches.
 - Retention defaults keep article metadata and article relation rows for 730 days, ingestion logs for 90 days, and launch cache rows for 730 days after `window_start`. Source, company, tag, and curation catalog rows are retained until config or editorial changes remove them.
 
 ## D1 Write Path
 
-Article writes remain dedupe-first through `dedupe_hash`. Article-to-tag, article-to-company, and article-to-launch relation writes use D1 `batch` when available and fall back to sequential statement execution for tests or D1-compatible mocks.
+Article writes remain dedupe-first through `dedupe_hash`. D1-capable connections batch inserts, identity resolution and relation updates in chunks of 40 records; duplicate records still receive updated tag/company/launch relations. Missing translation/publisher columns retain their compatibility retries. Adapters without batch/result support use sequential execution. Each D1 batch consumes one binding request; individual SQL statement/parameter limits still apply.
 
 ## Translation
 

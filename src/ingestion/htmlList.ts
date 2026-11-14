@@ -444,7 +444,7 @@ export function extractHtmlListLinks(html: string, baseUrl: string): HtmlListLin
   const seenCandidates = new Set<string>();
   const scanHtml = visibleHtml(html);
 
-  function addCandidate(href: string, rawTitle: string, contextText: string): void {
+  function addCandidate(href: string, rawTitle: string, getContextText: () => string): void {
     const url = absoluteUrl(href, baseUrl);
     const title = stripHtml(rawTitle);
 
@@ -462,7 +462,7 @@ export function extractHtmlListLinks(html: string, baseUrl: string): HtmlListLin
     links.push({
       title,
       url,
-      contextText,
+      contextText: getContextText(),
     });
   }
 
@@ -473,19 +473,20 @@ export function extractHtmlListLinks(html: string, baseUrl: string): HtmlListLin
       continue;
     }
 
+    const contextText = stripHtml(block);
     for (const match of matches) {
-      addCandidate(anchorHref(match), anchorTitle(match[0]) ?? anchorBody(match), stripHtml(block));
+      addCandidate(anchorHref(match), anchorTitle(match[0]) ?? anchorBody(match), () => contextText);
     }
   }
 
   for (const match of scanHtml.matchAll(anchorPattern)) {
     const anchorStart = match.index ?? 0;
     const anchorEnd = anchorStart + match[0].length;
-    const anchorText = stripHtml(match[0]);
-    const nearbyDate = nearestDateContext(scanHtml, anchorStart, anchorEnd);
-    const contextText = nearbyDate && !anchorText.includes(nearbyDate) ? `${anchorText} ${nearbyDate}` : anchorText;
-
-    addCandidate(anchorHref(match), anchorTitle(match[0]) ?? anchorBody(match), contextText);
+    addCandidate(anchorHref(match), anchorTitle(match[0]) ?? anchorBody(match), () => {
+      const anchorText = stripHtml(match[0]);
+      const nearbyDate = nearestDateContext(scanHtml, anchorStart, anchorEnd);
+      return nearbyDate && !anchorText.includes(nearbyDate) ? `${anchorText} ${nearbyDate}` : anchorText;
+    });
   }
 
   return links;

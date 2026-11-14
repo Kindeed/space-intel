@@ -101,21 +101,21 @@ function articleLaunchStatements(db: SqlDatabase, articleId: number, launchExter
   );
 }
 
-async function linkArticleRelations(db: SqlDatabase, articleId: number, record: IngestionRecord): Promise<void> {
-  await runDbStatements(db, [
+function articleRelationStatements(db: SqlDatabase, articleId: number, record: IngestionRecord): DbStatement[] {
+  return [
     ...articleTagStatements(db, articleId, record.item.tags),
     ...articleCompanyStatements(db, articleId, record.item.companies),
     ...articleLaunchStatements(db, articleId, record.item.relatedLaunchIds),
-  ]);
+  ];
 }
 
-async function insertArticleRecord(
+function articleInsertStatement(
   db: SqlDatabase,
   sourceId: number,
   record: IngestionRecord,
   includeTranslationFields: boolean,
   includePublisherField: boolean,
-): Promise<DbRunResult> {
+): DbStatement {
   if (!includeTranslationFields && !includePublisherField) {
     return db
       .prepare(
@@ -134,8 +134,7 @@ async function insertArticleRecord(
         record.item.region,
         record.dedupeHash,
         'fetched',
-      )
-      .run();
+      );
   }
 
   if (!includeTranslationFields) {
@@ -157,8 +156,7 @@ async function insertArticleRecord(
         record.item.region,
         record.dedupeHash,
         'fetched',
-      )
-      .run();
+      );
   }
 
   if (!includePublisherField) {
@@ -185,8 +183,7 @@ async function insertArticleRecord(
         record.item.translationProvider ?? null,
         record.item.translatedAt ?? null,
         record.item.translationError ?? null,
-      )
-      .run();
+      );
   }
 
   return db
@@ -213,8 +210,7 @@ async function insertArticleRecord(
       record.item.translatedAt ?? null,
       record.item.translationError ?? null,
       record.item.publisherName ?? null,
-    )
-    .run();
+    );
 }
 
 export async function persistArticleRecords(
@@ -227,12 +223,50 @@ export async function persistArticleRecords(
   let includeTranslationFields = true;
   let includePublisherField = true;
 
+  if (typeof db.batch === 'function' && typeof db.prepare('SELECT 1').all === 'function') {
+    // D1 counts a batch as one binding request. Keep both writes and identity
+    // resolution bounded instead of making several round trips per article.
+    for (let offset = 0; offset < records.length; offset += 40) {
+      const chunk = records.slice(offset, offset + 40);
+      let results: DbRunResult[] | undefined;
+      while (!results) {
+        try {
+          results = await runDbStatements(db, chunk.map((record) =>
+            articleInsertStatement(db, sourceId, record, includeTranslationFields, includePublisherField)));
+        } catch (error) {
+          if (includeTranslationFields && isMissingArticleTranslationColumnError(error)) {
+            includeTranslationFields = false;
+            continue;
+          }
+          if (includePublisherField && isMissingArticlePublisherColumnError(error)) {
+            includePublisherField = false;
+            continue;
+          }
+          throw error;
+        }
+      }
+      inserted += results.reduce((sum, result) => sum + (result.meta?.changes ?? 0), 0);
+      const identities = await runDbStatements(db, chunk.map((record) => db
+        .prepare('SELECT id FROM articles WHERE dedupe_hash = ? OR url = ? ORDER BY id DESC LIMIT 1')
+        .bind(record.dedupeHash, record.item.url)));
+      const relations: DbStatement[] = [];
+      identities.forEach((result, index) => {
+        const row = result.results?.[0];
+        if (row && typeof row === 'object' && 'id' in row && typeof row.id === 'number') {
+          relations.push(...articleRelationStatements(db, row.id, chunk[index]));
+        }
+      });
+      await runDbStatements(db, relations);
+    }
+    return { inserted, skipped: records.length - inserted };
+  }
+
   for (const record of records) {
     let result: DbRunResult | null = null;
 
     while (!result) {
       try {
-        result = await insertArticleRecord(db, sourceId, record, includeTranslationFields, includePublisherField);
+        result = await articleInsertStatement(db, sourceId, record, includeTranslationFields, includePublisherField).run();
       } catch (error) {
         if (includeTranslationFields && isMissingArticleTranslationColumnError(error)) {
           includeTranslationFields = false;
@@ -253,7 +287,7 @@ export async function persistArticleRecords(
     const articleId = await resolveArticleId(db, record);
 
     if (articleId) {
-      await linkArticleRelations(db, articleId, record);
+      await runDbStatements(db, articleRelationStatements(db, articleId, record));
     }
   }
 

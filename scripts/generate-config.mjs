@@ -23,7 +23,7 @@ async function processConfigPair([yamlFile, jsonFile]) {
   if (checkOnly) {
     const current = await readFile(jsonPath, 'utf8');
 
-    if (current !== generated) {
+    if (current.replace(/\r\n/g, '\n') !== generated) {
       return { drift: true, message: `${jsonFile} is out of sync with ${yamlFile}` };
     }
 

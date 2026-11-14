@@ -40,6 +40,15 @@ export function ingestionErrorCategory(error: string | null): string | null {
     return null;
   }
 
+  if (message.includes('too many subrequests') || message.includes('too many api requests')
+    || message.includes('cpu time') || message.includes('exceeded resource')) {
+    return 'resource_limit';
+  }
+
+  if (/\bhttp 429\b/.test(message)) {
+    return 'rate_limited';
+  }
+
   if (message.includes('timed out') || message.includes('timeout')) {
     return 'timeout';
   }
