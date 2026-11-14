@@ -1,6 +1,7 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {resolve} from 'node:path';
+import {rmSync} from 'node:fs';
 import {controlSchema,reserveBudget,releaseUnused,type PreviewControl} from '../src/recent/scheduler';
 import {recentSnapshotSchema} from '../src/recent/types';
 import {isRecentDate} from '../src/recent/snapshot';
@@ -16,7 +17,12 @@ function remote(kind:'get'|'put',key:string,file:string,missing=false):boolean{
   const result=spawnSync(process.execPath,[wrangler,'r2','object',kind,`${prefix}${key}`,'--file',file,'--remote','--config','wrangler.preview.toml'],{encoding:'utf8',maxBuffer:2*1024*1024,windowsHide:true});
   if(result.status===0)return true;
   const message=`${result.stdout||''}\n${result.stderr||''}`;
-  if(missing && /(?:specified key does not exist|NoSuchKey|object.*not found|key.*does not exist)/i.test(message))return false;
+  if(missing && /(?:specified key does not exist|NoSuchKey|object.*not found|key.*does not exist)/i.test(message)){
+    // Wrangler may create an empty destination before it reports a missing key.
+    // Remove only this task's incomplete local download, never a published object.
+    rmSync(file,{force:true});
+    return false;
+  }
   const token=process.env.CLOUDFLARE_API_TOKEN;
   throw new Error((token?message.replaceAll(token,'[redacted]'):message).slice(-2500));
 }
