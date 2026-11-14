@@ -51,6 +51,7 @@ jobs:
           pnpm typecheck
           pnpm check:config
           pnpm test
+          pnpm recent:collect --validate
       - name: Restore preview state and reserve shared daily request budget
         run: node scripts/run-recent.mjs --task=r2 prepare
         env:
@@ -66,6 +67,11 @@ jobs:
           fi
       - name: Publish only the isolated preview snapshot
         run: node scripts/run-recent.mjs --task=r2 publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Account for requests even when collection fails
+        if: always()
+        run: node scripts/run-recent.mjs --task=r2 finalize
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       - name: Build isolated preview app
