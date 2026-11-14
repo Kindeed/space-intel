@@ -13,7 +13,7 @@ class FakeHealthStatement {
   }
 
   async first<T = unknown>(): Promise<T | null> {
-    if (this.query === 'SELECT 1 AS healthy') return { healthy: 1 } as T;
+    if (this.query === 'SELECT id FROM articles ORDER BY id DESC LIMIT 1') return { id: 1 } as T;
     if (this.query.includes('MAX(published_at)')) {
       return { latestArticlePublishedAt: '2026-05-18T08:00:00Z' } as T;
     }
@@ -72,14 +72,35 @@ class FakeHealthDatabase {
 }
 
 describe('health API', () => {
-  it('checks connectivity with one constant query and no application-table reads by default', async () => {
+  it('checks the row-read budget with one primary-key query and no log scans by default', async () => {
     const prepare = vi.fn((query: string) => new FakeHealthStatement(query));
     const response = await onRequestGet({
       env: { DB: { prepare } }, request: new Request('https://example.test/api/health'),
     } as unknown as Parameters<typeof onRequestGet>[0]);
     expect(response.status).toBe(200);
-    expect(prepare.mock.calls).toEqual([['SELECT 1 AS healthy']]);
+    expect(prepare.mock.calls).toEqual([['SELECT id FROM articles ORDER BY id DESC LIMIT 1']]);
     expect(await response.json()).toMatchObject({ ok: true, diagnostics: { diagnosticsAvailable: false, diagnosticsRequested: false } });
+  });
+
+  it('treats a reachable empty article table as available', async () => {
+    const response = await onRequestGet({ env: { DB: {
+      prepare: () => ({ first: async () => null }),
+    } } } as unknown as Parameters<typeof onRequestGet>[0]);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, checks: { database: true } });
+  });
+
+  it('reports a failed real read even when a constant query would succeed', async () => {
+    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const prepare = vi.fn((query: string) => ({ first: async () => {
+      if (query.includes('FROM articles')) throw new Error('D1 row-read allowance exhausted');
+      return { healthy: 1 };
+    } }));
+    try {
+      const response = await onRequestGet({ env: { DB: { prepare } } } as unknown as Parameters<typeof onRequestGet>[0]);
+      expect(response.status).toBe(503);
+      expect(prepare).toHaveBeenCalledTimes(1);
+    } finally { errorLog.mockRestore(); }
   });
 
   it('returns 503 when D1 rejects diagnostics without exposing quota details', async () => {

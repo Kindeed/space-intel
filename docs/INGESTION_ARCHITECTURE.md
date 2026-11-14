@@ -41,7 +41,7 @@ Article writes remain dedupe-first through `dedupe_hash`. D1-capable connections
 
 ## Read Budget And Health
 
-`GET /api/health` performs only `SELECT 1 AS healthy` and reports actual database connectivity; it does not read application tables. Missing/rejected database access returns uncached HTTP 503. The asset check reports binding presence only.
+`GET /api/health` reads at most one article ID via the primary key and reports actual row-read availability, including a reachable empty table. A constant `SELECT 1` can still succeed after row-read quota exhaustion, so it is not a valid recovery probe. No log scans or business aggregates run by default. Missing/rejected database access returns uncached HTTP 503. The asset check reports binding presence only.
 
 Detailed diagnostics require `?diagnostics=1`. Ingestion timestamps and failures cover only the last 240 log IDs, stated in the response. Global open-log and upcoming-launch counts stop at 200; `*CountExact: false` means the actual count exceeds that cap. Their SQL explicitly requires the relevant indexes, preventing accidental full scans on an unmigrated database. Missing indexes produce unavailable diagnostics and HTTP 503 instead of synthetic zero totals. The default lightweight check remains independent of these indexes.
 

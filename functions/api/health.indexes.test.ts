@@ -9,14 +9,14 @@ it('uses indexes for real health log queries after the additive migration', asyn
   const sqlite = new DatabaseSync(':memory:');
   try {
     sqlite.exec(`
-      CREATE TABLE articles (published_at TEXT);
+      CREATE TABLE articles (id INTEGER PRIMARY KEY, published_at TEXT);
       CREATE INDEX idx_articles_published_at ON articles(published_at DESC);
       CREATE TABLE launches (window_start TEXT);
       CREATE TABLE ingestion_logs (
         id INTEGER PRIMARY KEY, source_key TEXT, started_at TEXT,
         finished_at TEXT, success_count INTEGER, failure_count INTEGER, error TEXT
       );
-      INSERT INTO articles VALUES ('2026-11-14T06:00:41Z');
+      INSERT INTO articles(published_at) VALUES ('2026-11-14T06:00:41Z');
       WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 2000)
       INSERT INTO ingestion_logs
       SELECT n, CASE WHEN n % 60 = 1 THEN 'launch-test' ELSE 'snapi' END,

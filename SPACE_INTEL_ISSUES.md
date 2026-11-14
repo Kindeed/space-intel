@@ -34,6 +34,16 @@
 
 ## Current Issues
 
+### 2026-11-14 - SI-ISSUE-362 - Constant health probe misses exhausted row-read budget
+
+- Priority: P1
+- Status: FIXED
+- Area: observability | database
+- Found In: PR #33 production verification
+- Evidence: After PR #33 deployed, a single health check using `SELECT 1` returned 200 while a known article detail read still returned 500 under the D1 daily row-read limit. A constant query does not exercise a business-row read.
+- Fix: Read at most one article ID via its integer primary key instead. Query success, including an empty table, proves a real table read is allowed; rejected access returns uncached 503. No aggregate or log scan is added.
+- Regression Check: Tests cover the constant-success/row-read-failure distinction, a reachable empty table, one-query default behavior, and index/cap handling. Full suite: 68 files / 487 tests, typecheck and lint passed; build and deployment verification follow.
+
 ### 2026-11-14 - SI-ISSUE-361 - D1 daily read exhaustion interrupts rollout verification
 
 - Priority: P1
@@ -41,8 +51,8 @@
 - Area: database | observability | deployment | data-freshness
 - Found In: PR #31 / #32 production rotation observation
 - Evidence: At about 07:25–07:31 UTC, new source logs stopped closing, `/api/articles?limit=1` returned 500, and `/api/health` returned HTTP 200 with `diagnosticsAvailable: false`. The authenticated D1 console explicitly reported the Free daily row-read limit was exceeded. D1 query insights showed health queries scanning approximately 113k–227k rows per call; the minute health monitor added avoidable scan load and was stopped. Last successful coverage query showed 41 runs, 3 unfinished, latest finished at 07:24:50 UTC. Some quota failures occur before a source log can be created.
-- Fix: PR #33 now makes default health a single constant connectivity query. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration now covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed from this unmerged migration to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. Production index presence remains unverified until quota reset. No high-frequency health polling or paid plan.
-- Regression Check: Default health has exactly one constant query and no application reads. Real SQLite covers absent indexes, bounded primary-key reads, capped counts/exactness flags and idempotent partial-index migration; public errors remain safe. Scheduled result logging is regression-tested. Full local suite 68 files / 485 tests, typecheck, lint, config parity and Worker dry-run passed; current production build/deploy verification follows. Production migration is not applied and data recovery remains blocked. CPU counters alone do not establish database or data freshness recovery.
+- Fix: PR #33 merged/deployed as `1396458`, Worker `028af9fa`. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed before merging to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. The default constant probe is being refined to a single real row read (SI-ISSUE-362). Production indexes and data recovery remain unverified until quota reset. No high-frequency health polling or paid plan.
+- Regression Check: Default health has one bounded query; its constant-probe limitation and single-row refinement are tracked in SI-ISSUE-362. Real SQLite covers absent indexes, bounded primary-key reads, capped counts/exactness flags and idempotent partial-index migration; public errors remain safe. Scheduled result logging is regression-tested and visible on production. PR #33 local suite 68 files / 485 tests, typecheck, lint, config parity, build, Worker dry-run and production CI passed. Production migration is not applied and data recovery remains blocked. CPU counters alone do not establish database or data freshness recovery.
 - Notes: D1 limits reset at midnight UTC (08:00 Beijing the following day). Do not upgrade, bypass the quota, or treat unavailable diagnostics as zero failures. Daily maintenance and the remainder of the source rotation remain unverified.
 
 ### 2026-11-14 - SI-ISSUE-360 - Scheduled-only Worker throws on HTTP probes
