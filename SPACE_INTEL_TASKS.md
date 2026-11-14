@@ -17,6 +17,8 @@
 
 当前任务：
 
+- IN_PROGRESS：仅接入独立近期资讯预览工作流，每日 UTC 00:17/04:17/10:17/14:17 运行（北京时间 08:17/12:17/18:17/22:17）。应用代码固定取 `codex/recent-aggregation-preview` 分支，R2 仅写 `recent/preview/v1/`，部署仅限 Pages 的 `recent-aggregation-preview` 预览分支，不合入预览应用到生产主页，不修改旧 D1/cron 和其他服务。需核验现有凭据、两轮远端发布及请求预算，再记录实际稳定性结果。
+
 - IN_PROGRESS：PR #33 已于 16:11:47 合并，16:12:49 部署 Worker `028af9fa`（北京时间），main 为 `1396458`，Pages/verify/Worker CI 均通过，保持 Free。已上线详细诊断有界读取、部分索引迁移、结构采集日志、两分钟缓存及 LL2 2.3.0；默认探测追加单条真实行读取修复，以识别读取额度耗尽。额度恢复后核对并补齐索引，再观察完整轮转及新闻/发射更新；禁止每分钟 health 轮询。见 `docs/D1_FREE_RECOVERY_RUNBOOK.md`。
 
 - DONE：PR #31 已于 2026-11-14 14:33（北京时间）合并部署；PR #32 的 HTTP 探测 404 修复也已上线，最终 main 为 `a6aec09`，Worker `30de6bea`。两次生产 verify、Pages 与 scheduled Worker 部署均成功，套餐保持 Free。
