@@ -19,6 +19,11 @@ export const companySectorIds = [
   'Satellite manufacturing',
   'spacecraft',
   'Space stations',
+  'Satellite components',
+  'Satellite ground services',
+  'Rocket engines',
+  'Geospatial applications',
+  'Navigation',
 ] as const;
 
 export type CompanySectorId = (typeof companySectorIds)[number];
@@ -35,6 +40,11 @@ export const companySectorLabels: Record<CompanySectorId, string> = {
   'Satellite manufacturing': '卫星制造',
   spacecraft: '航天器',
   'Space stations': '空间站',
+  'Satellite components': '卫星部件',
+  'Satellite ground services': '卫星地面服务',
+  'Rocket engines': '火箭发动机',
+  'Geospatial applications': '空天信息应用',
+  Navigation: '导航与定位',
 };
 
 function normalizeTaxonomyText(value: string): string {

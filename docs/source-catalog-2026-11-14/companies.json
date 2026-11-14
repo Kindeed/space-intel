@@ -1,0 +1,681 @@
+{
+  "asOf": "2026-11-14",
+  "companies": [
+    {
+      "id": "spacex",
+      "name": "SpaceX",
+      "country": "United States",
+      "sector": "Launch, satellite internet",
+      "website": "https://www.spacex.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-726772aa9e99"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "rocket-lab",
+      "name": "Rocket Lab",
+      "country": "United States",
+      "sector": "Launch, spacecraft",
+      "website": "https://www.rocketlabusa.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-b831cd9f7952"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "blue-origin",
+      "name": "Blue Origin",
+      "country": "United States",
+      "sector": "Launch, lunar services",
+      "website": "https://www.blueorigin.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-98cd49c074ca"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "relativity-space",
+      "name": "Relativity Space",
+      "country": "United States",
+      "sector": "Launch",
+      "website": "https://www.relativityspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-8bf979178178"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "firefly-aerospace",
+      "name": "Firefly Aerospace",
+      "country": "United States",
+      "sector": "Launch, lunar services",
+      "website": "https://fireflyspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-c8f61a7af63e"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "sierra-space",
+      "name": "Sierra Space",
+      "country": "United States",
+      "sector": "Space stations, spacecraft",
+      "website": "https://www.sierraspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-d70bb5fee9bb"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "axiom-space",
+      "name": "Axiom Space",
+      "country": "United States",
+      "sector": "Commercial space station",
+      "website": "https://www.axiomspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-1d4a4e3af628"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "intuitive-machines",
+      "name": "Intuitive Machines",
+      "country": "United States",
+      "sector": "Lunar commercial services",
+      "website": "https://www.intuitivemachines.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-daf60823d787"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "planet-labs",
+      "name": "Planet Labs",
+      "country": "United States",
+      "sector": "Remote sensing",
+      "website": "https://www.planet.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-0a89599a22e3"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "maxar",
+      "name": "Maxar",
+      "country": "United States",
+      "sector": "Remote sensing, spacecraft",
+      "website": "https://www.maxar.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-020601642841"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "ast-spacemobile",
+      "name": "AST SpaceMobile",
+      "country": "United States",
+      "sector": "Satellite communications",
+      "website": "https://ast-science.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-2e154aa6e14c"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "landspace",
+      "name": "蓝箭航天",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.landspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-2f8ef7facbf6",
+        "source-decf0cc25048"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "galactic-energy",
+      "name": "星河动力",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.galactic-energy.cn/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-f209684e637f"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "space-pioneer",
+      "name": "天兵科技",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.spacepioneer.cc/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-fd4a6f1ae0e3"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "orienspace",
+      "name": "东方空间",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.orienspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-25c9f7d94819"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "ispace-china",
+      "name": "星际荣耀",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.i-space.com.cn/news",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-415119f03c41"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "deep-blue-aerospace",
+      "name": "深蓝航天",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.dbaspace.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-b10cc0d250b0"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "cas-space",
+      "name": "中科宇航",
+      "country": "China",
+      "sector": "Launch",
+      "website": "https://www.cas-space.com/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-c6f004883275"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "charming-globe",
+      "name": "长光卫星",
+      "country": "China",
+      "sector": "Remote sensing",
+      "website": "https://www.jl1.cn/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-5003d59f161f"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "galaxy-space",
+      "name": "银河航天",
+      "country": "China",
+      "sector": "Satellite internet",
+      "website": "https://www.yinhehangtian.cn/yinheNews",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-44fed745924d"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "geespace",
+      "name": "时空道宇",
+      "country": "China",
+      "sector": "Satellite internet",
+      "website": "https://www.geespace.com/news/",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-710de833b3cf"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "minospace",
+      "name": "微纳星空",
+      "country": "China",
+      "sector": "Satellite manufacturing",
+      "website": "https://www.minospace.cn/news_list.html",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-4d10d7a56415"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "commsat",
+      "name": "九天微星",
+      "country": "China",
+      "sector": "Satellite manufacturing",
+      "website": "https://www.commsat.cn/news.html",
+      "existingEntity": true,
+      "sourceIds": [
+        "source-7a4b7909f122"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-fd314a906af9",
+      "name": "天仪空间（天仪研究院）",
+      "country": "China",
+      "sector": "SAR遥感与卫星制造",
+      "website": "https://cn.spacety.com/news",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-c30b8c84e7b0"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-ae17acfbdaa4",
+      "name": "航天驭星",
+      "country": "China",
+      "sector": "测运控与地面站",
+      "website": "https://www.emposat.com/dynamic/news/list",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-0e868a2614ea"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-7693a0fdb295",
+      "name": "九州云箭",
+      "country": "China",
+      "sector": "火箭发动机",
+      "website": "https://www.jzyjspace.com/news/1/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-a9f247d43301"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-fa4013fd7729",
+      "name": "航天宏图",
+      "country": "China",
+      "sector": "遥感应用与企业公告",
+      "website": "https://www.piesat.cn/website/cn/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-25a1fee23f69"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-2043a962f17e",
+      "name": "中科星图",
+      "country": "China",
+      "sector": "空天信息应用",
+      "website": "https://www.geovis.com.cn/news/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-dad6a2bde17e"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-30fa59d12b52",
+      "name": "中科星图测控",
+      "country": "China",
+      "sector": "卫星测运控",
+      "website": "https://www.spaceinsighter.com/companynews",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-5600c30ac7ac"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-5b2691ceffc6",
+      "name": "航宇微",
+      "country": "China",
+      "sector": "卫星芯片与遥感",
+      "website": "https://www.myorbita.net/xw/list_13.aspx",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-62c1f138fdd9"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-e20117db7136",
+      "name": "星网宇达",
+      "country": "China",
+      "sector": "导航与测控",
+      "website": "https://www.starneto.com/new_center/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-9c5b2d268880"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-4749b38f7beb",
+      "name": "合众思壮",
+      "country": "China",
+      "sector": "北斗导航",
+      "website": "https://www.unistrong.com/News/NewsList.aspx?classid=11",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-4cabdbec2ff8"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-9b1c106da774",
+      "name": "北斗星通",
+      "country": "China",
+      "sector": "北斗导航",
+      "website": "https://navchina.com/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-21a85434e8e1"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-8ba612967f84",
+      "name": "星邑空间",
+      "country": "China",
+      "sector": "测运控与卫星应用",
+      "website": "https://www.xingyispace.com/news/list_29.html",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-bafaaad41ada"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-2be1d702a6cd",
+      "name": "中科天塔",
+      "country": "China",
+      "sector": "星载设备与测运控",
+      "website": "https://www.tianta.com.cn/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-88efa9b80e72"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-707a178a03a6",
+      "name": "中国运载火箭技术研究院",
+      "country": "China",
+      "sector": "运载火箭与商业发射",
+      "website": "https://www.calt.com/",
+      "existingEntity": false,
+      "sourceIds": [
+        "source-3c2e0afa14b4"
+      ],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": []
+    },
+    {
+      "id": "company-7b0769bd0177",
+      "name": "国星宇航",
+      "country": "China",
+      "sector": "卫星与在轨计算",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-c733e6bb04b9",
+      "name": "中国星网",
+      "country": "China",
+      "sector": "卫星互联网",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-e45d664ab3df",
+      "name": "上海垣信",
+      "country": "China",
+      "sector": "卫星互联网",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-9bc287b1202c",
+      "name": "国电高科",
+      "country": "China",
+      "sector": "卫星物联网",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-1017f4772516",
+      "name": "箭元科技",
+      "country": "China",
+      "sector": "运载火箭",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-868845837723",
+      "name": "天链测控",
+      "country": "China",
+      "sector": "测运控",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-b066f5ee3c7a",
+      "name": "易动宇航",
+      "country": "China",
+      "sector": "空间推进",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-7e2cd6a05a51",
+      "name": "华力创通",
+      "country": "China",
+      "sector": "卫星通信与导航",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    },
+    {
+      "id": "company-bf38ec212f2a",
+      "name": "天银机电",
+      "country": "China",
+      "sector": "卫星部件",
+      "website": null,
+      "existingEntity": false,
+      "sourceIds": [],
+      "headquarters": null,
+      "projectRegions": [],
+      "geographyStatus": "not_verified",
+      "gaps": [
+        "待确认稳定的公司官方新闻/公告入口；暂通过政府及可靠报道发现线索。"
+      ]
+    }
+  ]
+}

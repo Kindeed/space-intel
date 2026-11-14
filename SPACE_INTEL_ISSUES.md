@@ -34,15 +34,70 @@
 
 ## Current Issues
 
+### 2026-11-14 - SI-ISSUE-367 - Public government XML lists and approval notices are under-collected
+
+- Priority: P2
+- Status: FIXED
+- Area: recent-preview | source-coverage | parsing
+- Found In: expansion of province and commercial-spaceport notice sources
+- Evidence: Public HanWeb government lists place dated anchors inside non-executable `text/xml` script blocks; generic script removal discards these records. The generic official-page exclusion of "生态环境" can also suppress environmental-impact notices. Wide row context may admit an unrelated attachment, so relevance must be checked again against the normalized item.
+- Fix: The preview explicitly expands public XML list data, uses aerospace-specific inclusion and no generic environmental exclusion for approval feeds, and rechecks normalized item relevance. It distinguishes planning/EIA notice/EIA approval/land/procurement/award/construction labels. Provincial portal directories, publisher locations and inferred project regions remain separate.
+- Regression Check: Public XML and milestone fixtures, strict RSS dates, bounded merge/filtering, preview serving and scheduler budget/backoff are covered by the 73-file / 506-test suite. Typecheck, lint, build, config checks and desktop/tablet/mobile local checks pass. Cloud preview publication and repeated remote updates remain in progress.
+- Notes: Official columns with no dated records remain unverified; supplementary reporting channels preserve the actual publisher and show limited-access links. New sources remain disabled in legacy production ingestion.
+
+### 2026-11-14 - SI-ISSUE-366 - Recent RSS must not turn undated articles into fresh news
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | ingestion | data-quality
+- Found In: recent aggregation implementation and source sampling
+- Evidence: The shared RSS metadata fallback uses collection time when a feed item has no valid date. That is unsuitable for a strict rolling 30-day view. Official-page dates also lack time precision and must not be displayed as an invented 08:00 publication time.
+- Fix: Added an opt-in strict date rule for the pilot RSS collector; undated items are skipped. Snapshot items record date precision, retain real publication/collection timestamps separately, exclude future/expired rows and unrelated internal activities, and classify project regions separately from publisher headquarters. Legacy production behavior was not changed or deployed.
+- Regression Check: New strict-RSS and snapshot tests pass in the 70-file / 496-test suite. Desktop/tablet/mobile preview checks verify real items, combined filters, zero legacy API requests and unavailable-data handling. Typecheck, lint, build and generated config checks pass.
+- Notes: Two source samples establish local parse availability only. Province-specific recent coverage remains limited to the actual sampled content; no synthetic rows were added.
+
+### 2026-11-14 - SI-ISSUE-363 - Log retention cannot keep pace with full minute rotation
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | retention | database
+- Found In: user-requested architecture assessment
+- Evidence: A complete minute source rotation produces approximately 1,440 log entries per day. `cleanupRetainedData` defaults to deleting at most 500 expired ingestion logs in its one daily run, with a 90-day log retention horizon. Once that horizon is reached, full operation can add expired backlog faster than the default cleanup removes it; daily job interruption makes this worse.
+- Fix: Design bounded operational-log retention throughput and per-source status records, with a measured Free read/write budget. Preserve necessary audit evidence separately; do not delete articles or run an unreviewed bulk purge as an immediate workaround.
+- Planned Direction: `docs/RECENT_NEWS_AGGREGATION_PLAN_2026-11-14.md` replaces per-run production D1 logging with bounded snapshot source status and retires the old cron after cutover. This is a plan; the current issue remains OPEN until runtime retirement is verified.
+- Regression Check: Source/config arithmetic and retention defaults reviewed locally. No production queries, deletion or runtime changes performed for this assessment.
+
+### 2026-11-14 - SI-ISSUE-364 - Launch UI freshness claim is disconnected from actual refresh state
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | data-freshness | frontend
+- Found In: user-requested architecture assessment
+- Evidence: `LiveHud` statically labels the launch panel as real-time updates. Launch persistence writes event fields without a per-record fetched/refreshed timestamp; production previously served cached launches while the latest LL2 fetch failed. The UI cannot distinguish current data from a last-known cache using the launch payload alone.
+- Fix: Add explicit source refresh state and timestamps, preserve the last successful published data, and show freshness/degraded status from that metadata. Include this in the read-snapshot design rather than adding expensive per-page log queries.
+- Planned Direction: The recent-aggregation plan supplies per-source last-success metadata and removes the real-time claim from scheduled launch snapshots; implementation and UI verification remain pending.
+- Regression Check: Local UI and persistence reviewed. Actual remaining launch recovery remains tracked by SI-ISSUE-359; no UI code changed in this assessment.
+
+### 2026-11-14 - SI-ISSUE-365 - Daily maintenance performs full entity work before cleanup
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | ingestion | maintenance
+- Found In: user-requested architecture assessment
+- Evidence: The daily path in `runScheduledIngestion` synchronizes catalog data and loads all articles for entity matching before running retention/stale-log maintenance. It lacks a persisted progress cursor for entity backfill. A termination or rejection before maintenance prevents that invocation from reaching cleanup.
+- Fix: Separate bounded maintenance and resumable entity backfill, each with explicit resource budgets and completion state. Source minute rotation does not establish daily-job safety.
+- Planned Direction: The recent-aggregation plan classifies only bounded recent snapshot records and retires legacy daily backfill after cutover; the existing job is unchanged at this planning stage.
+- Regression Check: Static code finding; actual daily CPU/resource failure has not been newly verified. No additional production work was triggered.
+
 ### 2026-11-14 - SI-ISSUE-362 - Constant health probe misses exhausted row-read budget
 
 - Priority: P1
-- Status: FIXED
+- Status: VERIFIED
 - Area: observability | database
 - Found In: PR #33 production verification
 - Evidence: After PR #33 deployed, a single health check using `SELECT 1` returned 200 while a known article detail read still returned 500 under the D1 daily row-read limit. A constant query does not exercise a business-row read.
 - Fix: Read at most one article ID via its integer primary key instead. Query success, including an empty table, proves a real table read is allowed; rejected access returns uncached 503. No aggregate or log scan is added.
-- Regression Check: Tests cover the constant-success/row-read-failure distinction, a reachable empty table, one-query default behavior, and index/cap handling. Full suite: 68 files / 487 tests, typecheck and lint passed; build and deployment verification follow.
+- Regression Check: Tests cover the constant-success/row-read-failure distinction, a reachable empty table, one-query default behavior, and index/cap handling. Full suite: 68 files / 487 tests, typecheck, lint, build and production CI passed. PR #34 merged as `383e36b`; at 08:23:46 UTC the deployed health returned uncached 503 / database=false under the exhausted read budget. No repeated health monitoring was started.
 
 ### 2026-11-14 - SI-ISSUE-361 - D1 daily read exhaustion interrupts rollout verification
 
@@ -51,7 +106,7 @@
 - Area: database | observability | deployment | data-freshness
 - Found In: PR #31 / #32 production rotation observation
 - Evidence: At about 07:25–07:31 UTC, new source logs stopped closing, `/api/articles?limit=1` returned 500, and `/api/health` returned HTTP 200 with `diagnosticsAvailable: false`. The authenticated D1 console explicitly reported the Free daily row-read limit was exceeded. D1 query insights showed health queries scanning approximately 113k–227k rows per call; the minute health monitor added avoidable scan load and was stopped. Last successful coverage query showed 41 runs, 3 unfinished, latest finished at 07:24:50 UTC. Some quota failures occur before a source log can be created.
-- Fix: PR #33 merged/deployed as `1396458`, Worker `028af9fa`. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed before merging to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. The default constant probe is being refined to a single real row read (SI-ISSUE-362). Production indexes and data recovery remain unverified until quota reset. No high-frequency health polling or paid plan.
+- Fix: PR #33 merged/deployed as `1396458`, Worker `028af9fa`. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed before merging to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. PR #34 deployed the single real row probe (SI-ISSUE-362), final Worker `72381720`. Production indexes and data recovery remain unverified until quota reset. No high-frequency health polling or paid plan.
 - Regression Check: Default health has one bounded query; its constant-probe limitation and single-row refinement are tracked in SI-ISSUE-362. Real SQLite covers absent indexes, bounded primary-key reads, capped counts/exactness flags and idempotent partial-index migration; public errors remain safe. Scheduled result logging is regression-tested and visible on production. PR #33 local suite 68 files / 485 tests, typecheck, lint, config parity, build, Worker dry-run and production CI passed. Production migration is not applied and data recovery remains blocked. CPU counters alone do not establish database or data freshness recovery.
 - Notes: D1 limits reset at midnight UTC (08:00 Beijing the following day). Do not upgrade, bypass the quota, or treat unavailable diagnostics as zero failures. Daily maintenance and the remainder of the source rotation remain unverified.
 

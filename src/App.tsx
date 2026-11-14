@@ -1,6 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { BottomTabs } from './components/BottomTabs';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SiteHeader } from './components/SiteHeader';
@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage';
 import { queryClient } from './queryClient';
 
 const ArticleDetailPage = lazy(() => import('./pages/ArticleDetailPage').then((module) => ({ default: module.ArticleDetailPage })));
+const RecentPage = lazy(() => import('./recent/RecentPage').then((module) => ({ default: module.RecentPage })));
 const ArticlesPage = lazy(() => import('./pages/ArticlesPage').then((module) => ({ default: module.ArticlesPage })));
 const CompaniesPage = lazy(() => import('./pages/CompaniesPage').then((module) => ({ default: module.CompaniesPage })));
 const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage').then((module) => ({ default: module.CompanyDetailPage })));
@@ -18,6 +19,10 @@ const TopicDetailPage = lazy(() => import('./pages/TopicDetailPage').then((modul
 const TopicsPage = lazy(() => import('./pages/TopicsPage').then((module) => ({ default: module.TopicsPage })));
 
 export function AppRoutes() {
+  const location = useLocation();
+  if (location.pathname === '/recent' || location.pathname.startsWith('/recent/')) {
+    return <Suspense fallback={<div className="inline-status">近期资讯加载中。</div>}><RecentPage /></Suspense>;
+  }
   return (
     <QueryClientProvider client={queryClient}>
       <main className="app-shell">

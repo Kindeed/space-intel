@@ -39,6 +39,7 @@ export async function collectRssFeed(source: SourceConfig, context: CollectorCon
 
   const items: NormalizedItem[] = [];
   for (const item of feed.items) {
+    if (source.strict_dates && (!item.isoDate || !Number.isFinite(Date.parse(item.isoDate)))) continue;
     const title = collectorDisplayText(item.title, '');
     const url = normalizeHttpUrl(item.link ?? '');
     const language: NormalizedItem['language'] = source.region === 'cn' ? 'zh' : 'en';

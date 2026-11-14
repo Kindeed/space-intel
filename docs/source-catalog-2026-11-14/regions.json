@@ -1,0 +1,584 @@
+{
+  "asOf": "2026-11-14",
+  "regions": [
+    {
+      "name": "北京",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-a223ed1e7521",
+        "source-9cc52e3a25b6",
+        "source-975ed99c1385"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 3
+    },
+    {
+      "name": "河北",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-611c19c7b153",
+        "source-dba6aca1debf",
+        "source-494ded690dd0",
+        "source-c32c018ccf54",
+        "source-da62f0917aaf",
+        "source-6d1a95207b38",
+        "source-ee8f186bc449"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 7
+    },
+    {
+      "name": "天津",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-75859e3499d7",
+        "source-d86fb9a6a8d8",
+        "source-9fbcb61c3496",
+        "source-0a6e014fb219"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 4
+    },
+    {
+      "name": "山西",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-4803e2640966",
+        "source-9b21a6fd7c7e",
+        "source-a00049969d71",
+        "source-8ba65e85c662",
+        "source-5d152d61a69d",
+        "source-dba1b08fe64c"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "辽宁",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-a8608fde7093",
+        "source-b9396de43d72",
+        "source-b9b92a9b1b8a",
+        "source-e282c0952d07",
+        "source-871450b2d650",
+        "source-420cb6eb1364"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "内蒙古",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-71499c91e708",
+        "source-4171bd0aaae7",
+        "source-0c630cc1b4e4",
+        "source-5f1868145d35",
+        "source-b0d2dd63ebab",
+        "source-abb089d4457b",
+        "source-9483b0aa66e6"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 7
+    },
+    {
+      "name": "上海",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-b424e438cdcb",
+        "source-5e6538f933e8",
+        "source-0cf871d7d5ef",
+        "source-880795a61456",
+        "source-2e4ebc2e12bc"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 5
+    },
+    {
+      "name": "黑龙江",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-277fd2a66342",
+        "source-702fde940b00",
+        "source-b88a9f4e32cc",
+        "source-721933591eff",
+        "source-9948798df4ba",
+        "source-05d904439a6b"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "吉林",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-d7af0eba51a1",
+        "source-2f8281395282"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 2
+    },
+    {
+      "name": "江苏",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-0285c8b148e3",
+        "source-dcebccf6185a",
+        "source-2d924b8a782c",
+        "source-ce81b50a2e05",
+        "source-eb00e95a1760"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 5
+    },
+    {
+      "name": "浙江",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-29f24e12df19",
+        "source-0f1ce9ac8747",
+        "source-b16f7b68a31c"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 3
+    },
+    {
+      "name": "安徽",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-4d4b8b964ed3",
+        "source-8dfbe8e829a9"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 2
+    },
+    {
+      "name": "江西",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-d1537fb76c8e"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "山东",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-b4f6e5f22c57"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "福建",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-59a5e06489d7",
+        "source-ec06dae38969",
+        "source-6e8dc8be8267",
+        "source-9999a19993c0",
+        "source-5651b2cca61e",
+        "source-667107ef5b18"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "湖北",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-523920d721d3",
+        "source-c2557a43f117"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 2
+    },
+    {
+      "name": "河南",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-5ac7ca50a174"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "湖南",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-9fbb73773272"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "广东",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-a559c7839f86",
+        "source-8ec8158a3931",
+        "source-ee63955ba0d4"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 3
+    },
+    {
+      "name": "广西",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-60e8db2c86ec"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "重庆",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-4f28589190e8",
+        "source-6d89c8579c58",
+        "source-c6e0d9c3409c",
+        "source-77e670b46e17"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 4
+    },
+    {
+      "name": "四川",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-37e4d4b18e74",
+        "source-5e2e03091c43",
+        "source-9d93d0a21433",
+        "source-f0c7a1eaef66",
+        "source-091f9d980385",
+        "source-37a706d55482"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "贵州",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-1c749a23870b",
+        "source-9b2dd8337e42",
+        "source-aee6b84797bc",
+        "source-24db3f628b63",
+        "source-81ea4b17923a",
+        "source-83968c7c7647",
+        "source-381c49b004ad"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 7
+    },
+    {
+      "name": "海南",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-f56e9f9f9d76"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "云南",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-ec6893b35733",
+        "source-ca1ab6745e23",
+        "source-833e8de199b2",
+        "source-c2be1de7400c",
+        "source-3c1d14dab343",
+        "source-1547909a8d6f",
+        "source-829dd00c1030"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 7
+    },
+    {
+      "name": "陕西",
+      "scope": "mainland_province",
+      "priority": "first_validation",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-c1758d45fa0c",
+        "source-22929184c245",
+        "source-d3e0ccbbed88",
+        "source-933765837f67",
+        "source-aee40bcf313d",
+        "source-359fd88af20f",
+        "source-627a49851862"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 7
+    },
+    {
+      "name": "西藏",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-472de4f3adb1",
+        "source-07778866ce3d",
+        "source-e4398825d38a",
+        "source-52636a2cae9b",
+        "source-01c2b208bc79"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 5
+    },
+    {
+      "name": "甘肃",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-4401eea92e97"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "新疆",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-2bea072b26c6",
+        "source-024c8f4ecfb0",
+        "source-49498a69ed2c",
+        "source-2f11755065db",
+        "source-99f0c469f0f2",
+        "source-4330cbcd186c"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "香港",
+      "scope": "extension",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-b3db586e5ca5"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "澳门",
+      "scope": "extension",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-089ae2045635"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "宁夏",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-7aaf3ce11b18",
+        "source-6ac2245afb20",
+        "source-533cdb807c1d",
+        "source-b705bf1aa43b",
+        "source-8867cc5e7689",
+        "source-f8abe8fa7610"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 6
+    },
+    {
+      "name": "青海",
+      "scope": "mainland_province",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-a7785c2b8f12"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "新疆生产建设兵团",
+      "scope": "extension",
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "sourceIds": [
+        "source-51bde5632c56"
+      ],
+      "gaps": [
+        "尚未逐一完成发改/工信/科技/采购公告的相关性、日期和增量试采。",
+        "城市、区县、园区及项目地覆盖仍不完整。"
+      ],
+      "candidateEntranceCount": 1
+    },
+    {
+      "name": "台湾",
+      "scope": "extension",
+      "sourceIds": [],
+      "candidateEntranceCount": 0,
+      "priority": "coverage",
+      "companyHeadquartersInferred": false,
+      "gaps": [
+        "官方目录中为脚本占位链接，没有作为可用URL录入；机构和企业入口待核实。"
+      ]
+    }
+  ]
+}

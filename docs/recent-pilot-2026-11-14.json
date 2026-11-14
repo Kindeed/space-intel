@@ -1,0 +1,474 @@
+{
+  "asOf": "2026-11-14",
+  "scope": "Two local public-source samples; no production D1 or health requests. Not a guarantee of long-term or Cloudflare-egress availability.",
+  "sampleTimes": [
+    "2026-11-14T13:24:48.369Z",
+    "2026-11-14T13:46:53.480Z"
+  ],
+  "discoveryCandidates": 48,
+  "requests": [
+    49,
+    27
+  ],
+  "sources": [
+    {
+      "id": "cas-space-news",
+      "name": "中科宇航新闻",
+      "url": "https://www.cas-space.com/",
+      "region": "cn",
+      "category": "company",
+      "collected": 10,
+      "recentCount": 5,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "casic-news",
+      "name": "中国航天科工集团新闻",
+      "url": "http://www.casic.com.cn/",
+      "region": "cn",
+      "category": "news",
+      "collected": 6,
+      "recentCount": 2,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "changguang-satellite-news",
+      "name": "长光卫星新闻",
+      "url": "https://www.jl1.cn/index.aspx",
+      "region": "cn",
+      "category": "company",
+      "collected": 3,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "cnsa-policy",
+      "name": "国家航天局政策公告",
+      "url": "https://www.cnsa.gov.cn/n6758823/n6758839/index.html",
+      "region": "cn",
+      "category": "policy",
+      "collected": 10,
+      "recentCount": 1,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "european-spaceflight-rss",
+      "name": "European Spaceflight",
+      "url": "https://europeanspaceflight.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 10,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "guangdong-drc-policy",
+      "name": "广东省发改委政策文件",
+      "url": "https://drc.gd.gov.cn/qtwj/",
+      "region": "cn",
+      "category": "policy",
+      "collected": 2,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "landspace-news",
+      "name": "蓝箭航天新闻",
+      "url": "https://www.landspace.com/site/",
+      "region": "cn",
+      "category": "company",
+      "collected": 8,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "nasa-news-rss",
+      "name": "NASA News",
+      "url": "https://www.nasa.gov/news-release/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 2,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "nasa-spaceflight-rss",
+      "name": "NASASpaceflight",
+      "url": "https://www.nasaspaceflight.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 8,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "orienspace-news",
+      "name": "东方空间新闻",
+      "url": "https://www.orienspace.com/newsPage",
+      "region": "cn",
+      "category": "company",
+      "collected": 15,
+      "recentCount": 1,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-commsat",
+      "name": "九天微星",
+      "url": "https://www.commsat.cn/news.html",
+      "region": "cn",
+      "category": "company",
+      "collected": 4,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-geespace",
+      "name": "时空道宇",
+      "url": "https://www.geespace.com/news/",
+      "region": "cn",
+      "category": "company",
+      "collected": 3,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-geovis",
+      "name": "中科星图",
+      "url": "https://www.geovis.com.cn/news/",
+      "region": "cn",
+      "category": "company",
+      "collected": 7,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-hubei-industry",
+      "name": "湖北经信热点聚焦",
+      "url": "https://jxt.hubei.gov.cn/bmdt/rdjj/index_1.shtml",
+      "region": "cn",
+      "category": "news",
+      "collected": 1,
+      "recentCount": 1,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-jiangsu-policy",
+      "name": "江苏工信政策发布",
+      "url": "https://gxt.jiangsu.gov.cn/col/col6299/index.html",
+      "region": "cn",
+      "category": "policy",
+      "collected": 3,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-jzyj",
+      "name": "九州云箭",
+      "url": "https://www.jzyjspace.com/news/1/",
+      "region": "cn",
+      "category": "company",
+      "collected": 2,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-minospace",
+      "name": "微纳星空",
+      "url": "https://www.minospace.cn/news_list.html",
+      "region": "cn",
+      "category": "company",
+      "collected": 9,
+      "recentCount": 3,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-orbita",
+      "name": "航宇微",
+      "url": "https://www.myorbita.net/xw/list_13.aspx",
+      "region": "cn",
+      "category": "company",
+      "collected": 4,
+      "recentCount": 3,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-starneto",
+      "name": "星网宇达",
+      "url": "https://www.starneto.com/new_center/",
+      "region": "cn",
+      "category": "company",
+      "collected": 1,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "recent-xingyi",
+      "name": "星邑空间",
+      "url": "https://www.xingyispace.com/news/list_29.html",
+      "region": "cn",
+      "category": "company",
+      "collected": 9,
+      "recentCount": 0,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "satnews-rss",
+      "name": "SatNews",
+      "url": "https://news.satnews.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 9,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "spacechina-news",
+      "name": "中国航天科技集团新闻",
+      "url": "https://www.spacechina.com/n25/n2014789/index.html",
+      "region": "cn",
+      "category": "news",
+      "collected": 1,
+      "recentCount": 1,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "spaceflight-now-rss",
+      "name": "Spaceflight Now",
+      "url": "https://spaceflightnow.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 8,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "spacenews-rss",
+      "name": "SpaceNews",
+      "url": "https://spacenews.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 16,
+      "recentCount": 12,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "spacepolicyonline-rss",
+      "name": "SpacePolicyOnline",
+      "url": "https://spacepolicyonline.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 4,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "spaceq-rss",
+      "name": "SpaceQ",
+      "url": "https://spaceq.ca/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 10,
+      "recentCount": 6,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    },
+    {
+      "id": "universe-today-rss",
+      "name": "Universe Today",
+      "url": "https://www.universetoday.com/feed/",
+      "region": "global",
+      "category": "news",
+      "collected": 20,
+      "recentCount": 6,
+      "attemptedAt": "2026-11-14T13:46:53.480Z",
+      "lastSuccessAt": "2026-11-14T13:46:53.480Z",
+      "status": "ok"
+    }
+  ],
+  "snapshot": {
+    "items": 78,
+    "domesticItems": 17,
+    "internationalItems": 61,
+    "bytes": 70329,
+    "gzipBytes": 14620
+  },
+  "notSelected": [
+    {
+      "id": "beijing-jxj-news",
+      "name": "北京市经信局工作动态",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "beijing-jxj-notices",
+      "name": "北京市经信局通知公告",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "cmse-news",
+      "name": "中国载人航天工程新闻",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "cnsa-news",
+      "name": "国家航天局新闻",
+      "status": "error",
+      "errorCategory": "network_error"
+    },
+    {
+      "id": "deepblueaerospace-news",
+      "name": "深蓝航天新闻",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "hainan-gov-news",
+      "name": "海南省政府今日海南",
+      "status": "error",
+      "errorCategory": "network_error"
+    },
+    {
+      "id": "most-news",
+      "name": "科学技术部工作动态",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "ndrc-policy",
+      "name": "国家发展改革委政策",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-calt",
+      "name": "中国运载火箭技术研究院",
+      "status": "error",
+      "errorCategory": "network_error"
+    },
+    {
+      "id": "recent-galactic",
+      "name": "星河动力",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-galaxy",
+      "name": "银河航天",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-ispace",
+      "name": "星际荣耀",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-jiangsu-notices",
+      "name": "江苏工信公告公示",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-spaceinsighter",
+      "name": "中科星图测控",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-spacety",
+      "name": "天仪空间",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "recent-wuhu-notices",
+      "name": "芜湖工信通知公告",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "shanghai-gov-news",
+      "name": "上海市政府要闻",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "shanghai-gov-policy",
+      "name": "上海市政府政策文件",
+      "status": "empty",
+      "errorCategory": null
+    },
+    {
+      "id": "sichuan-gov-news",
+      "name": "四川省政府新闻",
+      "status": "error",
+      "errorCategory": "http_error"
+    },
+    {
+      "id": "sichuan-gov-policy",
+      "name": "四川省政府政策文件",
+      "status": "error",
+      "errorCategory": "http_error"
+    },
+    {
+      "id": "spacepioneer-news",
+      "name": "天兵科技新闻",
+      "status": "empty",
+      "errorCategory": null
+    }
+  ]
+}

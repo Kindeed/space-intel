@@ -191,6 +191,7 @@ export const officialPageCollector: SourceCollector = {
     }
 
     let html = await response.text();
+    if(context.transformHtml) html=context.transformHtml(html);
     let effectiveUrl = source.url;
     let links = extractHtmlListLinks(html, effectiveUrl);
     const redirectedUrl = scriptRedirectUrl(html, effectiveUrl);
@@ -208,6 +209,7 @@ export const officialPageCollector: SourceCollector = {
       }
 
       html = await redirectedResponse.text();
+      if(context.transformHtml) html=context.transformHtml(html);
       effectiveUrl = redirectedUrl;
       links = extractHtmlListLinks(html, effectiveUrl);
     }
@@ -215,6 +217,7 @@ export const officialPageCollector: SourceCollector = {
     const seen = new Set<string>();
     const items: NormalizedItem[] = [];
     const maxItems = source.max_items ?? 20;
+    if (context.observeListing) context.observeListing({links:links.length,datedLinks:links.filter((link)=>extractDate(`${link.title} ${link.contextText} ${link.url}`)).length});
 
     for (const link of links) {
       if (isNavigationTitle(link.title)) {

@@ -1,0 +1,8 @@
+name = "space-intel"
+account_id = "10ac7759c7e55f60267f7550f95f6db6"
+compatibility_date = "2026-05-09"
+pages_build_output_dir = ".recent/deploy/site"
+
+[[r2_buckets]]
+binding = "R2_ASSETS"
+bucket_name = "space-intel-assets"
