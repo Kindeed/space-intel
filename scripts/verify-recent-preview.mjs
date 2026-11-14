@@ -10,6 +10,8 @@ const browser = await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL ||
 const results=[];
 const snapshot=await (await fetch(`${base}/recent/current.json`)).json();
 const expectedSources=snapshot.sources.length;
+const populatedCompany=snapshot.companies.find(company=>company.country==='China'&&snapshot.items.some(item=>item.region==='cn'&&item.companyIds.includes(company.id)&&Date.parse(item.publishedAt)>=Date.now()-30*86400000));
+assert(populatedCompany,'The real snapshot must include domestic company news');
 try {
   for (const viewport of [{width:1440,height:1000},{width:820,height:1180},{width:390,height:844}]) {
     const page = await browser.newPage({viewport});
@@ -35,10 +37,11 @@ try {
     await page.getByLabel('公司筛选').selectOption('minospace');
     await page.getByRole('heading',{name:'这个范围暂时没有近期资讯'}).waitFor();
     await clearFilters();
-    await page.getByLabel('公司筛选').selectOption('orbita');
-    await page.locator('.recent-results').filter({hasText:'航宇微'}).waitFor();
+    await page.getByLabel('公司筛选').selectOption(populatedCompany.id);
+    await page.locator('.recent-results').filter({hasText:populatedCompany.name}).waitFor();
+    await page.locator('.recent-card').first().waitFor();
     assert((await page.locator('.recent-card').count())>0);
-    assert((await page.locator('.recent-card').allTextContents()).every(text=>text.includes('航宇微')));
+    assert((await page.locator('.recent-card').allTextContents()).every(text=>text.includes(populatedCompany.name)));
     await clearFilters();
     await page.getByLabel('搜索近期资讯').fill('武汉');
     await page.getByRole('button',{name:'搜索',exact:true}).click();
@@ -48,10 +51,29 @@ try {
     await clearFilters();
     await page.getByLabel('内容类型').selectOption('policy');
     await page.locator('.recent-results').filter({hasText:'政策公告'}).waitFor();
-    await page.locator('.category-policy').first().waitFor();
-    assert((await page.locator('.recent-card').count())>0);
-    assert((await page.locator('.recent-card').allTextContents()).every(text=>text.includes('政策公告')));
+    const policyCount=snapshot.items.filter(item=>item.region==='cn'&&item.category==='policy'&&Date.parse(item.publishedAt)>=Date.now()-30*86400000).length;
+    if(policyCount){
+      await page.locator('.category-policy').first().waitFor();
+      assert((await page.locator('.recent-card').allTextContents()).every(text=>text.includes('政策公告')));
+    }else{
+      await page.getByRole('heading',{name:'这个范围暂时没有近期资讯'}).waitFor();
+      assert.equal(await page.locator('.recent-card').count(),0,'Do not fabricate policies in quiet publication periods');
+    }
     await clearFilters();
+    for(const [focus,label] of [['spaceport','发射场／建设项目'],['ttc','遥测／测运控']]){
+      await page.getByLabel('关注领域').getByRole('button',{name:label,exact:true}).click();
+      await page.waitForFunction(value=>new URLSearchParams(location.search).get('focus')===value,focus);
+      const expected=snapshot.items.filter(item=>item.region==='cn'&&item.focus.includes(focus)&&Date.parse(item.publishedAt)>=Date.now()-30*86400000);
+      if(expected.length){
+        await page.waitForFunction(urls=>{
+          const rendered=[...document.querySelectorAll('.recent-card-title')].map(node=>node.getAttribute('href'));
+          return rendered.length===Math.min(100,urls.length)&&rendered.every(url=>urls.includes(url));
+        },expected.map(item=>item.url));
+        const links=await page.locator('.recent-card-title').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href')));
+        assert(links.length>0&&links.every(url=>expected.some(item=>item.url===url)),`${label} must show relevant items`);
+      }else await page.getByRole('heading',{name:'这个范围暂时没有近期资讯'}).waitFor();
+      await clearFilters();
+    }
     await page.getByLabel('国内外筛选').getByRole('button',{name:'国外',exact:true}).click();
     assert((await page.locator('.recent-card').count())>0);
     const article=page.locator('.recent-card-title').first();

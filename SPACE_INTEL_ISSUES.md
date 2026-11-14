@@ -34,26 +34,48 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-370 - Expanded domestic coverage still depends heavily on supplementary reporting
+
+- Priority: P2
+- Status: OPEN
+- Area: recent-preview | source-quality | upstream-access
+- Found In: hosted snapshot and remote acceptance
+- Evidence: 149 tracked entrances yield 71 ok, 6 empty and 72 errors (61 network, 11 HTTP). Of 186 domestic articles, 172 use supplementary Google News links and only 14 use direct links. The snapshot has no recent policy, approval or procurement rows. Seven project directories and 31 provincial navigation entries are not evidence of verified approvals.
+- Fix: Continue identifying accessible, dated official notice lists for planning, EIA, land and tenders, and public company news. Retain explicit source failure and limited-access labels, and preserve recent last-good data. Do not bypass upstream controls or insert old/fabricated announcements to fill categories.
+- Regression Check: Snapshot counts recorded in `docs/recent-preview-evidence-2026-11-15.json`; hosted browser checks enforce honest policy empty state and focus relevance. Real cross-day scheduled stability remains unverified.
+- Notes: Preview infrastructure works, but source coverage is not fully stable. No production cutover or D1 recovery claim.
+
+### 2026-11-15 - SI-ISSUE-368 - Preview cold-start and deployment configuration failures
+
+- Priority: P1
+- Status: VERIFIED
+- Area: recent-preview | scheduler | deployment
+- Found In: initial hosted workflow runs
+- Evidence: ISO fractional dots violated round ID validation; missing R2 keys left an empty local download that failed JSON parsing; Pages rejected account_id in its generated deployment config. Failed runs could consume reserved internal request budget conservatively.
+- Fix: Normalize generated round IDs and validate config before reserving; clean only incomplete missing-key local downloads; remove account_id from generated Pages config and use the account environment variable; always finalize tracked request usage. Internal budget deferral is eligible next slot without upstream backoff.
+- Regression Check: Runs 43612284933, 43612337494 and 43613446016 completed R2 prepare, collection, publish/retention, finalization, build and deploy. 73-file / 508-test suite passes, including budget and Pages routing regressions. Request count remains 532/600 for the UTC day, including the conservative earlier reservation.
+- Notes: No budget bypass or production D1 changes. Cross-day schedule execution is still an observation item.
+
 ### 2026-11-15 - SI-ISSUE-369 - Pages canonical redirect loops on the recent preview route
 
 - Priority: P1
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | deployment | routing
 - Found In: clean remote Chrome acceptance against deployment e091db33
 - Evidence: `/recent` returned 308 to `/`; the preview worker redirects `/` back to `/recent`. The asset subrequest to `/index.html` triggered Pages canonicalization, although JSON publication and deployment steps had succeeded.
 - Fix: Fetch the root HTML through the ASSETS binding directly, bypassing the public worker's root redirect. Add a regression that models Pages canonical redirects for `/index.html`.
-- Regression Check: Targeted tests and a new hosted browser acceptance are required before VERIFIED.
+- Regression Check: Run 43613446016 passes full 73-file / 508-test suite and deploys 53dc0fa5. Clean hosted Chrome acceptance passes 1440/820/390 widths, combined filters, focus relevance and unavailable data. Stable alias returns HTML 200 without redirect loops; JSON returns 200. Local typecheck/lint and routing regression pass.
 - Notes: This affects only the isolated preview. Production routes and D1 are unchanged.
 
 ### 2026-11-14 - SI-ISSUE-367 - Public government XML lists and approval notices are under-collected
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | source-coverage | parsing
 - Found In: expansion of province and commercial-spaceport notice sources
 - Evidence: Public HanWeb government lists place dated anchors inside non-executable `text/xml` script blocks; generic script removal discards these records. The generic official-page exclusion of "生态环境" can also suppress environmental-impact notices. Wide row context may admit an unrelated attachment, so relevance must be checked again against the normalized item.
 - Fix: The preview explicitly expands public XML list data, uses aerospace-specific inclusion and no generic environmental exclusion for approval feeds, and rechecks normalized item relevance. It distinguishes planning/EIA notice/EIA approval/land/procurement/award/construction labels. Provincial portal directories, publisher locations and inferred project regions remain separate.
-- Regression Check: Public XML and milestone fixtures, strict RSS dates, bounded merge/filtering, preview serving and scheduler budget/backoff are covered by the 73-file / 506-test suite. Typecheck, lint, build, config checks and desktop/tablet/mobile local checks pass. Cloud preview publication and repeated remote updates remain in progress.
+- Regression Check: Public XML and milestone fixtures, strict RSS dates, bounded merge/filtering, preview serving and scheduler budget/backoff pass in the 73-file / 508-test hosted suite. Typecheck, lint, build, config and remote desktop/tablet/mobile checks pass. This verifies parser behavior and preview publication, not universal source availability or the existence of recent official approvals (see SI-ISSUE-370).
 - Notes: Official columns with no dated records remain unverified; supplementary reporting channels preserve the actual publisher and show limited-access links. New sources remain disabled in legacy production ingestion.
 
 ### 2026-11-14 - SI-ISSUE-366 - Recent RSS must not turn undated articles into fresh news

@@ -11,13 +11,14 @@
 
 ## Current Development Plan
 
-更新时间：2026-11-14
+更新时间：2026-11-15
 
 当前重点：v1 已具备 React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序、主要业务页面、Git-backed Pages 部署、scheduled Worker、R2、production ingestion、catalog sync、实体关联、launch cache、Hy-MT 翻译链路和 D1 数据保留策略。当前开发重心从“大功能补齐”转为治理文档清晰化、线上采集质量观察、回归问题闭环和后续增强筛选。
 
 当前任务：
 
-- IN_PROGRESS：远程浏览器验收发现预览 `/recent` 与 Pages `/index.html` 规范跳转形成循环（SI-ISSUE-369）；修复 ASSETS 请求路径并增加托管环境回归，完成后再交付预览。JSON 采集/发布正常，未切换生产。
+- DONE：预览 Pages 规范跳转循环（SI-ISSUE-369）已修复，云端运行 43613446016 与 1440/820/390 远程浏览器验收通过；包含发射场/遥测筛选、政策空状态、180 个来源目录、503 提示，零旧 API/health 请求。73 文件/508 测试通过。记录见 `docs/RECENT_PREVIEW_SCHEDULE_2026-11-15.md`。
+- IN_PROGRESS：官方原文覆盖仍不足（SI-ISSUE-370）。当前 149 个跟踪入口为 71 正常、6 无可用条目、72 请求失败；国内 186 条中 172 条为补充报道链接，政策/报批/采购分类本轮均为 0。继续针对具体公开栏目排查，不以目录数量宣称全国政策覆盖或长期稳定；跨日 cron 尚待观察。
 
 - DONE：PR #35 已合并，独立预览工作流每日北京时间 08:17/12:17/18:17/22:17 运行；代码取 `codex/recent-aggregation-preview`，R2 仅写 `recent/preview/v1/`，仅部署 Pages 预览分支，无 D1 绑定。云端两轮 43612284933 / 43612337494 已完成采集、发布、预算收尾和部署，资讯从 239 增至 243。预览地址 `https://recent-aggregation-preview.space-intel.pages.dev/recent`；未替换生产主页。
 
