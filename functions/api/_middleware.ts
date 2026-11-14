@@ -1,5 +1,5 @@
 const publicReadPath = /^\/api\/(?:home|sources|(?:articles|launches|companies|topics)(?:\/[^/]+)?)\/?$/;
-const publicCacheSeconds = 30;
+const publicCacheSeconds = 120;
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;

@@ -2,7 +2,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import { URL as NodeURL } from 'node:url';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { onRequestGet } from './health';
 
 it('uses indexes for real health log queries after the additive migration', async () => {
@@ -27,8 +27,6 @@ it('uses indexes for real health log queries after the additive migration', asyn
       FROM seq;
     `);
     const migration = readFileSync(new NodeURL('../../migrations/0009_health_query_indexes.sql', import.meta.url), 'utf8');
-    sqlite.exec(migration);
-    sqlite.exec(migration); // Applying the additive migration twice is safe.
     const plans: string[] = [];
     const db = {
       prepare(query: string) {
@@ -46,17 +44,46 @@ it('uses indexes for real health log queries after the additive migration', asyn
         };
       },
     };
-    const response = await onRequestGet({ env: { DB: db } } as unknown as Parameters<typeof onRequestGet>[0]);
+    const basicResponse = await onRequestGet({ env: { DB: db } } as unknown as Parameters<typeof onRequestGet>[0]);
+    expect(basicResponse.status).toBe(200);
+    expect(plans).toHaveLength(0);
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const unavailable = await onRequestGet({
+        env: { DB: db }, request: new Request('https://example.test/api/health?diagnostics=1'),
+      } as unknown as Parameters<typeof onRequestGet>[0]);
+      expect(unavailable.status).toBe(503);
+      expect(await unavailable.json()).toMatchObject({ diagnostics: { diagnosticsAvailable: false, openIngestionLogCount: null } });
+    } finally { log.mockRestore(); }
+    sqlite.exec(migration);
+    sqlite.exec(migration); // Applying the additive migration twice is safe.
+    plans.length = 0;
+    const response = await onRequestGet({
+      env: { DB: db }, request: new Request('https://example.test/api/health?diagnostics=1'),
+    } as unknown as Parameters<typeof onRequestGet>[0]);
     expect(response.status).toBe(200);
     const payload = await response.json() as { diagnostics: { openIngestionLogCount: number; recentFailedIngestionLogs: unknown[] } };
     expect(payload.diagnostics.openIngestionLogCount).toBe(1);
     expect(payload.diagnostics.recentFailedIngestionLogs).toHaveLength(5);
-    expect(plans).toHaveLength(5);
+    expect(plans).toHaveLength(2);
     for (const plan of plans) {
       expect(plan).toContain('USING');
       expect(plan).not.toContain('USE TEMP B-TREE');
       expect(plan).not.toMatch(/SCAN ingestion_logs(?:$| \|)/);
     }
+    sqlite.exec(`
+      WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 250)
+      INSERT INTO ingestion_logs SELECT 3000 + n, 'snapi', '2026-11-14', NULL, 0, 0, NULL FROM seq;
+      WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 250)
+      INSERT INTO launches SELECT '2099-01-01T00:00:00Z' FROM seq;
+    `);
+    const capped = await onRequestGet({
+      env: { DB: db }, request: new Request('https://example.test/api/health?diagnostics=1'),
+    } as unknown as Parameters<typeof onRequestGet>[0]);
+    expect(await capped.json()).toMatchObject({ diagnostics: {
+      openIngestionLogCount: 200, openIngestionLogCountExact: false,
+      upcomingLaunchCount: 200, upcomingLaunchCountExact: false,
+    } });
   } finally {
     sqlite.close();
   }

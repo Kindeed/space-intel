@@ -13,6 +13,7 @@ class FakeHealthStatement {
   }
 
   async first<T = unknown>(): Promise<T | null> {
+    if (this.query === 'SELECT 1 AS healthy') return { healthy: 1 } as T;
     if (this.query.includes('MAX(published_at)')) {
       return { latestArticlePublishedAt: '2026-05-18T08:00:00Z' } as T;
     }
@@ -21,47 +22,26 @@ class FakeHealthStatement {
       return { openIngestionLogCount: 2 } as T;
     }
 
-    if (this.query.includes('MAX(finished_at)')) {
-      return { latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z' } as T;
-    }
-
     if (this.query.includes('COUNT(*) AS upcomingLaunchCount')) {
       return { upcomingLaunchCount: 12 } as T;
-    }
-
-    if (this.query.includes("source_key = 'launch-library-2'")) {
-      return {
-        sourceKey: 'launch-library-2',
-        startedAt: '2026-05-18T06:00:00Z',
-        finishedAt: '2026-05-18T06:00:03Z',
-        successCount: 25,
-        failureCount: 0,
-        hasError: 0,
-        error: null,
-      } as T;
-    }
-
-    if (this.query.includes('FROM ingestion_logs') && this.query.includes('ORDER BY finished_at DESC')) {
-      expect(this.query).toContain('finished_at IS NOT NULL');
-      return {
-        sourceKey: 'google-news-cn-commercial-space',
-        startedAt: '2026-05-18T08:00:00Z',
-        finishedAt: '2026-05-18T08:00:05Z',
-        successCount: 3,
-        failureCount: 0,
-        hasError: 0,
-        error: null,
-      } as T;
     }
 
     return null;
   }
 
   async all<T = unknown>(): Promise<{ results: T[] }> {
-    if (this.query.includes('failure_count > 0')) {
+    if (this.query.includes('FROM ingestion_logs')) {
       return {
         results: [
           {
+            id: 100,
+            sourceKey: 'google-news-cn-commercial-space',
+            startedAt: '2026-05-18T08:00:00Z',
+            finishedAt: '2026-05-18T08:00:05Z',
+            successCount: 3, failureCount: 0, hasError: 0, error: null,
+          } as T,
+          {
+            id: 99,
             sourceKey: 'demo-rss',
             startedAt: '2026-05-18T07:00:00Z',
             finishedAt: '2026-05-18T07:00:02Z',
@@ -69,6 +49,13 @@ class FakeHealthStatement {
             failureCount: 1,
             hasError: 1,
             error: 'Source ingestion timed out after 25000ms',
+          } as T,
+          {
+            id: 98,
+            sourceKey: 'launch-library-2',
+            startedAt: '2026-05-18T06:00:00Z',
+            finishedAt: '2026-05-18T06:00:03Z',
+            successCount: 25, failureCount: 0, hasError: 0, error: null,
           } as T,
         ],
       };
@@ -85,6 +72,16 @@ class FakeHealthDatabase {
 }
 
 describe('health API', () => {
+  it('checks connectivity with one constant query and no application-table reads by default', async () => {
+    const prepare = vi.fn((query: string) => new FakeHealthStatement(query));
+    const response = await onRequestGet({
+      env: { DB: { prepare } }, request: new Request('https://example.test/api/health'),
+    } as unknown as Parameters<typeof onRequestGet>[0]);
+    expect(response.status).toBe(200);
+    expect(prepare.mock.calls).toEqual([['SELECT 1 AS healthy']]);
+    expect(await response.json()).toMatchObject({ ok: true, diagnostics: { diagnosticsAvailable: false, diagnosticsRequested: false } });
+  });
+
   it('returns 503 when D1 rejects diagnostics without exposing quota details', async () => {
     const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
@@ -107,6 +104,7 @@ describe('health API', () => {
 
   it('returns safe ingestion diagnostics without internal error details', async () => {
     const response = await onRequestGet({
+      request: new Request('https://example.test/api/health?diagnostics=1'),
       env: {
         DB: new FakeHealthDatabase() as unknown as D1Database,
         R2_ASSETS: {} as R2Bucket,
@@ -121,9 +119,13 @@ describe('health API', () => {
         assets: true,
       },
       diagnostics: {
+        ingestionLogScope: 'recent_log_ids',
+        ingestionLogIdWindow: 240,
         latestArticlePublishedAt: '2026-05-18T08:00:00Z',
         openIngestionLogCount: 2,
+        openIngestionLogCountExact: true,
         upcomingLaunchCount: 12,
+        upcomingLaunchCountExact: true,
         latestSuccessfulIngestionAt: '2026-05-18T08:00:05Z',
         recentFailedIngestionLogs: [
           {
@@ -163,6 +165,7 @@ describe('health API', () => {
 
   it('does not expose internal source keys in diagnostics', async () => {
     const response = await onRequestGet({
+      request: new Request('https://example.test/api/health?diagnostics=1'),
       env: {
         DB: new FakeHealthDatabase() as unknown as D1Database,
         R2_ASSETS: {} as R2Bucket,

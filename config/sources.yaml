@@ -18,12 +18,12 @@ sources:
     name: Launch Library 2
     type: api
     region: global
-    url: https://ll.thespacedevs.com/2.2.0/launch/upcoming/
+    url: https://ll.thespacedevs.com/2.3.0/launches/upcoming/?mode=normal&hide_recent_previous=true
     credibility: 5
     enabled: true
     purpose: Primary upcoming launch and event cache for launch pages and article relations, including Chinese state and commercial launch providers when present upstream.
     expected_content: Mission, provider, vehicle, site, window, and status metadata.
-    risk_notes: Public API; cache event metadata only. Use official Chinese human-spaceflight, CASC/China Rocket, and CGWIC planning pages as source-quality cross-checks when Chinese launch coverage appears stale or incomplete.
+    risk_notes: Public supported LL2 2.3.0 API; one scheduled request per hourly rotation, no immediate retries or development-data fallback. Cache event metadata only and respect upstream 429 limits. Use official Chinese human-spaceflight, CASC/China Rocket, and CGWIC planning pages as source-quality cross-checks when Chinese launch coverage appears stale or incomplete.
     dedupe_strategy: external_id
     public_category: data
     access_domestic: limited

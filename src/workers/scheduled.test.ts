@@ -13,6 +13,25 @@ vi.mock('../ingestion', async (importOriginal) => {
 });
 
 describe('scheduled Worker', () => {
+  it('reports source failures even when the platform invocation resolves successfully', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const waitUntil = vi.fn();
+    vi.mocked(runScheduledIngestion).mockResolvedValueOnce({
+      kind: 'hourly', durationMs: 20, successSourceCount: 0, failedSourceCount: 1,
+      sourceRuns: [{ sourceKey: 'snapi', collected: 0, inserted: 0, skipped: 0, failures: 1 }],
+      maintenance: null, catalogSync: null, curationsInserted: 0, entityLinks: null,
+    });
+    try {
+      await worker.scheduled({ cron: sourceCron, scheduledTime: Date.parse('2026-11-14T00:00:00Z') } as ScheduledController,
+        { DB: {} as D1Database }, { waitUntil } as unknown as ExecutionContext);
+      await waitUntil.mock.calls[0][0];
+      expect(log).toHaveBeenCalledWith(expect.objectContaining({
+        event: 'space_intel_ingestion', failedSources: 1,
+        sources: [{ sourceKey: 'snapi', failures: 1, written: 0 }],
+      }));
+    } finally { log.mockRestore(); }
+  });
+
   it('rejects HTTP probes without throwing or triggering ingestion', async () => {
     vi.mocked(runScheduledIngestion).mockClear();
     const response = await worker.fetch();

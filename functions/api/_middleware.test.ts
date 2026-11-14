@@ -25,7 +25,7 @@ describe('public API edge cache', () => {
     await Promise.all(pending);
     const second = await run();
     expect(next).toHaveBeenCalledTimes(1);
-    expect(second.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=30');
+    expect(second.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=120');
     expect(await second.json()).toEqual(await first.json());
   });
 
