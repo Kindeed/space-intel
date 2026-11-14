@@ -231,6 +231,28 @@ const sources: SourceConfig[] = [
 ];
 
 describe('scheduled ingestion', () => {
+  it.each([true, false])('runs requested stale-log maintenance before collection (enabled: %s)', async (runMaintenance) => {
+    const db = new MemoryScheduledDatabase();
+    db.logs.push({
+      id: 1, sourceKey: 'terminated-source', startedAt: '2026-11-14T00:00:00Z',
+      finishedAt: null, successCount: 0, failureCount: 0, error: null,
+    });
+    const now = '2026-11-14T05:00:00.000Z';
+    const result = await runScheduledIngestion({
+      db, sources: [sources[0]], kind: 'hourly', runMaintenance,
+      context: {
+        now: () => new Date(now),
+        fetch: async () => {
+          expect(db.logs[0].finishedAt).toBe(runMaintenance ? now : null);
+          return Response.json({ results: [] });
+        },
+      },
+    });
+    expect(result.maintenance).toEqual(runMaintenance
+      ? { staleIngestionLogsClosed: 1, retention: null, failures: 0 }
+      : null);
+  });
+
   it('runs hourly ingestion idempotently for articles and caches launches', async () => {
     const db = new MemoryScheduledDatabase();
     const context = {

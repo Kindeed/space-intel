@@ -34,6 +34,47 @@
 
 ## Current Issues
 
+### 2026-11-14 - SI-ISSUE-356 - Scheduled ingestion exceeds CPU budget and leaves partial source refreshes
+
+- Priority: P1
+- Status: FIXED
+- Area: ingestion | performance | deployment | data
+- Found In: user report and authenticated Cloudflare metrics
+- Evidence: Latest past-24-hour metrics: 24 invocations, 11 exceeded CPU time, zero uncaught exceptions and zero memory-limit errors. Active version is 97a5738f; Workers plan is Free. Public health shows 10 open ingestion logs and latest successful source completion at 2026-11-14T00:02:04.783Z. D1 logs show consecutive unfinished SNAPI runs and repeated subrequest-limit failures for later official/procurement sources. Worker and Pages share the space_intel D1 database.
+- Fix: Prepared minute-based single-source rotation using ScheduledController.scheduledTime, cached config parsing, maintenance before source work, bounded RSS normalization, lazy HTML context extraction and explicit resource/rate-limit diagnostic categories. Current 60 enabled sources each receive one invocation per 60-minute rotation. Account plan is unchanged.
+- Regression Check: Rotation coverage/delayed-delivery/invalid-schedule tests, maintenance ordering, full suite (67 files / 479 tests), typecheck, lint, build, config parity, scheduled Worker dry-run and Pages Functions compilation passed. Production recovery remains unverified until deployment and observation of a full rotation.
+- Notes: CPU hard termination cannot be caught in application code. Single-source jobs and daily maintenance can still exceed Free CPU limits; local success does not establish production recovery.
+
+### 2026-11-14 - SI-ISSUE-357 - Article persistence uses several D1 binding requests per item
+
+- Priority: P1
+- Status: VERIFIED
+- Area: ingestion | database | performance
+- Found In: CPU/subrequest investigation
+- Evidence: Source writes previously performed an insert, ID resolution and relation batch for each record, including duplicates. Large feeds multiply binding requests within one invocation.
+- Fix: D1-capable connections now process up to 40 records per chunk, batching inserts, identity queries and relation updates. Sequential compatibility remains for database adapters without batch/result support. Legacy-column retries and duplicate relation updates are preserved.
+- Regression Check: Real in-memory SQLite migrations with D1-shaped batch results cover 80-row inserts, duplicate re-ingestion, relation changes and legacy schemas, each under 10 binding requests. Full verification passed.
+
+### 2026-11-14 - SI-ISSUE-358 - Public reads and frontend navigation perform avoidable work
+
+- Priority: P2
+- Status: VERIFIED
+- Area: api | frontend | performance | tooling
+- Found In: requested site audit
+- Evidence: Every public API read reached its handler, route code was bundled into the initial entry, abandoned queries were not cancelled, and unknown URLs rendered no recovery content. Windows CRLF checkout also caused false generated-config drift; Wrangler dry-run output was included in lint.
+- Fix: Added a 30-second edge cache for allowlisted public JSON GETs, route-level lazy loading, query AbortSignal propagation and an unknown-route recovery link. Health/admin/authenticated/cookie-bearing reads, errors and private responses bypass cache. Config comparison tolerates CRLF and lint excludes generated .wrangler output.
+- Regression Check: Cache hit/query isolation/bypass/error/failure tests, request cancellation, unknown-route rendering, full suite and build passed. Browser verified desktop and mobile homepage, news, domestic filter, pagination, detail, launches, official, keyword submission and recovery; no horizontal overflow in checked views. Initial JS changed from 351.16 kB (110.79 kB gzip) to 337.77 kB (108.46 kB gzip).
+
+### 2026-11-14 - SI-ISSUE-359 - Several upstream sources reject production ingestion
+
+- Priority: P1
+- Status: OPEN
+- Area: ingestion | upstream | data-freshness
+- Found In: read-only production D1 log queries
+- Evidence: Query window starting 2026-11-13T00:00:00Z includes 23 failed Launch Library 2 runs with no successful run in that window; raw logs contain HTTP 429. ESA feed returns 404 and SpaceRef/Wuxi sources return 403. A single local public LL2 request returned 200; this does not prove availability from the Worker egress.
+- Fix: Isolate source failures and distinguish rate_limited/resource_limit diagnostics. Further work must verify the official feed endpoints, production Retry-After/rate-limit policy and launch cache freshness without bypassing upstream restrictions.
+- Regression Check: Error classification tests passed; upstream production recovery and cached launch accuracy are unverified.
+
 ### 2026-06-04 - SI-ISSUE-355 - Mobile pagination controls are left aligned
 
 - Priority: P3

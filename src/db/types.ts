@@ -1,4 +1,5 @@
 export type DbRunResult = {
+  results?: unknown[];
   meta?: {
     changes?: number;
     last_row_id?: number;

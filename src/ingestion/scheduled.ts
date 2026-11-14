@@ -44,6 +44,7 @@ export type ScheduledIngestionInput = {
   kind: 'hourly' | 'daily';
   sourceTimeoutMs?: number;
   translationEnv?: TranslationEnv;
+  runMaintenance?: boolean;
 };
 
 export type ScheduledIngestionResult = {
@@ -203,6 +204,12 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
   const timeoutMs = input.sourceTimeoutMs ?? sourceIngestionTimeoutMs;
 
   if (input.kind === 'hourly') {
+    // Close logs from terminated invocations before starting more source work.
+    // A CPU termination cannot execute a catch/finally block at the end.
+    if (input.runMaintenance !== false) {
+      maintenance = await runScheduledMaintenanceSafely(input.db, input.context.now(), { runRetention: false });
+    }
+
     const snapiSource = input.sources.find((source) => source.key === 'snapi');
 
     if (snapiSource?.enabled) {
@@ -306,10 +313,6 @@ export async function runScheduledIngestion(input: ScheduledIngestionInput): Pro
     }
 
     maintenance = await runScheduledMaintenanceSafely(input.db, input.context.now(), { runRetention: true });
-  }
-
-  if (input.kind === 'hourly') {
-    maintenance = await runScheduledMaintenanceSafely(input.db, input.context.now(), { runRetention: false });
   }
 
   const curationsInserted =

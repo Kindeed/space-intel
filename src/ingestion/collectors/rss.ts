@@ -37,35 +37,38 @@ export async function collectRssFeed(source: SourceConfig, context: CollectorCon
   const maxItems = source.max_items ?? 50;
   const sourceName = collectorDisplayText(feed.title, source.name);
 
-  return feed.items
-    .filter((item) => collectorDisplayText(item.title, '') && item.link)
-    .flatMap((item) => {
-      const title = collectorDisplayText(item.title, '');
-      const url = normalizeHttpUrl(item.link ?? '');
-      const language: NormalizedItem['language'] = source.region === 'cn' ? 'zh' : 'en';
+  const items: NormalizedItem[] = [];
+  for (const item of feed.items) {
+    const title = collectorDisplayText(item.title, '');
+    const url = normalizeHttpUrl(item.link ?? '');
+    const language: NormalizedItem['language'] = source.region === 'cn' ? 'zh' : 'en';
 
-      if (!url) {
-        return [];
-      }
+    if (!url || !title) {
+      continue;
+    }
 
-      return {
-        sourceKey: source.key,
-        sourceName,
-        publisherName: sourceName,
-        title,
-        originalTitle: title,
-        summary: itemSummary(item),
-        url,
-        publishedAt: itemDate(item, context),
-        language,
-        region: source.region,
-        rawId: item.guid ?? url,
-        relatedLaunchIds: [],
-        companies: source.default_companies ?? [],
-        tags: source.default_tags ?? [],
-      };
-    })
-    .slice(0, maxItems);
+    items.push({
+      sourceKey: source.key,
+      sourceName,
+      publisherName: sourceName,
+      title,
+      originalTitle: title,
+      summary: itemSummary(item),
+      url,
+      publishedAt: itemDate(item, context),
+      language,
+      region: source.region,
+      rawId: item.guid ?? url,
+      relatedLaunchIds: [],
+      companies: source.default_companies ?? [],
+      tags: source.default_tags ?? [],
+    });
+    if (items.length >= maxItems) {
+      break;
+    }
+  }
+
+  return items;
 }
 
 export const rssCollector: SourceCollector = {

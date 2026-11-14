@@ -20,8 +20,8 @@ type ApiQueryOptions = {
   retry?: boolean | number;
 };
 
-export async function fetchJson<T>(path: string): Promise<T> {
-  const response = await fetch(path);
+export async function fetchJson<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(path, { signal });
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
@@ -33,7 +33,7 @@ export async function fetchJson<T>(path: string): Promise<T> {
 export function useApiQuery<T>(key: readonly unknown[], path: string | null, options: ApiQueryOptions = {}): UseQueryResult<T, Error> {
   return useQuery({
     queryKey: key,
-    queryFn: () => fetchJson<T>(path ?? ''),
+    queryFn: ({ signal }) => fetchJson<T>(path ?? '', signal),
     enabled: Boolean(path),
     staleTime: options.staleTime ?? 60_000,
     gcTime: 5 * 60_000,

@@ -33,6 +33,13 @@ describe('App', () => {
     expect(html).not.toContain('Content Policy');
   });
 
+  it('provides a recovery link for unknown routes', () => {
+    const html = renderAt('/missing-page');
+    expect(html).toContain('未找到页面');
+    expect(html).toContain('返回首页');
+    expect(html).toContain('href="/"');
+  });
+
   it('does not render fixed design notes as article key points', () => {
     const html = renderAt('/articles/1');
 

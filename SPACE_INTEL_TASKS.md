@@ -11,11 +11,13 @@
 
 ## Current Development Plan
 
-更新时间：2026-06-04
+更新时间：2026-11-14
 
 当前重点：v1 已具备 React/Vite/TypeScript 前端、Cloudflare Pages Functions API、D1 schema、采集管线、人工精选、首页排序、主要业务页面、Git-backed Pages 部署、scheduled Worker、R2、production ingestion、catalog sync、实体关联、launch cache、Hy-MT 翻译链路和 D1 数据保留策略。当前开发重心从“大功能补齐”转为治理文档清晰化、线上采集质量观察、回归问题闭环和后续增强筛选。
 
 当前任务：
+
+- IN_PROGRESS：2026-11-14 免费方案采集修复和站点审查已完成本地验证，等待审查与生产验证。最新控制台为 24 次调用、11 次 CPU 超限，health 有 10 条未闭合日志。已实现每分钟单源轮转、有界 D1 批处理、维护前置、限流/资源错误分类、公开 API 短缓存、页面按需加载、请求取消和未知路由恢复。67 文件 / 479 测试、typecheck、lint、配置检查、build、Worker dry-run、Pages Functions 编译和桌面/手机浏览器检查通过；上游 429/403/404 与单源免费 CPU 预算仍需上线后复核。详见 `docs/REVIEW_REPORT_2026-11-14.md`、`SI-ISSUE-356` 至 `SI-ISSUE-359`。
 
 - DONE：移动端分页按钮对齐修复已完成。资讯、官方和发射页共用的分页行现在水平居中，避免“上一页 / 下一页”在手机端贴左显示；共享样式回归测试、typecheck、lint、build、布局验证和 390px 移动端浏览器居中检查已通过。跟踪项见 `SPACE_INTEL_ISSUES.md` 中 `SI-ISSUE-355`。
 - IN_PROGRESS：发射规划中国火箭覆盖修复正在闭环。已针对 `SI-ISSUE-354` 确认上游 Launch Library 2 当前包含长征、捷龙、星云等中国发射记录，但生产 `/api/launches` 缺失；本轮改为每小时刷新 launch cache，提高 LL2 拉取数量，增加公开 health 的 launch cache 统计和最近 launch ingestion 脱敏状态，并让 admin logs 支持按 `launch-library-2` 过滤。同步补充中国载人航天、航天科技/中国商火和长城公司发射机会等官方规划源声明，后续需要专门 extractor 把“规划/机会”与精确发射事件分层建模。配置检查、目标测试、完整回归、类型检查、lint、构建、diff check、PR #28 CI 和 scheduled Worker 部署已通过；生产复查显示最新 Launch Library 2 采集为 `http_error`，仍需 admin token 手动重跑或等待下一次 hourly launch ingestion 复查。
