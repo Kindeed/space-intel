@@ -34,6 +34,16 @@
 
 ## Current Issues
 
+### 2026-11-14 - SI-ISSUE-360 - Scheduled-only Worker throws on HTTP probes
+
+- Priority: P2
+- Status: FIXED
+- Area: worker | observability | deployment
+- Found In: PR #31 production rollout
+- Evidence: New version initially recorded an uncaught exception with sub-millisecond CPU time and no D1 source log. An HTTP GET to the public Worker URL reproduced HTTP 500 / Cloudflare 1101. The module exported a scheduled handler but no fetch handler.
+- Fix: Return an explicit uncached HTTP 404 for HTTP requests without running ingestion; the cron handler is unchanged.
+- Regression Check: Added HTTP response/no-ingestion regression coverage; full verification and production recheck pending.
+
 ### 2026-11-14 - SI-ISSUE-356 - Scheduled ingestion exceeds CPU budget and leaves partial source refreshes
 
 - Priority: P1

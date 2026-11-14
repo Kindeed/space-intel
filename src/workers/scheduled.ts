@@ -58,6 +58,12 @@ export async function runSpaceIntelScheduled(cron: string, env: Env, scheduledTi
 }
 
 export default {
+  async fetch(): Promise<Response> {
+    return new Response('Not Found', {
+      status: 404,
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil(runSpaceIntelScheduled(controller.cron, env, controller.scheduledTime));
   },
