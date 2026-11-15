@@ -5483,6 +5483,7 @@ sources:
       category: approval
       focus: spaceport
       cadence: twice
+      transport: preview
   - key: build-yangjiang-news
     name: 阳江项目建设动态
     url: https://www.yangjiang.gov.cn/yj/ywdt/yjyw/index.html
@@ -5508,6 +5509,7 @@ sources:
       category: news
       focus: spaceport
       cadence: twice
+      transport: preview
   - key: build-shanghai-district
     name: 上海地区工程建设动态
     url: https://www.shanghai.gov.cn/nw15343/index.html
@@ -5583,3 +5585,4 @@ sources:
       category: news
       focus: spaceport
       cadence: twice
+      transport: preview

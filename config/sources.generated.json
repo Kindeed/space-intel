@@ -6219,7 +6219,8 @@
         "candidate": true,
         "category": "approval",
         "focus": "spaceport",
-        "cadence": "twice"
+        "cadence": "twice",
+        "transport": "preview"
       }
     },
     {
@@ -6248,7 +6249,8 @@
         "candidate": true,
         "category": "news",
         "focus": "spaceport",
-        "cadence": "twice"
+        "cadence": "twice",
+        "transport": "preview"
       }
     },
     {
@@ -6335,7 +6337,8 @@
         "candidate": true,
         "category": "news",
         "focus": "spaceport",
-        "cadence": "twice"
+        "cadence": "twice",
+        "transport": "preview"
       }
     }
   ]
