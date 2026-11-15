@@ -13,7 +13,8 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "verify:layout": "node scripts/verify-layout.mjs"
+    "verify:layout": "node scripts/verify-layout.mjs",
+    "recent:collect": "node scripts/run-recent.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",

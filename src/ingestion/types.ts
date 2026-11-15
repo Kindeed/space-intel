@@ -34,6 +34,19 @@ export type SourceConfig = {
   access_global?: SourceAccessStatus;
   access_note?: string;
   public_badge?: string;
+  strict_dates?: boolean;
+  recent?: {
+    candidate: boolean;
+    category: 'news' | 'policy' | 'company' | 'procurement' | 'approval';
+    publisher_region?: string;
+    companies?: string[];
+    focus?: 'ttc' | 'spaceport';
+    directory?: boolean;
+    cadence?: 'twice'|'four';
+    format?: 'ningbo_eia_json'|'nuxt_news';
+    transport?: 'preview';
+    article_url_prefix?: string;
+  };
 };
 
 export type NormalizedItem = {
@@ -61,6 +74,8 @@ export type NormalizedItem = {
 export type CollectorContext = {
   fetch: typeof fetch;
   now: () => Date;
+  observeListing?: (counts:{links:number;datedLinks:number}) => void;
+  transformHtml?: (html:string) => string;
 };
 
 export type SourceCollector = {

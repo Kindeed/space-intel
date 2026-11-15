@@ -176,6 +176,90 @@
       "english_name": "Commsat",
       "country": "China",
       "sector": "Satellite manufacturing"
+    },
+    {
+      "slug": "orbita",
+      "name": "航宇微",
+      "country": "China",
+      "sector": "Satellite components, Remote sensing",
+      "website": "https://www.myorbita.net/"
+    },
+    {
+      "slug": "xingyi-space",
+      "name": "星邑空间",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "website": "https://www.xingyispace.com/"
+    },
+    {
+      "slug": "jzyj",
+      "name": "九州云箭",
+      "country": "China",
+      "sector": "Rocket engines",
+      "website": "https://www.jzyjspace.com/"
+    },
+    {
+      "slug": "geovis",
+      "name": "中科星图",
+      "country": "China",
+      "sector": "Geospatial applications",
+      "website": "https://www.geovis.com.cn/"
+    },
+    {
+      "slug": "starneto",
+      "name": "星网宇达",
+      "country": "China",
+      "sector": "Navigation, Satellite ground services",
+      "website": "https://www.starneto.com/"
+    },
+    {
+      "slug": "emposat",
+      "name": "航天驭星",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "website": "https://www.emposat.com/"
+    },
+    {
+      "slug": "tianta",
+      "name": "中科天塔",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "website": "https://www.tianta.com.cn/"
+    },
+    {
+      "slug": "spaceinsighter",
+      "name": "星图测控",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "website": "https://www.spaceinsighter.com/"
+    },
+    {
+      "slug": "tyspace",
+      "name": "天银星际",
+      "country": "China",
+      "sector": "Satellite components",
+      "website": "https://www.ty-space.com/"
+    },
+    {
+      "slug": "adaspace",
+      "name": "国星宇航",
+      "country": "China",
+      "sector": "Satellite manufacturing",
+      "website": "https://www.adaspace.com/"
+    },
+    {
+      "slug": "tianlian-ttc",
+      "name": "天链测控",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "profile": "测运控公司跟踪实体，官网入口待核实。"
+    },
+    {
+      "slug": "eastcom",
+      "name": "东方通信",
+      "country": "China",
+      "sector": "Satellite ground services",
+      "profile": "跟踪卫星通信地面站相关业务信息。"
     }
   ]
 }

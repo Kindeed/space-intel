@@ -1,0 +1,6623 @@
+{
+  "asOf": "2026-11-14",
+  "researchOnly": true,
+  "note": "候选入口目录；数量不是独立发布者数或可采集源数。所有新入口均未生产启用。",
+  "stats": {
+    "sourceEntrances": 213,
+    "existingEnabledEntrances": 60,
+    "newCandidateEntrances": 153,
+    "cnEntrances": 176,
+    "internationalEntrances": 37,
+    "mainlandProvinceGroups": 31,
+    "companyEntities": 45,
+    "cnCompanyEntities": 34,
+    "companyEntitiesWithoutSource": 9,
+    "byCategory": {
+      "existing_api": 2,
+      "existing_rss": 20,
+      "existing_google_news_rss": 6,
+      "existing_official_page": 29,
+      "existing_procurement_page": 3,
+      "government_directory": 34,
+      "government_procurement_directory": 11,
+      "government_department_directory": 69,
+      "government_listing": 4,
+      "company_official": 19,
+      "company_homepage": 12,
+      "agency_official": 3,
+      "agency_feed_discovery": 1
+    },
+    "byVerification": {
+      "configured_not_revalidated": 60,
+      "homepage_reachable": 25,
+      "linked_by_official_portal": 80,
+      "homepage_probe_failed": 9,
+      "search_discovered_listing": 4,
+      "search_discovered": 20,
+      "reader_open_listing": 2,
+      "reader_open_empty": 1,
+      "existing_entity_website": 12
+    }
+  },
+  "sources": [
+    {
+      "id": "source-ccc564888948",
+      "name": "Spaceflight News",
+      "url": "https://api.spaceflightnewsapi.net/v4/articles/",
+      "category": "existing_api",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Core international commercial space news aggregation.",
+      "expectedContent": [
+        "News metadata, titles, summaries, publication timestamps, source links."
+      ],
+      "risks": [
+        "Public API; respect rate limits and store summaries/metadata only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://api.spaceflightnewsapi.net/v4/articles/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-00a510715fa5",
+      "name": "Launch Library 2",
+      "url": "https://ll.thespacedevs.com/2.3.0/launches/upcoming/?mode=normal&hide_recent_previous=true",
+      "category": "existing_api",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Primary upcoming launch and event cache for launch pages and article relations, including Chinese state and commercial launch providers when present upstream.",
+      "expectedContent": [
+        "Mission, provider, vehicle, site, window, and status metadata."
+      ],
+      "risks": [
+        "Public supported LL2 2.3.0 API; one scheduled request per hourly rotation, no immediate retries or development-data fallback. Cache event metadata only and respect upstream 429 limits. Use official Chinese human-spaceflight, CASC/China Rocket, and CGWIC planning pages as source-quality cross-checks when Chinese launch coverage appears stale or incomplete.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://ll.thespacedevs.com/2.3.0/launches/upcoming/?mode=normal&hide_recent_previous=true"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b7a018a9b519",
+      "name": "NASASpaceflight",
+      "url": "https://www.nasaspaceflight.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "International launch and commercial space reporting.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.nasaspaceflight.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-77bebbd7a9fa",
+      "name": "SpaceNews",
+      "url": "https://spacenews.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "International policy, market, and company reporting.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spacenews.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c2edd5eb4423",
+      "name": "Space.com",
+      "url": "https://www.space.com/feeds/all",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Broad international space industry and science coverage.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.space.com/feeds/all"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-27cff5b8ad9a",
+      "name": "Spaceflight Now",
+      "url": "https://spaceflightnow.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Launch operations and mission reporting.",
+      "expectedContent": [
+        "Article metadata, launch-related summaries, timestamps, original links."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spaceflightnow.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-5660bd53d493",
+      "name": "The Space Review",
+      "url": "https://www.thespacereview.com/articles.xml",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Long-form policy, market, and commercial space analysis references.",
+      "expectedContent": [
+        "Article metadata, summaries, publication date, original link."
+      ],
+      "risks": [
+        "Do not store full article text.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.thespacereview.com/articles.xml"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e3069eef100a",
+      "name": "NASA News",
+      "url": "https://www.nasa.gov/news-release/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Official NASA announcements relevant to commercial providers and missions.",
+      "expectedContent": [
+        "Official announcement metadata, summaries, publication time, original link."
+      ],
+      "risks": [
+        "Public official source; store summaries and links.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.nasa.gov/news-release/feed/"
+        },
+        {
+          "kind": "public_search",
+          "url": "https://www.nasa.gov/news-release/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-851a923bcb01",
+      "name": "ESA News",
+      "url": "https://www.esa.int/rssfeed/Our_Activities/Space_Transportation",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "European launch and transportation policy context.",
+      "expectedContent": [
+        "Official announcement metadata, summaries, publication time, original link."
+      ],
+      "risks": [
+        "Public official source; store summaries and links.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.esa.int/rssfeed/Our_Activities/Space_Transportation"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f05aef5e3c20",
+      "name": "Payload",
+      "url": "https://payloadspace.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Commercial space business, finance, and industry newsletter-style reporting.",
+      "expectedContent": [
+        "Article metadata, summaries, publication time, company and industry context links."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://payloadspace.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b9f132e99000",
+      "name": "European Spaceflight",
+      "url": "https://europeanspaceflight.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "European launch, satellite, and commercial provider coverage.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store summaries and links only; verify provider claims against original sources when used editorially.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://europeanspaceflight.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-aae92c0685a0",
+      "name": "SpaceWatch.Global",
+      "url": "https://spacewatch.global/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "International space policy, security, satellite, and commercial ecosystem coverage.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Broad analysis source; store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spacewatch.global/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-60fda9f7985d",
+      "name": "SpaceQ",
+      "url": "https://spaceq.ca/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Canadian commercial space, policy, launch, and satellite industry reporting.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spaceq.ca/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-ced99e8f6716",
+      "name": "Via Satellite",
+      "url": "https://www.satellitetoday.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Satellite communications, operators, ground segment, and space business coverage.",
+      "expectedContent": [
+        "Article metadata, summaries, publication time, original link."
+      ],
+      "risks": [
+        "Store summaries and links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.satellitetoday.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9d9acd1b5d97",
+      "name": "SatNews",
+      "url": "https://news.satnews.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Satellite industry announcements, operator updates, and mission news.",
+      "expectedContent": [
+        "Article metadata, short summaries, publication time, original link."
+      ],
+      "risks": [
+        "Announcement-heavy source; store summaries and links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.satnews.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-80612dd4b4b4",
+      "name": "SpaceRef",
+      "url": "https://spaceref.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Broad space news and official release aggregation with commercial-space relevance.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Broad aggregator-like source; dedupe carefully and store summaries only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spaceref.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e3f9cbf3e3b6",
+      "name": "Universe Today",
+      "url": "https://www.universetoday.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Broad space coverage that can surface commercial missions, lunar services, and launch context.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Broad science source; filter by commercial-space relevance in downstream views.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.universetoday.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-265b1889acb2",
+      "name": "Ars Technica Space",
+      "url": "https://arstechnica.com/space/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct RSS source for launch, commercial space, and space policy reporting.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only; do not reproduce full articles.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://arstechnica.com/space/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-6fbb7b0553e4",
+      "name": "SpacePolicyOnline",
+      "url": "https://spacepolicyonline.com/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct RSS source for civil, commercial, and regulatory space policy updates.",
+      "expectedContent": [
+        "Article metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Store metadata and summaries only; policy interpretation should link to originals.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://spacepolicyonline.com/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-051bdfe1ec71",
+      "name": "Commercial Space Federation",
+      "url": "https://commercialspace.org/feed/",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Industry association updates on commercial space policy, safety, and market activity.",
+      "expectedContent": [
+        "Organization posts, publication time, summaries, and original links."
+      ],
+      "risks": [
+        "Advocacy source; label as organization material and store summaries/links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://commercialspace.org/feed/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-1a7589068dd3",
+      "name": "China in Space",
+      "url": "https://www.china-in-space.com/feed",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct feed tracking China's state-owned and commercial space industry developments.",
+      "expectedContent": [
+        "China space news metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Independent newsletter source; store summaries and links only and verify sensitive claims against originals.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.china-in-space.com/feed"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9fdcd4d623cc",
+      "name": "China Space Monitor",
+      "url": "https://chinaspacemonitor.substack.com/feed",
+      "category": "existing_rss",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct feed for Chinese commercial space market, policy, and company analysis.",
+      "expectedContent": [
+        "Newsletter metadata, excerpts, publication time, original link."
+      ],
+      "risks": [
+        "Newsletter analysis source; store summaries and links only and avoid paywalled/full-text reproduction.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://chinaspacemonitor.substack.com/feed"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-0cc7f82ade60",
+      "name": "民营火箭来源",
+      "url": "https://news.google.com/rss/search?q=%E6%B0%91%E8%90%A5%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese private launch company coverage.",
+      "expectedContent": [
+        "Aggregated article metadata and original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E6%B0%91%E8%90%A5%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-2232e8f83d81",
+      "name": "卫星互联网来源",
+      "url": "https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E4%BA%92%E8%81%94%E7%BD%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese satellite internet industry coverage.",
+      "expectedContent": [
+        "Aggregated article metadata and original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E4%BA%92%E8%81%94%E7%BD%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-074dc2365ef8",
+      "name": "航天政策来源",
+      "url": "https://news.google.com/rss/search?q=%E8%88%AA%E5%A4%A9%20%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese space policy and industrial policy coverage.",
+      "expectedContent": [
+        "Policy article metadata, summaries, timestamps, original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers; prefer official policy pages.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E8%88%AA%E5%A4%A9%20%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9b526affdb8e",
+      "name": "可回收火箭来源",
+      "url": "https://news.google.com/rss/search?q=%E5%8F%AF%E5%9B%9E%E6%94%B6%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese reusable launch vehicle technology and company milestones.",
+      "expectedContent": [
+        "Aggregated article metadata, summaries, timestamps, original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E5%8F%AF%E5%9B%9E%E6%94%B6%E7%81%AB%E7%AE%AD&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-eccf974fd1e2",
+      "name": "商业遥感来源",
+      "url": "https://news.google.com/rss/search?q=%E5%95%86%E4%B8%9A%E9%81%A5%E6%84%9F&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese commercial remote-sensing companies, satellites, and applications.",
+      "expectedContent": [
+        "Aggregated article metadata, summaries, timestamps, original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E5%95%86%E4%B8%9A%E9%81%A5%E6%84%9F&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e30e8184dc02",
+      "name": "卫星发射来源",
+      "url": "https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E5%8F%91%E5%B0%84%20%E5%95%86%E4%B8%9A&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "category": "existing_google_news_rss",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Chinese commercial satellite launch missions and provider activity.",
+      "expectedContent": [
+        "Aggregated article metadata, summaries, timestamps, original links."
+      ],
+      "risks": [
+        "Backup-only aggregator feed; Google News is not reliably accessible to domestic readers, so prefer direct sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://news.google.com/rss/search?q=%E5%8D%AB%E6%98%9F%E5%8F%91%E5%B0%84%20%E5%95%86%E4%B8%9A&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-bbded122224d",
+      "name": "国家航天局新闻",
+      "url": "https://www.cnsa.gov.cn/n6758823/n6758838/index.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Official China space administration policy and announcement source.",
+      "expectedContent": [
+        "Official announcement metadata and original links."
+      ],
+      "risks": [
+        "Official page may require page parser; store summaries and links.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cnsa.gov.cn/n6758823/n6758838/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e1287df9648c",
+      "name": "国家航天局政策公告",
+      "url": "https://www.cnsa.gov.cn/n6758823/n6758839/index.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track CNSA policy, regulation, standards, and major commercial-space notices from the public official list.",
+      "expectedContent": [
+        "Official policy and notice metadata, publication dates when available, and original links."
+      ],
+      "risks": [
+        "Public official list only; store metadata, generated summaries, and source links without reproducing full policy bodies.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cnsa.gov.cn/n6758823/n6758839/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-73e2d396e6e6",
+      "name": "工业和信息化部新闻",
+      "url": "https://www.miit.gov.cn/xwdt/index.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Official industrial policy updates that may affect satellite internet and aerospace manufacturing.",
+      "expectedContent": [
+        "Official announcement metadata and original links."
+      ],
+      "risks": [
+        "Broad policy source; filter by aerospace and satellite keywords.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.miit.gov.cn/xwdt/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-1c7a43764517",
+      "name": "国家发展改革委政策",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Macro industrial policy references for commercial space and low-altitude economy.",
+      "expectedContent": [
+        "Official policy metadata and original links."
+      ],
+      "risks": [
+        "Broad source; filter by relevant keywords.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.ndrc.gov.cn/xxgk/zcfb/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9be55eb26ede",
+      "name": "中国载人航天工程新闻",
+      "url": "https://www.cmse.gov.cn/xwzx/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Official human spaceflight program updates that can surface commercial cargo, payload, and supplier context.",
+      "expectedContent": [
+        "Official announcement metadata, publication dates when available, and original links."
+      ],
+      "risks": [
+        "Official page; store metadata, generated summaries, and links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cmse.gov.cn/xwzx/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-bba81bf9c9de",
+      "name": "科学技术部工作动态",
+      "url": "https://www.most.gov.cn/kjbgz/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Official science and technology policy updates relevant to aerospace, satellite applications, and industrial programs.",
+      "expectedContent": [
+        "Official work-update metadata and original links."
+      ],
+      "risks": [
+        "Broad government source; filter by aerospace, satellite, remote-sensing, and space-policy keywords.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.most.gov.cn/kjbgz/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-cf9c3ceb79ec",
+      "name": "中国政府采购网中央公告",
+      "url": "https://www.ccgp.gov.cn/cggg/zygg/",
+      "category": "existing_procurement_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Monitor central government procurement notices for satellite, remote-sensing, measurement-control, and space-information projects.",
+      "expectedContent": [
+        "Public procurement listing metadata, notice titles, dates when available, and original notice links."
+      ],
+      "risks": [
+        "Public listing page only; do not bypass login, CAPTCHA, robots controls, or store full tender documents.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.ccgp.gov.cn/cggg/zygg/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-7c4b40ae45e9",
+      "name": "中国政府采购网地方公告",
+      "url": "https://www.ccgp.gov.cn/cggg/dfgg/",
+      "category": "existing_procurement_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Monitor local government procurement notices for satellite, remote-sensing, measurement-control, space-information, and aerospace-related projects.",
+      "expectedContent": [
+        "Public local procurement listing metadata, notice titles, dates when available, buyer region, and original notice links."
+      ],
+      "risks": [
+        "Public listing page only; filter strictly by aerospace procurement terms, do not bypass login/CAPTCHA controls, and do not store tender-document bodies.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.ccgp.gov.cn/cggg/dfgg/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-ddf9a4dff402",
+      "name": "全国公共资源交易平台航天公告",
+      "url": "https://www.ggzy.gov.cn/",
+      "category": "existing_procurement_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Monitor national public-resource transaction notices for commercial-space facilities, satellite applications, remote-sensing, and aerospace project tenders.",
+      "expectedContent": [
+        "Public transaction listing metadata, notice titles, dates when available, and original links."
+      ],
+      "risks": [
+        "Broad national portal; filter strictly by aerospace procurement terms and keep only public metadata and source links.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.ggzy.gov.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-a223ed1e7521",
+      "name": "北京市经信局工作动态",
+      "url": "https://jxj.beijing.gov.cn/jxdt/gzdt/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "北京"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Beijing industry authority updates on commercial space, public test platforms, satellite internet, and aerospace manufacturing policy.",
+      "expectedContent": [
+        "Official news-list metadata, dates when available, and original links."
+      ],
+      "risks": [
+        "Public government listing page; store only metadata, generated summaries, and links.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://jxj.beijing.gov.cn/jxdt/gzdt/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9cc52e3a25b6",
+      "name": "北京市经信局通知公告",
+      "url": "https://jxj.beijing.gov.cn/jxdt/tzgg/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "北京"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Beijing official notices, application calls, and policy filings relevant to commercial space and aerospace manufacturing.",
+      "expectedContent": [
+        "Official notice metadata, dates when available, and original links."
+      ],
+      "risks": [
+        "Public government listing page; do not download attachments beyond linking to source pages.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://jxj.beijing.gov.cn/jxdt/tzgg/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b424e438cdcb",
+      "name": "上海市政府要闻",
+      "url": "https://www.shanghai.gov.cn/nw4411/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "上海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Shanghai municipal news, leadership activity, and industrial policy signals around commercial space and the Rocket City initiative.",
+      "expectedContent": [
+        "Official news metadata, dates when available, and original links."
+      ],
+      "risks": [
+        "Public government listing page; filter broad city news with aerospace-specific terms.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.shanghai.gov.cn/nw4411/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-5e6538f933e8",
+      "name": "上海市政府政策文件",
+      "url": "https://www.shanghai.gov.cn/nw12344/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "上海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Shanghai policy files that support commercial space, space information, satellite internet, and aerospace industry clusters.",
+      "expectedContent": [
+        "Official policy-file metadata and original links."
+      ],
+      "risks": [
+        "Public government listing page; PDF and attachment links are linked, not parsed as full text.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.shanghai.gov.cn/nw12344/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-a559c7839f86",
+      "name": "广东省政府政策文件",
+      "url": "https://www.gd.gov.cn/zwgk/gongbao/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "广东"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Guangdong official policy documents and gazette entries related to commercial space, satellite internet, and aerospace manufacturing.",
+      "expectedContent": [
+        "Official policy metadata, dates when available, and original links."
+      ],
+      "risks": [
+        "Broad government listing page; filter with aerospace policy terms and store metadata only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.gd.gov.cn/zwgk/gongbao/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-8ec8158a3931",
+      "name": "广东省发改委政策文件",
+      "url": "https://drc.gd.gov.cn/qtwj/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "广东"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Guangdong development and reform policy documents related to commercial space, satellite applications, and industrial investment.",
+      "expectedContent": [
+        "Official policy metadata and original links."
+      ],
+      "risks": [
+        "Public government listing page; do not scrape attachment bodies.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://drc.gd.gov.cn/qtwj/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-0285c8b148e3",
+      "name": "无锡市政府新闻",
+      "url": "https://www.wuxi.gov.cn/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "江苏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Wuxi official news, leadership activity, and policy signals around commercial space, satellite manufacturing, and the Xinglianti initiative.",
+      "expectedContent": [
+        "Official news metadata and original links."
+      ],
+      "risks": [
+        "Broad city homepage; filter with strict aerospace and satellite terms.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.wuxi.gov.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-dcebccf6185a",
+      "name": "无锡高新区新闻",
+      "url": "https://www.wnd.gov.cn/index.shtml",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [
+        "江苏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track Wuxi High-tech Zone official news for aerospace parks, satellite manufacturing, and local industrial ecosystem updates.",
+      "expectedContent": [
+        "Official park and district news metadata with original links."
+      ],
+      "risks": [
+        "Broad district homepage; filter with strict aerospace and satellite terms.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.wnd.gov.cn/index.shtml"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-edc9c8d4814f",
+      "name": "中国航天科技集团新闻",
+      "url": "https://www.spacechina.com/n25/n2014789/index.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct official source for CASC launch, satellite, and commercial-space industry updates.",
+      "expectedContent": [
+        "Official news metadata, publication dates when available, and original links."
+      ],
+      "risks": [
+        "State-owned enterprise source; store summaries and original links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.spacechina.com/n25/n2014789/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-cbb04dfcc99a",
+      "name": "中国航天科工集团新闻",
+      "url": "http://www.casic.com.cn/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct official source for CASIC launch, satellite, and aerospace industry updates.",
+      "expectedContent": [
+        "Official news metadata and original links."
+      ],
+      "risks": [
+        "State-owned enterprise source; store summaries and original links only.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "http://www.casic.com.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-decf0cc25048",
+      "name": "蓝箭航天新闻",
+      "url": "https://www.landspace.com/site/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for LandSpace launch vehicles, engine tests, missions, and financing updates.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; label as official company material and avoid marketing-copy overuse.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.landspace.com/site/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "landspace"
+    },
+    {
+      "id": "source-25c9f7d94819",
+      "name": "东方空间新闻",
+      "url": "https://www.orienspace.com/newsPage",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for Orienspace launch vehicles, sea-launch milestones, and company activity.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; label as official company material and verify major claims with independent reporting.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.orienspace.com/newsPage"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "orienspace"
+    },
+    {
+      "id": "source-fd4a6f1ae0e3",
+      "name": "天兵科技新闻",
+      "url": "https://www.spacepioneer.cc/news",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for Space Pioneer rocket development, test progress, missions, and financing updates.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; label as official company material and verify launch safety or failure claims with original notices.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.spacepioneer.cc/news"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "space-pioneer"
+    },
+    {
+      "id": "source-c6f004883275",
+      "name": "中科宇航新闻",
+      "url": "https://www.cas-space.com/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for CAS Space launch vehicles, factories, missions, and commercial cargo activity.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; store summaries and links only and verify launch records against launch data sources.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cas-space.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "cas-space"
+    },
+    {
+      "id": "source-b10cc0d250b0",
+      "name": "深蓝航天新闻",
+      "url": "https://www.dbaspace.com/indexs.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for Deep Blue Aerospace reusable rocket tests, launch plans, and company updates.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; label as official company material and verify commercial spaceflight claims independently.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.dbaspace.com/indexs.html"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "deep-blue-aerospace"
+    },
+    {
+      "id": "source-5003d59f161f",
+      "name": "长光卫星新闻",
+      "url": "https://www.jl1.cn/index.aspx",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Direct company source for Jilin-1 constellation, commercial remote sensing, satellite launches, and data services.",
+      "expectedContent": [
+        "Company announcement metadata, summaries generated from titles, and original links."
+      ],
+      "risks": [
+        "Company source; store summaries and links only and avoid reproducing image or article content.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.jl1.cn/index.aspx"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "charming-globe"
+    },
+    {
+      "id": "source-f27296a15aba",
+      "name": "卫星通信观察",
+      "url": "https://www.satbb.com/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track public Chinese-language satellite communication, direct-to-device, constellation, and space-connectivity industry updates.",
+      "expectedContent": [
+        "Public article-list metadata, titles, dates when available, short summaries, and original links."
+      ],
+      "risks": [
+        "Industry media site; RSS feed is closed, so use only the public homepage/list markup and label as media, not official policy.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.satbb.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b81d26354f3c",
+      "name": "未来天玑动态",
+      "url": "https://futurephecda.com/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track public commercial-space industry dynamics, launch, company, investment, and policy-adjacent updates from Future Space's public site.",
+      "expectedContent": [
+        "Public article-list metadata, titles, dates when available, short summaries, tags, and original links."
+      ],
+      "risks": [
+        "Industry data and media site; store only metadata and links, and do not treat reports or indices as official records.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://futurephecda.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f6ebaed4feb4",
+      "name": "中国载人航天飞行任务",
+      "url": "https://www.cmse.gov.cn/fxrw/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track official Chinese human-spaceflight mission pages with task names, launch time, launch site, and mission overview for Shenzhou and Tianzhou records.",
+      "expectedContent": [
+        "Official mission cards with launch time, launch site, mission name, and source links."
+      ],
+      "risks": [
+        "Official CMSE source. Treat as authoritative for human-spaceflight mission history and near-term notices, but keep it separate from LL2 global launch cache until a launch-planning extractor is added.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cmse.gov.cn/fxrw/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-cb7e21e4c9a1",
+      "name": "中国载人航天官方公告",
+      "url": "https://www.cmse.gov.cn/gfgg/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track official CMSE announcements that publish mission badges, station parameters, task notices, and human-spaceflight planning signals.",
+      "expectedContent": [
+        "Official announcement titles, publication dates, source links, and mission-related notices."
+      ],
+      "risks": [
+        "Official CMSE source; announcement pages are not always launch records, so use them as planning and verification signals rather than direct launch-cache replacement.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cmse.gov.cn/gfgg/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-8d3b5a8c63c8",
+      "name": "航天科技商业火箭发射机会",
+      "url": "https://www.spacechina.com/n25/n2014789/n2014809/c4583479/content.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track CASC/China Rocket public 2026-2027 Long March rideshare and piggyback launch opportunity planning.",
+      "expectedContent": [
+        "Official planning article metadata, available launch opportunity windows, launch vehicle references, and source link."
+      ],
+      "risks": [
+        "Official group article with planning windows instead of precise launch events; do not merge into scheduled launch records until a dedicated launch-planning extractor models approximate windows.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.spacechina.com/n25/n2014789/n2014809/c4583479/content.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-004e573581ee",
+      "name": "长城公司发射机会",
+      "url": "https://www.cgwic.com/Launchservice/piggyback.html",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track CGWIC public launch opportunity and piggyback launch service information for Chinese international commercial launch services.",
+      "expectedContent": [
+        "Launch opportunity service pages, vehicle references, customer launch-service context, and source links."
+      ],
+      "risks": [
+        "Official company service page, often static and opportunity-focused rather than dated mission schedule. Use as planning context and source-quality cross-check.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.cgwic.com/Launchservice/piggyback.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-4a274e5f8d94",
+      "name": "中关村商业航天联盟",
+      "url": "https://www.zcaia.org.cn/",
+      "category": "existing_official_page",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": true,
+      "collectionStatus": "existing_not_revalidated",
+      "verification": "configured_not_revalidated",
+      "purpose": "Track public updates, notices, industry observations, and event information from the commercial-space industry alliance.",
+      "expectedContent": [
+        "Public organization news metadata, titles, dates when available, and original links."
+      ],
+      "risks": [
+        "Industry organization source, not a government policy source; classify as organization and avoid mixing event notices with official policy unless tags clearly match.",
+        "启用配置不代表当前成功；本目录未重新调用生产数据库。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/sources.generated.json",
+          "url": "https://www.zcaia.org.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-975ed99c1385",
+      "name": "北京政府门户",
+      "url": "https://www.beijing.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "北京"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.beijing.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:20.656Z",
+        "status": 200,
+        "finalUrl": "https://www.beijing.gov.cn/",
+        "title": "北京市人民政府门户网站"
+      }
+    },
+    {
+      "id": "source-611c19c7b153",
+      "name": "河北政府门户",
+      "url": "http://www.hebei.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.hebei.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:20.764Z",
+        "status": 200,
+        "finalUrl": "https://www.hebei.gov.cn/",
+        "title": "河北省人民政府"
+      }
+    },
+    {
+      "id": "source-dba6aca1debf",
+      "name": "河北 · 政府采购",
+      "url": "http://www.ccgp-hebei.gov.cn/province/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "政府采购"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-494ded690dd0",
+      "name": "河北 · 省发展和改革委员会",
+      "url": "http://hbdrc.hebei.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "省发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c32c018ccf54",
+      "name": "河北 · 省科学技术厅",
+      "url": "https://kjt.hebei.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "省科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-da62f0917aaf",
+      "name": "河北 · 省工业和信息化厅",
+      "url": "http://gxt.hebei.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-6d1a95207b38",
+      "name": "河北 · 省财政厅",
+      "url": "http://czt.hebei.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-ee8f186bc449",
+      "name": "河北 · 省自然资源厅",
+      "url": "http://zrzy.hebei.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hebei.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-75859e3499d7",
+      "name": "天津政府门户",
+      "url": "http://www.tj.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "天津"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.tj.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:20.760Z",
+        "status": 200,
+        "finalUrl": "https://www.tj.gov.cn/",
+        "title": "天津政务网_天津市人民政府"
+      }
+    },
+    {
+      "id": "source-d86fb9a6a8d8",
+      "name": "天津 · 公共资源",
+      "url": "http://ggzy.zwfwb.tj.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "天津"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.tj.gov.cn/",
+          "label": "公共资源"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9fbcb61c3496",
+      "name": "天津 · 市发展改革委",
+      "url": "http://fzgg.tj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "天津"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.tj.gov.cn/",
+          "label": "市发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-0a6e014fb219",
+      "name": "天津 · 市工业和信息化局",
+      "url": "http://gyxxh.tj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "天津"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.tj.gov.cn/",
+          "label": "市工业和信息化局"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-4803e2640966",
+      "name": "山西政府门户",
+      "url": "http://www.shanxi.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.shanxi.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:21.175Z",
+        "status": 200,
+        "finalUrl": "https://www.shanxi.gov.cn/",
+        "title": "山西省人民政府"
+      }
+    },
+    {
+      "id": "source-9b21a6fd7c7e",
+      "name": "山西 · 省发展和改革委员会",
+      "url": "http://fgw.shanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanxi.gov.cn/",
+          "label": "省发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-a00049969d71",
+      "name": "山西 · 省科学技术厅",
+      "url": "http://kjt.shanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanxi.gov.cn/",
+          "label": "省科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-8ba65e85c662",
+      "name": "山西 · 省工业和信息化厅",
+      "url": "http://gxt.shanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanxi.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-5d152d61a69d",
+      "name": "山西 · 省财政厅",
+      "url": "http://czt.shanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanxi.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-dba1b08fe64c",
+      "name": "山西 · 省自然资源厅",
+      "url": "http://zrzyt.shanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanxi.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-a8608fde7093",
+      "name": "辽宁政府门户",
+      "url": "http://www.ln.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.ln.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:21.948Z",
+        "status": 200,
+        "finalUrl": "https://www.ln.gov.cn/",
+        "title": "辽宁省人民政府"
+      }
+    },
+    {
+      "id": "source-b9396de43d72",
+      "name": "辽宁 · 省发展改革委",
+      "url": "http://fgw.ln.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.ln.gov.cn/",
+          "label": "省发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b9b92a9b1b8a",
+      "name": "辽宁 · 省科技厅",
+      "url": "http://kjt.ln.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.ln.gov.cn/",
+          "label": "省科技厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e282c0952d07",
+      "name": "辽宁 · 省工业和信息化厅",
+      "url": "http://gxt.ln.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.ln.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-871450b2d650",
+      "name": "辽宁 · 省财政厅",
+      "url": "http://czt.ln.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.ln.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-420cb6eb1364",
+      "name": "辽宁 · 省自然资源厅",
+      "url": "http://zrzy.ln.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "辽宁"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.ln.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-71499c91e708",
+      "name": "内蒙古政府门户",
+      "url": "http://www.nmg.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.nmg.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:21.878Z",
+        "status": 200,
+        "finalUrl": "https://www.nmg.gov.cn/",
+        "title": "内蒙古自治区人民政府"
+      }
+    },
+    {
+      "id": "source-4171bd0aaae7",
+      "name": "内蒙古 · 发展和改革委员会",
+      "url": "http://fgw.nmg.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-0c630cc1b4e4",
+      "name": "内蒙古 · 科学技术厅",
+      "url": "http://kjt.nmg.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-5f1868145d35",
+      "name": "内蒙古 · 工业和信息化厅",
+      "url": "http://gxt.nmg.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b0d2dd63ebab",
+      "name": "内蒙古 · 财政厅",
+      "url": "http://czt.nmg.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-abb089d4457b",
+      "name": "内蒙古 · 自然资源厅",
+      "url": "http://zrzy.nmg.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9483b0aa66e6",
+      "name": "内蒙古 · 自治区公共资源交易中心",
+      "url": "http://ggzyjy.nmg.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "内蒙古"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nmg.gov.cn/",
+          "label": "自治区公共资源交易中心"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-0cf871d7d5ef",
+      "name": "上海政府门户",
+      "url": "http://www.shanghai.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "上海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.shanghai.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:22.600Z",
+        "status": 200,
+        "finalUrl": "https://www.shanghai.gov.cn/",
+        "title": "上海市人民政府"
+      }
+    },
+    {
+      "id": "source-880795a61456",
+      "name": "上海 · 市发展改革委",
+      "url": "http://fgw.sh.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "上海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanghai.gov.cn/",
+          "label": "市发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-2e4ebc2e12bc",
+      "name": "上海 · 市经济信息化委",
+      "url": "http://www.sheitc.sh.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "上海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shanghai.gov.cn/",
+          "label": "市经济信息化委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-277fd2a66342",
+      "name": "黑龙江政府门户",
+      "url": "http://www.hlj.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.hlj.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:22.408Z",
+        "status": 200,
+        "finalUrl": "https://www.hlj.gov.cn/",
+        "title": "黑龙江省人民政府"
+      }
+    },
+    {
+      "id": "source-702fde940b00",
+      "name": "黑龙江 · 省发展和改革委员会",
+      "url": "http://drc.hlj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hlj.gov.cn/",
+          "label": "省发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b88a9f4e32cc",
+      "name": "黑龙江 · 省科学技术厅",
+      "url": "http://kjt.hlj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hlj.gov.cn/",
+          "label": "省科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-721933591eff",
+      "name": "黑龙江 · 省工业和信息化厅",
+      "url": "http://gxt.hlj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hlj.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9948798df4ba",
+      "name": "黑龙江 · 省财政厅",
+      "url": "http://czt.hlj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hlj.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-05d904439a6b",
+      "name": "黑龙江 · 省自然资源厅",
+      "url": "http://zrzyt.hlj.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "黑龙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.hlj.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-d7af0eba51a1",
+      "name": "吉林政府门户",
+      "url": "http://www.jl.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "吉林"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.jl.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:21.975Z",
+        "status": 200,
+        "finalUrl": "https://www.jl.gov.cn/",
+        "title": "吉林省人民政府"
+      }
+    },
+    {
+      "id": "source-2f8281395282",
+      "name": "吉林 · 吉林省公共资源交易一体化平台",
+      "url": "https://www.jl.gov.cn/zwfw/ggzyjy/index.html",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "吉林"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.jl.gov.cn/",
+          "label": "吉林省公共资源交易一体化平台"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-2d924b8a782c",
+      "name": "江苏政府门户",
+      "url": "http://www.jiangsu.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "江苏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.jiangsu.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:23.224Z",
+        "status": 403,
+        "finalUrl": "https://www.jiangsu.gov.cn/"
+      }
+    },
+    {
+      "id": "source-29f24e12df19",
+      "name": "浙江政府门户",
+      "url": "http://www.zj.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "浙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.zj.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:23.348Z",
+        "status": 200,
+        "finalUrl": "https://www.zj.gov.cn/",
+        "title": "浙江省人民政府"
+      }
+    },
+    {
+      "id": "source-0f1ce9ac8747",
+      "name": "浙江 · 公共资源交易",
+      "url": "https://ggzy.zj.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "浙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.zj.gov.cn/",
+          "label": "公共资源交易"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b16f7b68a31c",
+      "name": "浙江 · 政府采购",
+      "url": "https://zfcg.czt.zj.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "浙江"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.zj.gov.cn/",
+          "label": "政府采购"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-4d4b8b964ed3",
+      "name": "安徽政府门户",
+      "url": "http://www.ah.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "安徽"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.ah.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:23.394Z",
+        "status": 200,
+        "finalUrl": "https://www.ah.gov.cn/",
+        "title": "安徽省人民政府"
+      }
+    },
+    {
+      "id": "source-d1537fb76c8e",
+      "name": "江西政府门户",
+      "url": "http://www.jiangxi.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "江西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.jiangxi.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:23.938Z",
+        "error": "TypeError: fetch failed"
+      }
+    },
+    {
+      "id": "source-b4f6e5f22c57",
+      "name": "山东政府门户",
+      "url": "http://www.shandong.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "山东"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.shandong.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.096Z",
+        "error": "TypeError: fetch failed"
+      }
+    },
+    {
+      "id": "source-59a5e06489d7",
+      "name": "福建政府门户",
+      "url": "http://www.fujian.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.fujian.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:23.531Z",
+        "status": 200,
+        "finalUrl": "https://www.fujian.gov.cn/",
+        "title": "福建省人民政府门户网站"
+      }
+    },
+    {
+      "id": "source-ec06dae38969",
+      "name": "福建 · 省科技厅",
+      "url": "https://kjt.fujian.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.fujian.gov.cn/",
+          "label": "省科技厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-6e8dc8be8267",
+      "name": "福建 · 省财政厅",
+      "url": "https://czt.fujian.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.fujian.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9999a19993c0",
+      "name": "福建 · 省自然资源厅",
+      "url": "https://zrzyt.fujian.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.fujian.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-5651b2cca61e",
+      "name": "福建 · 福建省公共资源交易电子公共服务平台",
+      "url": "https://ggzyfw.fujian.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.fujian.gov.cn/",
+          "label": "福建省公共资源交易电子公共服务平台"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-667107ef5b18",
+      "name": "福建 · 福建省公共资源交易电子行政监督平台",
+      "url": "https://ggzyjd.fujian.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "福建"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.fujian.gov.cn/",
+          "label": "福建省公共资源交易电子行政监督平台"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-523920d721d3",
+      "name": "湖北政府门户",
+      "url": "http://www.hubei.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "湖北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.hubei.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.386Z",
+        "status": 412,
+        "finalUrl": "https://www.hubei.gov.cn/"
+      }
+    },
+    {
+      "id": "source-5ac7ca50a174",
+      "name": "河南政府门户",
+      "url": "http://www.henan.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "河南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.henan.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.261Z",
+        "status": 200,
+        "finalUrl": "https://www.henan.gov.cn/",
+        "title": "河南省人民政府门户网站"
+      }
+    },
+    {
+      "id": "source-9fbb73773272",
+      "name": "湖南政府门户",
+      "url": "http://www.hunan.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "湖南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.hunan.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.438Z",
+        "error": "TypeError: fetch failed"
+      }
+    },
+    {
+      "id": "source-ee63955ba0d4",
+      "name": "广东政府门户",
+      "url": "http://www.gd.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "广东"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.gd.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.749Z",
+        "status": 200,
+        "finalUrl": "https://www.gd.gov.cn/",
+        "title": "广东省人民政府门户网站"
+      }
+    },
+    {
+      "id": "source-60e8db2c86ec",
+      "name": "广西政府门户",
+      "url": "http://www.gxzf.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "广西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.gxzf.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.771Z",
+        "error": "TypeError: fetch failed"
+      }
+    },
+    {
+      "id": "source-4f28589190e8",
+      "name": "重庆政府门户",
+      "url": "http://www.cq.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "重庆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.cq.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:25.949Z",
+        "status": 200,
+        "finalUrl": "https://www.cq.gov.cn/",
+        "title": "重庆市人民政府网"
+      }
+    },
+    {
+      "id": "source-6d89c8579c58",
+      "name": "重庆 · 市发展改革委",
+      "url": "http://fzggw.cq.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "重庆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.cq.gov.cn/",
+          "label": "市发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c6e0d9c3409c",
+      "name": "重庆 · 市经济信息委",
+      "url": "https://jjxxw.cq.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "重庆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.cq.gov.cn/",
+          "label": "市经济信息委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-77e670b46e17",
+      "name": "重庆 · 市规划自然资源局",
+      "url": "http://ghzrzyj.cq.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "重庆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.cq.gov.cn/",
+          "label": "市规划自然资源局"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-37e4d4b18e74",
+      "name": "四川政府门户",
+      "url": "http://www.sc.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.sc.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:26.283Z",
+        "status": 200,
+        "finalUrl": "https://www.sc.gov.cn/",
+        "title": "四川省人民政府网站"
+      }
+    },
+    {
+      "id": "source-5e2e03091c43",
+      "name": "四川 · 自然资源",
+      "url": "https://dnr.sc.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.sc.gov.cn/",
+          "label": "自然资源"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-9d93d0a21433",
+      "name": "四川 · 省发展改革委",
+      "url": "http://fgw.sc.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.sc.gov.cn/",
+          "label": "省发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f0c7a1eaef66",
+      "name": "四川 · 经济和信息化厅",
+      "url": "http://jxt.sc.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.sc.gov.cn/",
+          "label": "经济和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-091f9d980385",
+      "name": "四川 · 科技厅",
+      "url": "http://kjt.sc.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.sc.gov.cn/",
+          "label": "科技厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-37a706d55482",
+      "name": "四川 · 财政厅",
+      "url": "http://czt.sc.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "四川"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.sc.gov.cn/",
+          "label": "财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-1c749a23870b",
+      "name": "贵州政府门户",
+      "url": "http://www.guizhou.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.guizhou.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:26.631Z",
+        "status": 200,
+        "finalUrl": "https://www.guizhou.gov.cn/",
+        "title": "贵州省人民政府"
+      }
+    },
+    {
+      "id": "source-9b2dd8337e42",
+      "name": "贵州 · 省发展改革委",
+      "url": "http://fgw.guizhou.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-aee6b84797bc",
+      "name": "贵州 · 省科技厅",
+      "url": "http://kjt.guizhou.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省科技厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-24db3f628b63",
+      "name": "贵州 · 省工业和信息化厅",
+      "url": "http://gxt.guizhou.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-81ea4b17923a",
+      "name": "贵州 · 省财政厅",
+      "url": "http://czt.guizhou.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-83968c7c7647",
+      "name": "贵州 · 省自然资源厅",
+      "url": "https://zrzy.guizhou.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-381c49b004ad",
+      "name": "贵州 · 省公共资源交易中心",
+      "url": "https://ggzy.guizhou.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "贵州"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.guizhou.gov.cn/",
+          "label": "省公共资源交易中心"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f56e9f9f9d76",
+      "name": "海南政府门户",
+      "url": "https://www.hainan.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "海南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.hainan.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:24.794Z",
+        "status": 200,
+        "finalUrl": "https://www.hainan.gov.cn/",
+        "title": "海南省人民政府网"
+      }
+    },
+    {
+      "id": "source-ec6893b35733",
+      "name": "云南政府门户",
+      "url": "http://www.yn.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.yn.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:26.909Z",
+        "status": 200,
+        "finalUrl": "https://www.yn.gov.cn/",
+        "title": "云南省人民政府门户网站"
+      }
+    },
+    {
+      "id": "source-ca1ab6745e23",
+      "name": "云南 · 云南省发展和改革委员会",
+      "url": "https://yndrc.yn.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-833e8de199b2",
+      "name": "云南 · 云南省工业和信息化厅",
+      "url": "http://gxt.yn.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c2be1de7400c",
+      "name": "云南 · 云南省科学技术厅",
+      "url": "http://kjt.yn.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-3c1d14dab343",
+      "name": "云南 · 云南省财政厅",
+      "url": "http://czt.yn.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-1547909a8d6f",
+      "name": "云南 · 云南省自然资源厅",
+      "url": "http://dnr.yn.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-829dd00c1030",
+      "name": "云南 · 云南省政府采购",
+      "url": "http://www.yngp.com/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "云南"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.yn.gov.cn/",
+          "label": "云南省政府采购"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c1758d45fa0c",
+      "name": "陕西政府门户",
+      "url": "http://www.shaanxi.gov.cn",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.shaanxi.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:27.433Z",
+        "status": 200,
+        "finalUrl": "https://www.shaanxi.gov.cn/",
+        "title": "陕西省人民政府"
+      }
+    },
+    {
+      "id": "source-22929184c245",
+      "name": "陕西 · 省发展改革委",
+      "url": "http://sndrc.shaanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省发展改革委"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-d3e0ccbbed88",
+      "name": "陕西 · 省科技厅",
+      "url": "http://kjt.shaanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省科技厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-933765837f67",
+      "name": "陕西 · 省工业和信息化厅",
+      "url": "http://gxt.shaanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-aee40bcf313d",
+      "name": "陕西 · 省财政厅",
+      "url": "http://czt.shaanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-359fd88af20f",
+      "name": "陕西 · 省自然资源厅",
+      "url": "http://zrzyt.shaanxi.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-627a49851862",
+      "name": "陕西 · 省公共资源交易中心",
+      "url": "http://ggzy.shaanxi.gov.cn/",
+      "category": "government_procurement_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "陕西"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现航天项目采购/招标及成交公告。",
+      "expectedContent": [
+        "采购",
+        "招标",
+        "中标公告"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.shaanxi.gov.cn/",
+          "label": "省公共资源交易中心"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-472de4f3adb1",
+      "name": "西藏政府门户",
+      "url": "http://www.xizang.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "西藏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.xizang.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:27.340Z",
+        "status": 200,
+        "finalUrl": "https://www.xizang.gov.cn/",
+        "title": "西藏自治区人民政府"
+      }
+    },
+    {
+      "id": "source-07778866ce3d",
+      "name": "西藏 · 自治区发展和改革委员会",
+      "url": "http://drc.xizang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "西藏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xizang.gov.cn/",
+          "label": "自治区发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-e4398825d38a",
+      "name": "西藏 · 自治区科学技术厅",
+      "url": "http://sti.xizang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "西藏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xizang.gov.cn/",
+          "label": "自治区科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-52636a2cae9b",
+      "name": "西藏 · 自治区经济和信息化厅",
+      "url": "http://jxt.xizang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "西藏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xizang.gov.cn/",
+          "label": "自治区经济和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-01c2b208bc79",
+      "name": "西藏 · 自治区自然资源厅",
+      "url": "http://zrzyt.xizang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "西藏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xizang.gov.cn/",
+          "label": "自治区自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-4401eea92e97",
+      "name": "甘肃政府门户",
+      "url": "http://www.gansu.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "甘肃"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.gansu.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:27.646Z",
+        "status": 412,
+        "finalUrl": "https://www.gansu.gov.cn/"
+      }
+    },
+    {
+      "id": "source-2bea072b26c6",
+      "name": "新疆政府门户",
+      "url": "http://www.xinjiang.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.xinjiang.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:28.842Z",
+        "status": 200,
+        "finalUrl": "https://www.xinjiang.gov.cn/",
+        "title": "新疆维吾尔自治区人民政府网"
+      }
+    },
+    {
+      "id": "source-024c8f4ecfb0",
+      "name": "新疆 · 发展和改革委员会",
+      "url": "http://xjdrc.xinjiang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xinjiang.gov.cn/",
+          "label": "发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-49498a69ed2c",
+      "name": "新疆 · 科学技术厅",
+      "url": "http://kjt.xinjiang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xinjiang.gov.cn/",
+          "label": "科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-2f11755065db",
+      "name": "新疆 · 工业和信息化厅",
+      "url": "http://gxt.xinjiang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xinjiang.gov.cn/",
+          "label": "工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-99f0c469f0f2",
+      "name": "新疆 · 财政厅",
+      "url": "http://czt.xinjiang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xinjiang.gov.cn/",
+          "label": "财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-4330cbcd186c",
+      "name": "新疆 · 自然资源厅",
+      "url": "http://zrzyt.xinjiang.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.xinjiang.gov.cn/",
+          "label": "自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b3db586e5ca5",
+      "name": "香港政府门户",
+      "url": "http://www.gov.hk/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "香港"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.gov.hk/",
+        "checkedAt": "2026-11-14T10:54:29.493Z",
+        "status": 200,
+        "finalUrl": "https://www.gov.hk/",
+        "title": "GovHK - one-stop portal of the Hong Kong SAR Government / 香港政府一站通"
+      }
+    },
+    {
+      "id": "source-089ae2045635",
+      "name": "澳门政府门户",
+      "url": "http://www.gov.mo/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "澳门"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.gov.mo/",
+        "checkedAt": "2026-11-14T10:54:30.281Z",
+        "status": 200,
+        "finalUrl": "https://www.gov.mo/zh-hant/",
+        "title": "澳門特別行政區政府入口網站 &#8211; 澳門特別行政區政府入口網站"
+      }
+    },
+    {
+      "id": "source-7aaf3ce11b18",
+      "name": "宁夏政府门户",
+      "url": "http://www.nx.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_reachable",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.nx.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:28.298Z",
+        "status": 200,
+        "finalUrl": "https://www.nx.gov.cn/",
+        "title": "中国 - 宁夏"
+      }
+    },
+    {
+      "id": "source-6ac2245afb20",
+      "name": "宁夏 · 自治区发展和改革委员会",
+      "url": "http://fzggw.nx.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nx.gov.cn/",
+          "label": "自治区发展和改革委员会"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-533cdb807c1d",
+      "name": "宁夏 · 自治区科学技术厅",
+      "url": "https://kjt.nx.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nx.gov.cn/",
+          "label": "自治区科学技术厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-b705bf1aa43b",
+      "name": "宁夏 · 自治区工业和信息化厅",
+      "url": "http://gxt.nx.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nx.gov.cn/",
+          "label": "自治区工业和信息化厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-8867cc5e7689",
+      "name": "宁夏 · 自治区财政厅",
+      "url": "http://czt.nx.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nx.gov.cn/",
+          "label": "自治区财政厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f8abe8fa7610",
+      "name": "宁夏 · 自治区自然资源厅",
+      "url": "http://zrzyt.nx.gov.cn/",
+      "category": "government_department_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "宁夏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "linked_by_official_portal",
+      "purpose": "发现商业航天政策、申报、公示、产业项目和卫星应用信息。",
+      "expectedContent": [
+        "产业政策",
+        "项目公告",
+        "申报公示"
+      ],
+      "risks": [
+        "仅由政府门户链接发现，未独立试采；行业范围广，需主题过滤。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_portal_link",
+          "url": "https://www.nx.gov.cn/",
+          "label": "自治区自然资源厅"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-a7785c2b8f12",
+      "name": "青海政府门户",
+      "url": "http://www.qinghai.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "青海"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.qinghai.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:28.166Z",
+        "error": "TypeError: fetch failed"
+      }
+    },
+    {
+      "id": "source-51bde5632c56",
+      "name": "新疆生产建设兵团政府门户",
+      "url": "http://www.xjbt.gov.cn/",
+      "category": "government_directory",
+      "geography": "中国",
+      "regionGroups": [
+        "新疆生产建设兵团"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "homepage_probe_failed",
+      "purpose": "地区导航与政策原文追溯；门户首页不是已验证的航天采集栏目。",
+      "expectedContent": [
+        "政府政策",
+        "通知公告",
+        "地区项目动态"
+      ],
+      "risks": [
+        "首页可达不等于政策列表可解析；需继续定位部门栏目并过滤航天主题。"
+      ],
+      "evidence": [
+        {
+          "kind": "official_directory",
+          "url": "https://www.beijing.gov.cn/images/public_foot_response_2020.js"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "homepageProbe": {
+        "probeUrl": "https://www.xjbt.gov.cn/",
+        "checkedAt": "2026-11-14T10:54:31.812Z",
+        "error": "TimeoutError: The operation was aborted due to timeout"
+      }
+    },
+    {
+      "id": "source-ce81b50a2e05",
+      "name": "江苏工信公告公示",
+      "url": "https://gxt.jiangsu.gov.cn/col/col6281/index.html",
+      "category": "government_listing",
+      "geography": "中国",
+      "regionGroups": [
+        "江苏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered_listing",
+      "purpose": "发现相关原始信息，保留标题、原文链接、真实发布时间和必要摘要。",
+      "expectedContent": [
+        "通知公告",
+        "政策",
+        "产业动态"
+      ],
+      "risks": [
+        "未验证连续采集、日期提取、分页、转载识别及访问规则。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://gxt.jiangsu.gov.cn/col/col6281/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-eb00e95a1760",
+      "name": "江苏工信政策发布",
+      "url": "https://gxt.jiangsu.gov.cn/col/col6299/index.html",
+      "category": "government_listing",
+      "geography": "中国",
+      "regionGroups": [
+        "江苏"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered_listing",
+      "purpose": "发现相关原始信息，保留标题、原文链接、真实发布时间和必要摘要。",
+      "expectedContent": [
+        "通知公告",
+        "政策",
+        "产业动态"
+      ],
+      "risks": [
+        "未验证连续采集、日期提取、分页、转载识别及访问规则。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://gxt.jiangsu.gov.cn/col/col6299/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-c2557a43f117",
+      "name": "湖北经信热点聚焦",
+      "url": "https://jxt.hubei.gov.cn/bmdt/rdjj/index_1.shtml",
+      "category": "government_listing",
+      "geography": "中国",
+      "regionGroups": [
+        "湖北"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered_listing",
+      "purpose": "发现相关原始信息，保留标题、原文链接、真实发布时间和必要摘要。",
+      "expectedContent": [
+        "通知公告",
+        "政策",
+        "产业动态"
+      ],
+      "risks": [
+        "未验证连续采集、日期提取、分页、转载识别及访问规则。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://jxt.hubei.gov.cn/bmdt/rdjj/index_1.shtml"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-8dfbe8e829a9",
+      "name": "芜湖工信通知公告",
+      "url": "https://gxj.wuhu.gov.cn/xwzx/tzgg/index.html",
+      "category": "government_listing",
+      "geography": "中国",
+      "regionGroups": [
+        "安徽"
+      ],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered_listing",
+      "purpose": "发现相关原始信息，保留标题、原文链接、真实发布时间和必要摘要。",
+      "expectedContent": [
+        "通知公告",
+        "政策",
+        "产业动态"
+      ],
+      "risks": [
+        "未验证连续采集、日期提取、分页、转载识别及访问规则。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://gxj.wuhu.gov.cn/xwzx/tzgg/index.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f209684e637f",
+      "name": "星河动力官方动态",
+      "url": "https://www.galactic-energy.cn/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "运载火箭领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.galactic-energy.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "galactic-energy"
+    },
+    {
+      "id": "source-415119f03c41",
+      "name": "星际荣耀官方动态",
+      "url": "https://www.i-space.com.cn/news",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "运载火箭领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.i-space.com.cn/news"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "ispace-china"
+    },
+    {
+      "id": "source-44fed745924d",
+      "name": "银河航天官方动态",
+      "url": "https://www.yinhehangtian.cn/yinheNews",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "卫星互联网领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.yinhehangtian.cn/yinheNews"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "galaxy-space"
+    },
+    {
+      "id": "source-710de833b3cf",
+      "name": "时空道宇官方动态",
+      "url": "https://www.geespace.com/news/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "reader_open_listing",
+      "purpose": "卫星互联网领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_reader",
+          "url": "https://www.geespace.com/news/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "geespace"
+    },
+    {
+      "id": "source-4d10d7a56415",
+      "name": "微纳星空官方动态",
+      "url": "https://www.minospace.cn/news_list.html",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "reader_open_listing",
+      "purpose": "卫星制造领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_reader",
+          "url": "https://www.minospace.cn/news_list.html"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "minospace"
+    },
+    {
+      "id": "source-7a4b7909f122",
+      "name": "九天微星官方动态",
+      "url": "https://www.commsat.cn/news.html",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "卫星制造与通信领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.commsat.cn/news.html"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "commsat"
+    },
+    {
+      "id": "source-c30b8c84e7b0",
+      "name": "天仪空间（天仪研究院）官方动态",
+      "url": "https://cn.spacety.com/news",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "SAR遥感与卫星制造领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://cn.spacety.com/news"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-fd314a906af9"
+    },
+    {
+      "id": "source-0e868a2614ea",
+      "name": "航天驭星官方动态",
+      "url": "https://www.emposat.com/dynamic/news/list",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "reader_open_empty",
+      "purpose": "测运控与地面站领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "阅读器打开后显示暂无新闻数据；可能依赖脚本渲染或内容暂空。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_reader",
+          "url": "https://www.emposat.com/dynamic/news/list"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-ae17acfbdaa4"
+    },
+    {
+      "id": "source-a9f247d43301",
+      "name": "九州云箭官方动态",
+      "url": "https://www.jzyjspace.com/news/1/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "火箭发动机领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.jzyjspace.com/news/1/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-7693a0fdb295"
+    },
+    {
+      "id": "source-25a1fee23f69",
+      "name": "航天宏图官方动态",
+      "url": "https://www.piesat.cn/website/cn/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "遥感应用与企业公告领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "检索命中公告详情模板，不作为连续列表；需继续定位公告列表。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.piesat.cn/website/cn/pages/investor/notice/notice-info.html"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-fa4013fd7729"
+    },
+    {
+      "id": "source-dad6a2bde17e",
+      "name": "中科星图官方动态",
+      "url": "https://www.geovis.com.cn/news/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "空天信息应用领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.geovis.com.cn/news/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-2043a962f17e"
+    },
+    {
+      "id": "source-5600c30ac7ac",
+      "name": "中科星图测控官方动态",
+      "url": "https://www.spaceinsighter.com/companynews",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "卫星测运控领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.spaceinsighter.com/companynews"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-30fa59d12b52"
+    },
+    {
+      "id": "source-62c1f138fdd9",
+      "name": "航宇微官方动态",
+      "url": "https://www.myorbita.net/xw/list_13.aspx",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "卫星芯片与遥感领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.myorbita.net/xw/list_13.aspx"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-5b2691ceffc6"
+    },
+    {
+      "id": "source-9c5b2d268880",
+      "name": "星网宇达官方动态",
+      "url": "https://www.starneto.com/new_center/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "导航与测控领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.starneto.com/new_center/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-e20117db7136"
+    },
+    {
+      "id": "source-4cabdbec2ff8",
+      "name": "合众思壮官方动态",
+      "url": "https://www.unistrong.com/News/NewsList.aspx?classid=11",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "北斗导航领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.unistrong.com/News/NewsList.aspx?classid=11"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-4749b38f7beb"
+    },
+    {
+      "id": "source-21a85434e8e1",
+      "name": "北斗星通官方动态",
+      "url": "https://navchina.com/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "北斗导航领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://navchina.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-9b1c106da774"
+    },
+    {
+      "id": "source-bafaaad41ada",
+      "name": "星邑空间官方动态",
+      "url": "https://www.xingyispace.com/news/list_29.html",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "测运控与卫星应用领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.xingyispace.com/news/list_29.html"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-8ba612967f84"
+    },
+    {
+      "id": "source-88efa9b80e72",
+      "name": "中科天塔官方动态",
+      "url": "https://www.tianta.com.cn/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "星载设备与测运控领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.tianta.com.cn/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-2be1d702a6cd"
+    },
+    {
+      "id": "source-3c2e0afa14b4",
+      "name": "中国运载火箭技术研究院官方动态",
+      "url": "https://www.calt.com/",
+      "category": "company_official",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "运载火箭与商业发射领域的公司一手动态与公开公告。",
+      "expectedContent": [
+        "企业新闻",
+        "项目进展",
+        "公司公告"
+      ],
+      "risks": [
+        "企业自述需与官方发射、许可或采购记录交叉核对；新闻稿不等于独立报道。",
+        "未验证自动采集；不将官网自述视为第三方确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.calt.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "company-707a178a03a6"
+    },
+    {
+      "id": "source-726772aa9e99",
+      "name": "SpaceX官网",
+      "url": "https://www.spacex.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.spacex.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "spacex"
+    },
+    {
+      "id": "source-b831cd9f7952",
+      "name": "Rocket Lab官网",
+      "url": "https://www.rocketlabusa.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.rocketlabusa.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "rocket-lab"
+    },
+    {
+      "id": "source-98cd49c074ca",
+      "name": "Blue Origin官网",
+      "url": "https://www.blueorigin.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.blueorigin.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "blue-origin"
+    },
+    {
+      "id": "source-8bf979178178",
+      "name": "Relativity Space官网",
+      "url": "https://www.relativityspace.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.relativityspace.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "relativity-space"
+    },
+    {
+      "id": "source-c8f61a7af63e",
+      "name": "Firefly Aerospace官网",
+      "url": "https://fireflyspace.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://fireflyspace.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "firefly-aerospace"
+    },
+    {
+      "id": "source-d70bb5fee9bb",
+      "name": "Sierra Space官网",
+      "url": "https://www.sierraspace.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.sierraspace.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "sierra-space"
+    },
+    {
+      "id": "source-1d4a4e3af628",
+      "name": "Axiom Space官网",
+      "url": "https://www.axiomspace.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.axiomspace.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "axiom-space"
+    },
+    {
+      "id": "source-daf60823d787",
+      "name": "Intuitive Machines官网",
+      "url": "https://www.intuitivemachines.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.intuitivemachines.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "intuitive-machines"
+    },
+    {
+      "id": "source-0a89599a22e3",
+      "name": "Planet Labs官网",
+      "url": "https://www.planet.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.planet.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "planet-labs"
+    },
+    {
+      "id": "source-020601642841",
+      "name": "Maxar官网",
+      "url": "https://www.maxar.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.maxar.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "maxar"
+    },
+    {
+      "id": "source-2e154aa6e14c",
+      "name": "AST SpaceMobile官网",
+      "url": "https://ast-science.com/",
+      "category": "company_homepage",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://ast-science.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "ast-spacemobile"
+    },
+    {
+      "id": "source-2f8ef7facbf6",
+      "name": "蓝箭航天官网",
+      "url": "https://www.landspace.com/",
+      "category": "company_homepage",
+      "geography": "中国",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "existing_entity_website",
+      "purpose": "企业入口导航；继续定位稳定的新闻或投资者关系公告栏目。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "官网首页不是已验证的持续新闻源；旧配置域名可能迁移，需核验。"
+      ],
+      "evidence": [
+        {
+          "kind": "repository_config",
+          "path": "config/companies.generated.json",
+          "url": "https://www.landspace.com/"
+        }
+      ],
+      "checkedAt": "2026-11-14",
+      "companyId": "landspace"
+    },
+    {
+      "id": "source-380be12f65e7",
+      "name": "ESA新闻中心",
+      "url": "https://www.esa.int/Newsroom/",
+      "category": "agency_official",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "机构一手任务、许可或科学/工程新闻。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "未做连续采集验证；机构报道并不覆盖所有商业航天动态。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.esa.int/Newsroom/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-ab54ed8b75a0",
+      "name": "ESA官方RSS目录",
+      "url": "https://www.esa.int/Services/RSS_Feeds",
+      "category": "agency_feed_discovery",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "机构一手任务、许可或科学/工程新闻。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "未做连续采集验证；机构报道并不覆盖所有商业航天动态。",
+        "这是订阅发现目录，不是RSS本身；现有ESA失效订阅尚未修复。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.esa.int/Services/RSS_Feeds"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-3c596ba1c8a7",
+      "name": "JAXA新闻稿",
+      "url": "https://global.jaxa.jp/press/2026/",
+      "category": "agency_official",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "机构一手任务、许可或科学/工程新闻。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "未做连续采集验证；机构报道并不覆盖所有商业航天动态。",
+        "年份路径需年度滚动或改为稳定父栏目，尚待确认。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://global.jaxa.jp/press/2026/"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    },
+    {
+      "id": "source-f87974baece2",
+      "name": "ISRO新闻",
+      "url": "https://www.isro.gov.in/Press.html",
+      "category": "agency_official",
+      "geography": "国际",
+      "regionGroups": [],
+      "researchOnly": true,
+      "existingRuntimeEnabled": false,
+      "collectionStatus": "not_tested",
+      "verification": "search_discovered",
+      "purpose": "机构一手任务、许可或科学/工程新闻。",
+      "expectedContent": [
+        "新闻",
+        "公告"
+      ],
+      "risks": [
+        "未做连续采集验证；机构报道并不覆盖所有商业航天动态。"
+      ],
+      "evidence": [
+        {
+          "kind": "public_search",
+          "url": "https://www.isro.gov.in/Press.html"
+        }
+      ],
+      "checkedAt": "2026-11-14"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "preview": "https://ea32c2ef.space-intel.pages.dev/recent?view=sources",
+  "runs": [
+    43669927781,
+    43670019702
+  ],
+  "requestsFirstRun": 10,
+  "requestsRepeat": 0,
+  "dailyAccounted": 325,
+  "dailyLimit": 600,
+  "state": {
+    "version": 1,
+    "lastRunDay": "2026-11-15",
+    "seedCursor": 4,
+    "lastCheckedAt": "2026-11-15T02:55:12.378Z",
+    "requestsLastRun": 10,
+    "candidates": [
+      {
+        "url": "https://www.beijing.gov.cn/hudong/gfxwjzj/",
+        "name": "政策征集",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 20,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/shipin/Interviewlive/1467.html",
+        "name": "“首都开局起步‘十五五’”系列主题新闻发布...",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/shipin/szfxwfbh/",
+        "name": "新闻发布会",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/so/zcdh/zcjd",
+        "name": "政策解读",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/ywdt/",
+        "name": "要闻动态",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 80,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/ywdt/gzdt/",
+        "name": "部门动态",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "checkedAt": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "unavailable",
+        "dated": 26,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/ywdt/yaowen/",
+        "name": "北京新闻",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "pending",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/ywdt/zybwdt/",
+        "name": "中央部委动态",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "pending",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/zhengce/",
+        "name": "政策服务",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "pending",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/zhengce/zcdh",
+        "name": "找政策",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "pending",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "https://www.beijing.gov.cn/zhengce/zhengcefagui/",
+        "name": "最新政策",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": true,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "pending",
+        "dated": 0,
+        "related": 0
+      },
+      {
+        "url": "http://www.beijing.gov.cn/so/zcdh/yshj?channelId=38672",
+        "name": "政府采购",
+        "parentUrl": "https://www.beijing.gov.cn/",
+        "parentName": "北京政府政策入口",
+        "sameSite": false,
+        "firstSeen": "2026-11-15T02:55:12.378Z",
+        "lastSeen": "2026-11-15T02:55:12.378Z",
+        "successDays": [],
+        "status": "review",
+        "dated": 0,
+        "related": 0
+      }
+    ]
+  },
+  "qa": [
+    {
+      "width": 1440,
+      "candidates": 12,
+      "legacyApis": 0
+    },
+    {
+      "width": 390,
+      "candidates": 12,
+      "legacyApis": 0
+    }
+  ]
+}

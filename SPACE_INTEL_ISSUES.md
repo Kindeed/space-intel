@@ -34,15 +34,173 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-377 - Rejected discovery reservation erased valid candidate evidence
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-discovery
+- Evidence: A shared-budget rejection before an HTTP request was handled as a failed upstream check; candidate success dates could be cleared, the seed cursor advanced and the day marked complete despite zero requests.
+- Fix: Preserve candidate evidence and seed cursor on pre-request deferral; stop further work and record a checked day only after an actual accounted attempt.
+- Regression Check: Reservation-rejection regression verifies zero HTTP calls, unchanged evidence/cursor and no new checked day, with and without seed sources. Local and hosted full suite: 79 files / 538 tests passed. Hosted run 43672058491 completed with zero new requests and daily accounting unchanged at 325/600. See `docs/UI_REVIEW_2026-11-15.md`.
+
+### 2026-11-15 - SI-ISSUE-376 - Directory hierarchy and stale navigation filters obstruct browsing
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | frontend
+- Evidence: New-source candidates preceded the entire official directory; 181 source rows lacked search or paging. Company navigation retained project/category/query filters. Search input did not follow browser history. Mobile province selection required horizontal scrolling and small metadata reduced readability.
+- Fix: Collapse candidates, add local directory search/status/paging and project search; clear incompatible company filters, track URL search history, validate unknown view links; use a native mobile province selector and improve touch targets, metadata, wrapping and secondary-page hierarchy.
+- Regression Check: Local and remote browser acceptance passed at 1440/820/390/320 widths, including intersections, empty/error states, back/forward URL history, company navigation, project search, directory paging and keyboard candidate disclosure. No horizontal overflow, legacy API/health calls or browser exceptions; source-directory filters issue no additional data requests. Manual review captured all four views on desktop/mobile. Runtime commit 655b7c4, deployment cc4d3192. See `docs/UI_REVIEW_2026-11-15.md`.
+
+### 2026-11-15 - SI-ISSUE-375 - Source catalogue does not discover newly published columns
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-discovery
+- Evidence: The configured pilot collects new articles but cannot record new source URLs linked by existing official pages. Source admission has no persistent observation history.
+- Fix: Harvest public navigation from already collected HTML; rotate four configured government portal seeds daily and trial candidates within ten shared requests. Persist a bounded candidate pool under the preview prefix, require relevant dated records on distinct days, retain cross-site links for ownership review and generate disabled YAML proposals. Show evidence/status separately from the active source directory. Candidates do not enter the article pipeline until admitted through source configuration.
+- Regression Check: 78-file/534-test suite, typecheck/lint/config/build and runs 43669927781/43670019702 pass. First run discovers 12 candidates with 10 shared requests; same-day repeat uses 0 and retains 325/600 accounting. Hosted desktop/tablet/mobile and candidate panel/link/provenance checks pass with zero legacy API/health requests. Cross-day readiness is tested with fixtures; actual cross-day observation and automated admission PRs remain future work.
+- Notes: No whole-web search API, paid service, production merge or automatic weakening of the configured source whitelist is introduced.
+
+### 2026-11-15 - SI-ISSUE-374 - Facility catalogue misses construction phases and supporting port projects
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | project-coverage | classification
+- Evidence: Seven broad facility entries omit Hainan phase-two pads, Yangjiang/Liangshan/Guannan planning and Shanghai's rocket logistics dock. Recent-only cards hide older verified project context. Project names without aerospace keywords can be discarded, and retained articles do not gain newly configured component associations.
+- Fix: Add six separately evidenced project/component entries, dated stage notes and original evidence links. Distinguish construction/commissioning, planning, supporting docks and already accepted pads. Replace six low-relevance generic news feeds with local construction/notice and contractor sources while retaining the 150-source and 150/600 request limits. Match verified project aliases and relink retained metadata without refetching or changing dates.
+- Regression Check: Runs 43667504223 / 43667681247 pass 77-file/526-test suite, typecheck/config/build and preview deploy. Hosted 1440/820/390 browser checks pass; project-specific checks confirm 13 cards, 6 evidence notes/links/dates and retained phase-two procurement linkage without changing dates. Four of six new feeds parse; Liangshan timeout and Guannan HTTP 403 remain in source coverage tracking. No new recent articles were fabricated; budget is 315/600.
+- Notes: An evidence date is not a live construction status. The 30-day news window remains unchanged; no primary source was found to establish all potential project leads as approved or under construction.
+
+### 2026-11-15 - SI-ISSUE-373 - GitHub runner cannot reach some public domestic source origins
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-transport
+- Evidence: Same-runner Node/curl comparison fails on the same public sources. Authenticated Cloudflare preview probe 43662598142 reads CNSA HTML 200 but still times out on Hainan, demonstrating partial improvement only.
+- Fix: Add a preview-only GET transport with build-time fixed public source whitelist, no arbitrary target URL, no redirects and no forwarding of caller Authorization/Cookie. CI uses a per-run temporary credential; only its SHA-256 digest is stored in the existing preview control object. Configure it for 50 timeout/network failures, excluding explicit HTTP restrictions. Source requests remain in the shared 150/600 budget. Rate-limit and HTTP backoff survive transport changes.
+- Regression Check: Anonymous/unknown-target rejection, credential validation, credential/cookie non-forwarding, size limit and backoff regressions pass. Hosted 43665623470 and 43666269180 publish/deploy successfully; anonymous endpoint check returns 401. Full 77-file/524-test suite and remote 1440/820/390 browser acceptance pass. Final counters: 306/600 source requests, 283 articles, 20 domestic direct links. Remaining failures stay in SI-ISSUE-370.
+- Notes: No new server, plan, binding, production merge or D1 access. This verifies the transport implementation, not all origin availability. Source detail/status evidence is in `docs/source-recovery-evidence-2026-11-15.json`.
+
+### 2026-11-15 - SI-ISSUE-372 - Public structured listings and payload notices are missed
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | official-sources | parsing
+- Found In: replay of the failed government sources and telemetry company pages
+- Evidence: Ningbo's official EIA page explicitly links a static JSON list containing 9,572 dated records, but the generic HTML collector sees only its iframe. EMPOSAT publishes news metadata in public inline Nuxt JSON; its releaseTime is older than updateTime, so using modification time would invent fresh news. A valid CNSA payload solicitation lacks the narrow classifier's existing keywords and is discarded.
+- Fix: Add opt-in, metadata-only public JSON/Nuxt adapters with strict dates and official article prefixes, ignoring full content and modification time; retain payload/deep-space notices while rejecting unrelated generic schemes. Correct six verified public columns, add Hainan project approval/tender lists and remove the login-only Inner Mongolia application portal from the active pilot. New sources stay disabled in legacy production ingestion.
+- Regression Check: Cached replay verifies 13 target sources including the primary tender query. Full 77-file/524-test suite, typecheck/lint/config/build and hosted browser acceptance pass. EMPOSAT public data parses in hosted run 43661545852; the primary spaceport tender parses and publishes in 43666269180. Ningbo schema and CNSA classification are verified locally; their unstable hosted access is tracked separately in SI-ISSUE-370.
+- Notes: Ningbo and EMPOSAT parse successfully but have no qualifying recent rows in the sample. A repaired source is not evidence of a newly approved spaceport. No production merge is authorized.
+
+### 2026-11-15 - SI-ISSUE-371 - Preview failures hide transport causes and retain replaced-column state
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-diagnostics | ingestion
+- Found In: investigation of the 72 failed sources
+- Evidence: 71 of 72 baseline failures return an HTTP response in a bounded local probe, whereas the hosted snapshot reports 61 generic network errors. Local probing finds a login redirect and renamed/empty government columns. Replacing a source URL previously retained old validators/backoff; skipped sources also left a 25-second timer running.
+- Fix: Log safe nested transport/HTTP codes, stop before authentication redirects, reset state when the configured column URL changes and create timers only for actual attempts. Next: inspect one hosted run and repair verified public columns without increasing the daily limit.
+- Regression Check: Hosted run 43659396419 confirms ETIMEDOUT / UND_ERR_CONNECT_TIMEOUT and HTTP 403/420 failures; run 43660132615 compares Node and curl IPv4 on the same runner (8 requests, no proxy), confirming that curl does not resolve the blocked/reset sources. Safe diagnostic tests cover codes and redaction; 75 files / 517 tests pass. The one-off probe workflow is removed after use. Recovery on changed sources remains pending.
+- Notes: Only the preview branch is authorized. Do not merge, cut over production, bypass authentication or upgrade service plans.
+
+### 2026-11-15 - SI-ISSUE-370 - Expanded domestic coverage still depends heavily on supplementary reporting
+
+- Priority: P2
+- Status: IN_PROGRESS
+- Area: recent-preview | source-quality | upstream-access
+- Found In: hosted snapshot and remote acceptance
+- Evidence: 149 tracked entrances yield 71 ok, 6 empty and 72 errors (61 network, 11 HTTP). Of 186 domestic articles, 172 use supplementary Google News links and only 14 use direct links. The snapshot has no recent policy, approval or procurement rows. Seven project directories and 31 provincial navigation entries are not evidence of verified approvals.
+- Fix: Continue identifying accessible, dated official notice lists for planning, EIA, land and tenders, and public company news. Retain explicit source failure and limited-access labels, and preserve recent last-good data. Do not bypass upstream controls or insert old/fabricated announcements to fill categories.
+- Regression Check: Snapshot counts recorded in `docs/recent-preview-evidence-2026-11-15.json`; hosted browser checks enforce honest policy empty state and focus relevance. Real cross-day scheduled stability remains unverified.
+- Notes: Preview infrastructure works, but source coverage is not fully stable. No production cutover or D1 recovery claim.
+
+### 2026-11-15 - SI-ISSUE-368 - Preview cold-start and deployment configuration failures
+
+- Priority: P1
+- Status: VERIFIED
+- Area: recent-preview | scheduler | deployment
+- Found In: initial hosted workflow runs
+- Evidence: ISO fractional dots violated round ID validation; missing R2 keys left an empty local download that failed JSON parsing; Pages rejected account_id in its generated deployment config. Failed runs could consume reserved internal request budget conservatively.
+- Fix: Normalize generated round IDs and validate config before reserving; clean only incomplete missing-key local downloads; remove account_id from generated Pages config and use the account environment variable; always finalize tracked request usage. Internal budget deferral is eligible next slot without upstream backoff.
+- Regression Check: Runs 43612284933, 43612337494 and 43613446016 completed R2 prepare, collection, publish/retention, finalization, build and deploy. 73-file / 508-test suite passes, including budget and Pages routing regressions. Request count remains 532/600 for the UTC day, including the conservative earlier reservation.
+- Notes: No budget bypass or production D1 changes. Cross-day schedule execution is still an observation item.
+
+### 2026-11-15 - SI-ISSUE-369 - Pages canonical redirect loops on the recent preview route
+
+- Priority: P1
+- Status: VERIFIED
+- Area: recent-preview | deployment | routing
+- Found In: clean remote Chrome acceptance against deployment e091db33
+- Evidence: `/recent` returned 308 to `/`; the preview worker redirects `/` back to `/recent`. The asset subrequest to `/index.html` triggered Pages canonicalization, although JSON publication and deployment steps had succeeded.
+- Fix: Fetch the root HTML through the ASSETS binding directly, bypassing the public worker's root redirect. Add a regression that models Pages canonical redirects for `/index.html`.
+- Regression Check: Run 43613446016 passes full 73-file / 508-test suite and deploys 53dc0fa5. Clean hosted Chrome acceptance passes 1440/820/390 widths, combined filters, focus relevance and unavailable data. Stable alias returns HTML 200 without redirect loops; JSON returns 200. Local typecheck/lint and routing regression pass.
+- Notes: This affects only the isolated preview. Production routes and D1 are unchanged.
+
+### 2026-11-14 - SI-ISSUE-367 - Public government XML lists and approval notices are under-collected
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-coverage | parsing
+- Found In: expansion of province and commercial-spaceport notice sources
+- Evidence: Public HanWeb government lists place dated anchors inside non-executable `text/xml` script blocks; generic script removal discards these records. The generic official-page exclusion of "生态环境" can also suppress environmental-impact notices. Wide row context may admit an unrelated attachment, so relevance must be checked again against the normalized item.
+- Fix: The preview explicitly expands public XML list data, uses aerospace-specific inclusion and no generic environmental exclusion for approval feeds, and rechecks normalized item relevance. It distinguishes planning/EIA notice/EIA approval/land/procurement/award/construction labels. Provincial portal directories, publisher locations and inferred project regions remain separate.
+- Regression Check: Public XML and milestone fixtures, strict RSS dates, bounded merge/filtering, preview serving and scheduler budget/backoff pass in the 73-file / 508-test hosted suite. Typecheck, lint, build, config and remote desktop/tablet/mobile checks pass. This verifies parser behavior and preview publication, not universal source availability or the existence of recent official approvals (see SI-ISSUE-370).
+- Notes: Official columns with no dated records remain unverified; supplementary reporting channels preserve the actual publisher and show limited-access links. New sources remain disabled in legacy production ingestion.
+
+### 2026-11-14 - SI-ISSUE-366 - Recent RSS must not turn undated articles into fresh news
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | ingestion | data-quality
+- Found In: recent aggregation implementation and source sampling
+- Evidence: The shared RSS metadata fallback uses collection time when a feed item has no valid date. That is unsuitable for a strict rolling 30-day view. Official-page dates also lack time precision and must not be displayed as an invented 08:00 publication time.
+- Fix: Added an opt-in strict date rule for the pilot RSS collector; undated items are skipped. Snapshot items record date precision, retain real publication/collection timestamps separately, exclude future/expired rows and unrelated internal activities, and classify project regions separately from publisher headquarters. Legacy production behavior was not changed or deployed.
+- Regression Check: New strict-RSS and snapshot tests pass in the 70-file / 496-test suite. Desktop/tablet/mobile preview checks verify real items, combined filters, zero legacy API requests and unavailable-data handling. Typecheck, lint, build and generated config checks pass.
+- Notes: Two source samples establish local parse availability only. Province-specific recent coverage remains limited to the actual sampled content; no synthetic rows were added.
+
+### 2026-11-14 - SI-ISSUE-363 - Log retention cannot keep pace with full minute rotation
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | retention | database
+- Found In: user-requested architecture assessment
+- Evidence: A complete minute source rotation produces approximately 1,440 log entries per day. `cleanupRetainedData` defaults to deleting at most 500 expired ingestion logs in its one daily run, with a 90-day log retention horizon. Once that horizon is reached, full operation can add expired backlog faster than the default cleanup removes it; daily job interruption makes this worse.
+- Fix: Design bounded operational-log retention throughput and per-source status records, with a measured Free read/write budget. Preserve necessary audit evidence separately; do not delete articles or run an unreviewed bulk purge as an immediate workaround.
+- Planned Direction: `docs/RECENT_NEWS_AGGREGATION_PLAN_2026-11-14.md` replaces per-run production D1 logging with bounded snapshot source status and retires the old cron after cutover. This is a plan; the current issue remains OPEN until runtime retirement is verified.
+- Regression Check: Source/config arithmetic and retention defaults reviewed locally. No production queries, deletion or runtime changes performed for this assessment.
+
+### 2026-11-14 - SI-ISSUE-364 - Launch UI freshness claim is disconnected from actual refresh state
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | data-freshness | frontend
+- Found In: user-requested architecture assessment
+- Evidence: `LiveHud` statically labels the launch panel as real-time updates. Launch persistence writes event fields without a per-record fetched/refreshed timestamp; production previously served cached launches while the latest LL2 fetch failed. The UI cannot distinguish current data from a last-known cache using the launch payload alone.
+- Fix: Add explicit source refresh state and timestamps, preserve the last successful published data, and show freshness/degraded status from that metadata. Include this in the read-snapshot design rather than adding expensive per-page log queries.
+- Planned Direction: The recent-aggregation plan supplies per-source last-success metadata and removes the real-time claim from scheduled launch snapshots; implementation and UI verification remain pending.
+- Regression Check: Local UI and persistence reviewed. Actual remaining launch recovery remains tracked by SI-ISSUE-359; no UI code changed in this assessment.
+
+### 2026-11-14 - SI-ISSUE-365 - Daily maintenance performs full entity work before cleanup
+
+- Priority: P2
+- Status: OPEN
+- Area: architecture | ingestion | maintenance
+- Found In: user-requested architecture assessment
+- Evidence: The daily path in `runScheduledIngestion` synchronizes catalog data and loads all articles for entity matching before running retention/stale-log maintenance. It lacks a persisted progress cursor for entity backfill. A termination or rejection before maintenance prevents that invocation from reaching cleanup.
+- Fix: Separate bounded maintenance and resumable entity backfill, each with explicit resource budgets and completion state. Source minute rotation does not establish daily-job safety.
+- Planned Direction: The recent-aggregation plan classifies only bounded recent snapshot records and retires legacy daily backfill after cutover; the existing job is unchanged at this planning stage.
+- Regression Check: Static code finding; actual daily CPU/resource failure has not been newly verified. No additional production work was triggered.
+
 ### 2026-11-14 - SI-ISSUE-362 - Constant health probe misses exhausted row-read budget
 
 - Priority: P1
-- Status: FIXED
+- Status: VERIFIED
 - Area: observability | database
 - Found In: PR #33 production verification
 - Evidence: After PR #33 deployed, a single health check using `SELECT 1` returned 200 while a known article detail read still returned 500 under the D1 daily row-read limit. A constant query does not exercise a business-row read.
 - Fix: Read at most one article ID via its integer primary key instead. Query success, including an empty table, proves a real table read is allowed; rejected access returns uncached 503. No aggregate or log scan is added.
-- Regression Check: Tests cover the constant-success/row-read-failure distinction, a reachable empty table, one-query default behavior, and index/cap handling. Full suite: 68 files / 487 tests, typecheck and lint passed; build and deployment verification follow.
+- Regression Check: Tests cover the constant-success/row-read-failure distinction, a reachable empty table, one-query default behavior, and index/cap handling. Full suite: 68 files / 487 tests, typecheck, lint, build and production CI passed. PR #34 merged as `383e36b`; at 08:23:46 UTC the deployed health returned uncached 503 / database=false under the exhausted read budget. No repeated health monitoring was started.
 
 ### 2026-11-14 - SI-ISSUE-361 - D1 daily read exhaustion interrupts rollout verification
 
@@ -51,7 +209,7 @@
 - Area: database | observability | deployment | data-freshness
 - Found In: PR #31 / #32 production rotation observation
 - Evidence: At about 07:25–07:31 UTC, new source logs stopped closing, `/api/articles?limit=1` returned 500, and `/api/health` returned HTTP 200 with `diagnosticsAvailable: false`. The authenticated D1 console explicitly reported the Free daily row-read limit was exceeded. D1 query insights showed health queries scanning approximately 113k–227k rows per call; the minute health monitor added avoidable scan load and was stopped. Last successful coverage query showed 41 runs, 3 unfinished, latest finished at 07:24:50 UTC. Some quota failures occur before a source log can be created.
-- Fix: PR #33 merged/deployed as `1396458`, Worker `028af9fa`. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed before merging to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. The default constant probe is being refined to a single real row read (SI-ISSUE-362). Production indexes and data recovery remain unverified until quota reset. No high-frequency health polling or paid plan.
+- Fix: PR #33 merged/deployed as `1396458`, Worker `028af9fa`. Explicit detailed diagnostics read only the last 240 ingestion-log IDs, cap indexed counts at 200 with exactness flags, and refuse unindexed aggregate scans. Index migration covers articles, future launches and a small partial index of unfinished logs; full-history log indexes were removed before merging to avoid indexing 113k historical rows under the Free write budget. Public read caching is 120 seconds; scheduled summaries expose source outcomes without querying D1 again. PR #34 deployed the single real row probe (SI-ISSUE-362), final Worker `72381720`. Production indexes and data recovery remain unverified until quota reset. No high-frequency health polling or paid plan.
 - Regression Check: Default health has one bounded query; its constant-probe limitation and single-row refinement are tracked in SI-ISSUE-362. Real SQLite covers absent indexes, bounded primary-key reads, capped counts/exactness flags and idempotent partial-index migration; public errors remain safe. Scheduled result logging is regression-tested and visible on production. PR #33 local suite 68 files / 485 tests, typecheck, lint, config parity, build, Worker dry-run and production CI passed. Production migration is not applied and data recovery remains blocked. CPU counters alone do not establish database or data freshness recovery.
 - Notes: D1 limits reset at midnight UTC (08:00 Beijing the following day). Do not upgrade, bypass the quota, or treat unavailable diagnostics as zero failures. Daily maintenance and the remainder of the source rotation remain unverified.
 

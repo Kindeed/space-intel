@@ -61,6 +61,19 @@ const sourceSchema = z.object({
   access_global: z.enum(['direct', 'limited', 'blocked', 'unknown']).optional(),
   access_note: optionalDisplayTextSchema,
   public_badge: optionalDisplayTextSchema,
+  strict_dates: z.boolean().optional(),
+  recent: z.object({
+    candidate: z.boolean(),
+    category: z.enum(['news', 'policy', 'company', 'procurement', 'approval']),
+    publisher_region: z.string().optional(),
+    companies: z.array(z.string()).optional(),
+    focus: z.enum(['ttc', 'spaceport']).optional(),
+    directory: z.boolean().optional(),
+    cadence:z.enum(['twice','four']).optional(),
+    format:z.enum(['ningbo_eia_json','nuxt_news']).optional(),
+    transport:z.literal('preview').optional(),
+    article_url_prefix:sourceUrlSchema.optional(),
+  }).optional(),
 });
 
 const sourcesFileSchema = z.object({

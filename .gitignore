@@ -10,5 +10,7 @@ dist
 .claude/
 playwright-report
 test-results
+.recent/
+public/recent/current.json
 SSH.txt
 VPS-CF-MIGRATION-CONFIG.md

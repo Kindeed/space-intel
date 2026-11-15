@@ -64,7 +64,7 @@ export const googleNewsRssCollector: SourceCollector = {
     const maxItems = source.max_items ?? 50;
 
     return feed.items
-      .filter((item) => item.title && item.link)
+      .filter((item) => item.title && item.link && (!source.strict_dates || (item.isoDate && Number.isFinite(Date.parse(item.isoDate)))))
       .flatMap((item) => {
         const parsedTitle = parseGoogleNewsTitle(item.title ?? '');
         const url = canonicalGoogleNewsUrl(item.link ?? '');

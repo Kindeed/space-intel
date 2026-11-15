@@ -9,6 +9,8 @@ const configPairs = [
   ['companies.yaml', 'companies.generated.json'],
   ['topics.yaml', 'topics.generated.json'],
   ['curations.yaml', 'curations.generated.json'],
+  ['regions.yaml', 'regions.generated.json'],
+  ['facilities.yaml', 'facilities.generated.json'],
 ];
 
 async function generatedJsonFromYaml(yamlFile) {
