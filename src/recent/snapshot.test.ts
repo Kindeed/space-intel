@@ -23,6 +23,11 @@ function build(incoming: RecentItem[], previous?: RecentSnapshot, sources=[statu
 }
 
 describe('recent news snapshots', () => {
+  it('retains spaceport firefighting equipment tenders while excluding fire drills',()=>{
+    const procurement={...source,recent:{...source.recent!,category:'procurement' as const}};
+    expect(classifyItem(raw({title:'海南商业航天发射场（二期）消防车采购项目招标公告'}),procurement,companies,provinces,now)?.milestone).toBe('tender');
+    expect(classifyItem(raw({title:'商业航天公司组织消防演练'}),source,companies,provinces,now)).toBeNull();
+  });
   it('retains genuine payload and deep-space notices without admitting generic schemes',()=>{
     const policy={...source,recent:{...source.recent!,category:'policy' as const}};
     const notice=classifyItem(raw({title:'关于开展天问四号任务有效载荷研制方案征集工作的通知'}),policy,companies,provinces,now);

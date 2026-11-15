@@ -2065,7 +2065,7 @@ sources:
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 首页导航与独立政策栏目重复，2026-11-15 退出近期采集，保留具体政策文件入口。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -2081,7 +2081,7 @@ sources:
       - 北斗
     exclude_terms: []
     recent:
-      candidate: true
+      candidate: false
       category: policy
       publisher_region: 上海
 
@@ -5400,5 +5400,30 @@ sources:
       candidate: true
       category: procurement
       publisher_region: 海南
+      focus: spaceport
+      cadence: twice
+  - key: cgci-spaceport-procurement
+    name: 中技国际招标 · 商业发射场公告
+    type: official_page
+    region: cn
+    url: https://cgci.china-tender.com.cn/search.jspx?dq=&hy=&q=%E6%B5%B7%E5%8D%97%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9
+    credibility: 5
+    enabled: false
+    purpose: 跟踪海南商业发射场采购、变更和结果公告，采集授权招标代理机构原发公开元数据。
+    expected_content: 有真实发布日期的发射场设备、工程及服务招采原文链接。
+    risk_notes: 来自公开检索表单及已核实的海南二期采购公告；仅元数据，不登录、不获取标书、不把招标视为已建成或已获项目审批。
+    dedupe_strategy: canonical_url_title
+    include_terms:
+      - 商业航天
+      - 发射场
+      - 航天发射
+      - 航天港
+      - 测控
+      - 遥测
+    exclude_terms: []
+    max_items: 30
+    recent:
+      candidate: true
+      category: procurement
       focus: spaceport
       cadence: twice

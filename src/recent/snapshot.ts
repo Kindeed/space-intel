@@ -6,7 +6,7 @@ const dayMs = 86_400_000;
 import { snapshotByteLimit } from './limits';
 export { snapshotByteLimit } from './limits';
 const unique = (values: string[]) => [...new Set(values)];
-const irrelevantTitle = /党组|党建|理论学习|学习贯彻|消防|大国工匠|好记者|新员工|入职培训|人力资源|党支部|主题党日|招聘.*人员|人员.*招聘|涨停|跌停|融资余额|龙虎榜|盘中|股价|ETF|目标价|券商研报|评级|海钓|马拉松|足球赛|篮球赛|低成本.*实战|开发教程/;
+const irrelevantTitle = /党组|党建|理论学习|学习贯彻|消防演练|消防培训|大国工匠|好记者|新员工|入职培训|人力资源|党支部|主题党日|招聘.*人员|人员.*招聘|涨停|跌停|融资余额|龙虎榜|盘中|股价|ETF|目标价|券商研报|评级|海钓|马拉松|足球赛|篮球赛|低成本.*实战|开发教程/;
 const aerospaceTopic=/航天|卫星|火箭|空天|遥感|测控|遥测|测运控|北斗|星地|发射场|商业发射|有效载荷|星敏感器|太阳敏感器|深空|天问|嫦娥|探月/;
 function isRelevant(item: {title:string;summary:string;region:string;category?:string}): boolean {
   if (irrelevantTitle.test(item.title)) return false;
