@@ -77,10 +77,11 @@
  .recent-province-select { display:block;width:100%;min-height:44px;border:1px solid var(--border);border-radius:6px;background:#0d1825;color:#c2d8e6;padding:8px 12px;font-size:16px; }
  .recent-intro.is-compact { padding:20px 0;align-items:flex-start; }
  .recent-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
- .recent-metrics > div { padding:13px 16px; }
+ .recent-metrics > div { padding:12px;flex-direction:row;align-items:center;justify-content:space-between; }
  .recent-metrics > div:nth-child(2) { border-right:0; }
  .recent-metrics > div:nth-child(-n+2) { border-bottom:1px solid var(--border); }
- .recent-metrics span { font-size:12px; }.recent-metrics small { font-size:11px; }
+ .recent-metrics span { font-size:11px; }.recent-metrics small { font-size:11px; }.recent-metrics strong { font-size:20px; }
+ .recent-intro { padding:20px 0;gap:12px; }.recent-intro .recent-eyebrow { display:none; }.recent-intro h1 { margin-top:0; }
  .recent-filters input,.recent-directory-search input { font-size:16px;min-height:44px; }
  .recent-filters select { font-size:14px;min-height:44px; }
  .recent-tabs button,.recent-days button,.recent-focus button,.recent-more,.recent-project-actions button,.recent-results button,.recent-tags button { min-height:40px; }

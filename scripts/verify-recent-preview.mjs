@@ -8,6 +8,7 @@ await mkdir(output, {recursive:true});
 // Use a clean headless session; never connect to a user's browser profile.
 const browser = await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL || 'chrome',headless:true});
 const results=[];
+let activePage;
 const snapshot=await (await fetch(`${base}/recent/current.json`)).json();
 const expectedSources=snapshot.sources.length;
 const populatedCompany=snapshot.companies.find(company=>company.country==='China'&&snapshot.items.some(item=>item.region==='cn'&&item.companyIds.includes(company.id)&&Date.parse(item.publishedAt)>=Date.now()-30*86400000));
@@ -15,6 +16,7 @@ assert(populatedCompany,'The real snapshot must include domestic company news');
 try {
   for (const viewport of [{width:1440,height:1000},{width:820,height:1180},{width:390,height:844},{width:320,height:740}]) {
     const page = await browser.newPage({viewport});
+    activePage=page;
     const errors=[]; const apis=[]; const dataRequests=[];
     page.on('pageerror',(error)=>errors.push(error.message));
     page.on('request',(request)=>{if(new URL(request.url()).pathname.startsWith('/api/'))apis.push(request.url());});
@@ -28,9 +30,11 @@ try {
     }
     assert(allItems>0,'Actual news must be visible');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false,'No horizontal overflow');
+    if(viewport.width>=375&&viewport.width<=620)assert(await page.locator('.recent-card').first().evaluate(node=>node.getBoundingClientRect().top<innerHeight),'Standard mobile first screen must reach the news list');
     await page.screenshot({path:`${output}/recent-${viewport.width}.png`,fullPage:false});
 
     await page.getByRole('button',{name:'30 天',exact:true}).click();
+    await page.waitForFunction(()=>new URLSearchParams(location.search).get('days')==='30');
     if(viewport.width<=620)await page.getByLabel('选择省份').selectOption('湖北');
     else await page.getByLabel('省份筛选').getByRole('button',{name:/湖北/}).click();
     await page.locator('.recent-results').filter({hasText:'湖北'}).waitFor();
@@ -129,7 +133,10 @@ try {
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false);
     await page.screenshot({path:`${output}/sources-${viewport.width}.png`,fullPage:false});
     const more=page.getByRole('button',{name:/查看更多来源/});
-    while(await more.isVisible())await more.click();
+    while(await more.isVisible()){
+      const count=await page.locator('.recent-source').count();await more.click();
+      await page.waitForFunction(previous=>document.querySelectorAll('.recent-source').length>previous,count);
+    }
     assert.equal(await page.locator('.recent-source').count(),expectedSources);
     assert.equal(dataRequests.length,requestsBeforeFilters,'Directory search, status and paging must stay local');
     const disclosure=page.locator('.recent-discovery-toggle > summary');
@@ -151,4 +158,10 @@ try {
   await offline.close();
   await writeFile(`${output}/results.json`,JSON.stringify(results,null,2));
   console.log(JSON.stringify({passed:true,viewports:results,unavailableState:true}));
+} catch(error) {
+  if(activePage&&!activePage.isClosed()){
+    console.error(JSON.stringify({failedUrl:activePage.url(),viewport:activePage.viewportSize(),results:await activePage.locator('.recent-results').allTextContents()}));
+    await activePage.screenshot({path:`${output}/failure.png`,fullPage:false});
+  }
+  throw error;
 } finally { await browser.close(); }
