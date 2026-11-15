@@ -1,0 +1,20 @@
+name: Preview source transport comparison
+on:
+  push:
+    branches: [codex/recent-aggregation-preview]
+    paths: [.github/workflows/recent-source-transport.yml]
+permissions:
+  contents: read
+jobs:
+  compare:
+    if: github.repository == 'Kindeed/space-intel'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/probe-recent-transport.mjs
