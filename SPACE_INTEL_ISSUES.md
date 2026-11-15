@@ -37,11 +37,11 @@
 ### 2026-11-15 - SI-ISSUE-374 - Facility catalogue misses construction phases and supporting port projects
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | project-coverage | classification
 - Evidence: Seven broad facility entries omit Hainan phase-two pads, Yangjiang/Liangshan/Guannan planning and Shanghai's rocket logistics dock. Recent-only cards hide older verified project context. Project names without aerospace keywords can be discarded, and retained articles do not gain newly configured component associations.
 - Fix: Add six separately evidenced project/component entries, dated stage notes and original evidence links. Distinguish construction/commissioning, planning, supporting docks and already accepted pads. Replace six low-relevance generic news feeds with local construction/notice and contractor sources while retaining the 150-source and 150/600 request limits. Match verified project aliases and relink retained metadata without refetching or changing dates.
-- Regression Check: Classification and retained-phase linkage tests pass; full suite and hosted desktop/mobile checks are pending final deployment.
+- Regression Check: Runs 43667504223 / 43667681247 pass 77-file/526-test suite, typecheck/config/build and preview deploy. Hosted 1440/820/390 browser checks pass; project-specific checks confirm 13 cards, 6 evidence notes/links/dates and retained phase-two procurement linkage without changing dates. Four of six new feeds parse; Liangshan timeout and Guannan HTTP 403 remain in source coverage tracking. No new recent articles were fabricated; budget is 315/600.
 - Notes: An evidence date is not a live construction status. The 30-day news window remains unchanged; no primary source was found to establish all potential project leads as approved or under construction.
 
 ### 2026-11-15 - SI-ISSUE-373 - GitHub runner cannot reach some public domestic source origins
