@@ -1,4 +1,7 @@
 import { snapshotByteLimit } from '../recent/limits';
+import {fetchPreviewSource} from './sourceTransport';
+declare const __RECENT_ALLOWED_SOURCES__:Record<string,string>;
+const allowedSources=typeof __RECENT_ALLOWED_SOURCES__==='undefined'?{}:__RECENT_ALLOWED_SOURCES__;
 
 export type RecentPreviewEnv={R2_ASSETS:R2Bucket;ASSETS:Fetcher};
 export const previewSnapshotKey='recent/preview/v1/current.json';
@@ -22,6 +25,7 @@ export default {
   async fetch(request:Request,env:RecentPreviewEnv,context:ExecutionContext):Promise<Response>{
     const path=new URL(request.url).pathname;
     if(path==='/')return Response.redirect(new URL('/recent',request.url).href,302);
+    if(path==='/recent/source-fetch')return fetchPreviewSource(request,env.R2_ASSETS,allowedSources);
     if(path==='/recent/current.json'){
       const cache=typeof caches==='undefined'?undefined:(caches as CacheStorage&{default?:Cache}).default;
       return readPreviewSnapshot(request,env,context,cache);

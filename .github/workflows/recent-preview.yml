@@ -9,6 +9,10 @@ on:
         description: Recheck eligible sources in this slot (still respects backoff and daily budget)
         type: boolean
         default: false
+      source_probe:
+        description: Compare two fixed public sources from the authenticated preview node
+        type: boolean
+        default: false
   push:
     branches: [codex/recent-aggregation-preview]
     paths:
@@ -59,8 +63,11 @@ jobs:
       - name: Collect due preview sources
         env:
           FORCE_RECHECK: ${{ inputs.force || false }}
+          SOURCE_PROBE: ${{ inputs.source_probe || false }}
         run: |
-          if [ "$FORCE_RECHECK" = "true" ]; then
+          if [ "$SOURCE_PROBE" = "true" ]; then
+            node scripts/probe-preview-source.mjs
+          elif [ "$FORCE_RECHECK" = "true" ]; then
             pnpm recent:collect --force
           else
             pnpm recent:collect

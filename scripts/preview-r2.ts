@@ -2,6 +2,7 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {resolve} from 'node:path';
 import {rmSync} from 'node:fs';
+import {randomBytes} from 'node:crypto';
 import {controlSchema,reserveBudget,releaseUnused,type PreviewControl} from '../src/recent/scheduler';
 import {recentSnapshotSchema} from '../src/recent/types';
 import {isRecentDate} from '../src/recent/snapshot';
@@ -30,9 +31,10 @@ if(operation==='prepare'){
   let control:PreviewControl|undefined;
   if(remote('get','control.json','.recent/control.json',true))control=controlSchema.parse(JSON.parse(await readFile('.recent/control.json','utf8')));
   const reservation=reserveBudget(control,new Date(),runId);
+  reservation.control.sourceToken??=randomBytes(32).toString('hex');
   await writeFile('.recent/control.json',JSON.stringify(reservation.control));
   remote('put','control.json','.recent/control.json');
-  await writeFile('.recent/reservation.json',JSON.stringify({runId,budget:reservation.budget,day:reservation.control.day}));
+  await writeFile('.recent/reservation.json',JSON.stringify({runId,budget:reservation.budget,day:reservation.control.day,sourceToken:reservation.control.sourceToken}));
   await writeFile('.recent/usage.json',JSON.stringify({runId,requests:0}));
   if(remote('get','current.json','.recent/previous.json',true)){
     const previous=recentSnapshotSchema.parse(JSON.parse(await readFile('.recent/previous.json','utf8')));
