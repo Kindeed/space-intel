@@ -27,6 +27,19 @@ describe('source discovery',()=>{
   expect(visited).toEqual(['https://example.gov.cn/promising/']);
   expect(result.candidates.find(candidate=>candidate.url.endsWith('/promising/'))?.status).toBe('ready');
  });
+ it('preserves observations and seed rotation when the shared reservation rejects before a request',async()=>{
+  const candidate=recordDiscoveryCheck(findSourceCandidates('<a href="/news/">新闻动态</a>',parent,new Set(),now)[0],1,1,now);
+  const state={version:1 as const,seedCursor:0,requestsLastRun:2,candidates:[candidate]};
+  let fetched=0;
+  const options={state,hints:[],now:new Date('2026-11-16'),budget:10,persist:false,consume:async()=>{throw new Error('request_budget');},fetchHtml:async()=>{fetched++;return '';}};
+  for(const config of [[],[{...parent,recent:{directory:true}} as SourceConfig]]){
+   const result=await runDiscovery({...options,config});
+   expect(result.candidates).toEqual([candidate]);expect(result.seedCursor).toBe(0);
+   expect(result.lastRunDay).toBeUndefined();expect(result.lastCheckedAt).toBeUndefined();
+   expect(result.requestsLastRun).toBe(0);
+  }
+  expect(fetched).toBe(0);
+ });
  it('finds new columns while excluding scripts, articles, login and configured URLs',()=>{
   const html='<a href="/notice/">公示公告</a><a href="/known/">政策文件</a><a href="/202611/article.html">航天新闻</a><a href="/login/">公告办理</a><script><a href="/fake/">招标公告</a></script>';
   expect(findSourceCandidates(html,parent,new Set(['https://example.gov.cn/known/']),now).map(c=>c.url)).toEqual(['https://example.gov.cn/notice/']);

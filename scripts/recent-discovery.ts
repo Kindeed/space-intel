@@ -48,9 +48,12 @@ export async function runDiscovery(options:{state:DiscoveryState;hints:Array<{ht
  const max=Math.min(10,options.budget);let requests=0;
  const fetch=async(url:string)=>{if(requests>=max)throw new Error('discovery budget');await options.consume();requests++;return (options.fetchHtml??publicHtml)(url);};
  const seeds=config.filter(source=>source.recent?.directory&&discoveryUrl(source.url));
+ let deferred=false;
  for(let index=0;index<Math.min(4,max,seeds.length);index++){
-  const source=seeds[state.seedCursor%seeds.length];state.seedCursor++;
+  const source=seeds[state.seedCursor%seeds.length];const before=requests;
   try{const html=await fetch(source.url);state=mergeDiscovery(state,findSourceCandidates(html,source,known,now),now);}catch{/* keep existing evidence */}
+  if(requests===before){deferred=true;break;}
+  state.seedCursor++;
  }
  const today=now.toISOString().slice(0,10);
  const priority={observing:0,pending:1,ready:2,unavailable:3,review:4};
@@ -58,7 +61,8 @@ export async function runDiscovery(options:{state:DiscoveryState;hints:Array<{ht
     (!['ready','unavailable'].includes(candidate.status)||!candidate.checkedAt||Date.parse(candidate.checkedAt)<=now.getTime()-7*86400000))
   .sort((a,b)=>priority[a.status]-priority[b.status]||(a.checkedAt??'').localeCompare(b.checkedAt??'')||a.firstSeen.localeCompare(b.firstSeen));
  for(const candidate of queue){
-  if(requests>=max)break;
+  if(deferred||requests>=max)break;
+  const before=requests;
   let dated=0,related=0;
   try{
    const html=await fetch(candidate.url);
@@ -68,9 +72,12 @@ export async function runDiscovery(options:{state:DiscoveryState;hints:Array<{ht
    const items=await officialPageCollector.collect(source,{now:()=>now,fetch:async()=>new Response(html),transformHtml:expandPublicListingData});
    related=items.filter(item=>Date.parse(item.publishedAt)>=now.getTime()-30*86400000&&Date.parse(item.publishedAt)<=now.getTime()&&/航天|卫星|火箭|发射场|测控|遥测/.test(item.title)).length;
   }catch{/* failed checks do not become valid sources */}
+  // A rejected reservation did not contact this source. Preserve its evidence
+  // and retry later instead of recording an upstream failure.
+  if(requests===before){deferred=true;break;}
   Object.assign(candidate,recordDiscoveryCheck(candidate,dated,related,now));
  }
- state={...state,lastRunDay:today,lastCheckedAt:now.toISOString(),requestsLastRun:requests};
+ state={...state,...(requests?{lastRunDay:today,lastCheckedAt:now.toISOString()}:{}),requestsLastRun:requests};
  state=discoveryStateSchema.parse(state);
  while(Buffer.byteLength(JSON.stringify(state))>256*1024&&state.candidates.length)state.candidates.pop();
  await persist();

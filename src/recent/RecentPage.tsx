@@ -5,6 +5,7 @@ import { filterRecentItems } from './snapshot';
 import { recentSnapshotSchema, type RecentSnapshot } from './types';
 import './recent.css';
 import {discoveryStateSchema,type DiscoveryState} from './discovery';
+import {articleSummary,directorySources,recentView} from './presentation';
 
 const labels = { news: '新闻动态', policy: '政策公告', company: '企业动态', procurement: '采购公告', approval:'报批公示' };
 const stageLabels={planning_notice:'规划公示',eia_notice:'环评受理／公示',eia_approved:'环评批复',land_notice:'用地／选址信息',tender:'招采公告',award_candidate:'中标候选人公示',award:'中标／成交',construction_update:'建设动态',operational_update:'运行／任务动态',withdrawn:'终止／撤销信息'};
@@ -14,20 +15,23 @@ export function RecentPage() {
   const [discovery,setDiscovery]=useState<DiscoveryState>();
   const [discoveryError,setDiscoveryError]=useState(false);
   const [discoveryLimit,setDiscoveryLimit]=useState(12);
+  const [sourceQuery,setSourceQuery]=useState('');
+  const [sourceStatus,setSourceStatus]=useState('all');
+  const [sourceLimit,setSourceLimit]=useState(60);
+  const [projectQuery,setProjectQuery]=useState('');
   const [params, setParams] = useSearchParams();
   const [snapshot, setSnapshot] = useState<RecentSnapshot>();
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [query, setQuery] = useState(params.get('q') || '');
-  const view = params.get('view') || 'feed';
+  const view = recentView(params.get('view'));
   useEffect(()=>{
     if(view!=='sources')return;
     const abort=new AbortController();
     fetch('/recent/discovery.json',{signal:abort.signal,cache:'no-cache'}).then(response=>{if(!response.ok)throw new Error('unavailable');return response.json();})
       .then(data=>{setDiscovery(discoveryStateSchema.parse(data));setDiscoveryError(false);}).catch(()=>{if(!abort.signal.aborted)setDiscoveryError(true);});
     return ()=>abort.abort();
-  },[view]);
-  const region = params.get('region') || 'cn';
+  },[view,attempt]);
+  const region = ['cn','global','all'].includes(params.get('region')||'')?params.get('region')!:'cn';
   const days = [1,7,30].includes(Number(params.get('days'))) ? Number(params.get('days')) : 7;
   const province = region === 'global' ? '' : params.get('province') || '';
   const company = params.get('company') || '';
@@ -54,6 +58,7 @@ export function RecentPage() {
     const next = new URLSearchParams(params);
     for (const [key,value] of Object.entries(values)) { if(value) next.set(key,value); else next.delete(key); }
     setParams(next);
+    if(values.view)window.scrollTo(0,0);
   }
   const filters = {region,province,company,category,days,focus,facility,query:params.get('q') || ''};
   const items = snapshot ? filterRecentItems(snapshot,filters,now) : [];
@@ -61,6 +66,8 @@ export function RecentPage() {
   const cnItems = windowItems.filter((item)=>item.region==='cn');
   const companyMap = new Map(snapshot?.companies.map((item)=>[item.id,item.name]));
   const selectedSources = snapshot?.sources.filter((source)=>source.selected) || [];
+  const filteredSources=directorySources(snapshot?.sources??[],sourceQuery,sourceStatus);
+  const filteredProjects=snapshot?.facilities.filter(entry=>`${entry.name} ${entry.province} ${entry.kind}`.toLowerCase().includes(projectQuery.trim().toLowerCase()))??[];
   const updated = snapshot?.lastCheckedAt || snapshot?.lastDataUpdatedAt;
   const delayed = !updated || now.getTime()-Date.parse(updated) > 86_400_000;
   const visibleProvinces = snapshot?.provinces || [];
@@ -73,15 +80,15 @@ export function RecentPage() {
       <Link to="/recent" className="recent-brand"><Rocket size={24}/><strong>航天信息</strong><span>近期资讯</span></Link>
       <nav aria-label="近期资讯导航">
         {([['feed','近期资讯'],['companies','公司'],['projects','发射场与项目'],['sources','来源目录']] as const).map(([id,label]) =>
-          <button type="button" key={id} className={view===id?'is-active':''} onClick={()=>update({view:id})}>{label}</button>)}
+          <button type="button" key={id} aria-current={view===id?'page':undefined} className={view===id?'is-active':''} onClick={()=>update({view:id})}>{label}</button>)}
       </nav>
       <span className="recent-preview">预览版</span>
     </header>
 
-    <section className="recent-intro">
+    <section className={`recent-intro ${view!=='feed'?'is-compact':''}`}>
       <div><div className="recent-eyebrow"><Radio size={14}/> COMMERCIAL SPACE</div>
         <h1>关注商业航天的<span>下一步。</span></h1>
-        <p>政策、项目与公司动态，按地区和公司一起看。</p>
+        <p>{view==='feed'?'政策、项目与公司动态，按地区和公司一起看。':view==='companies'?'按公司查看近期动态与原始发布。':view==='projects'?'跟踪规划、建设与投用，每个阶段保留依据。':'查看已接入来源、更新状态与新发现的候选。'}</p>
       </div>
       <div className="recent-update"><span className={delayed?'status-dot is-delayed':'status-dot'}/>
         <div><strong>{updated?`最近检查 ${dateLabel(updated)}`:'等待本次更新'}</strong>
@@ -102,12 +109,15 @@ export function RecentPage() {
 
     {snapshot && view==='feed' && <div className="recent-layout">
       <aside className="recent-sidebar">
-        <div className="recent-section-label"><Globe2 size={15}/>国内地区</div>
+        <div className="recent-section-label"><Globe2 size={15}/>国内地区 · 近 30 天</div>
+        <select className="recent-province-select" aria-label="选择省份" value={province} onChange={event=>update({province:event.target.value,region:'cn'})}>
+          <option value="">全部地区 · {cnItems.length}</option>{visibleProvinces.map(entry=><option key={entry.id} value={entry.id}>{entry.name} · {cnItems.filter(item=>item.provinces.includes(entry.id)).length}</option>)}
+        </select>
         <div className="recent-provinces" aria-label="省份筛选">
-          <button type="button" className={!province?'is-active':''} onClick={()=>update({province:'',region:'cn'})}>全部地区<span>{cnItems.length}</span></button>
+          <button type="button" aria-pressed={!province} className={!province?'is-active':''} onClick={()=>update({province:'',region:'cn'})}>全部地区<span>{cnItems.length}</span></button>
           {visibleProvinces.map((entry)=>{
             const count=cnItems.filter((item)=>item.provinces.includes(entry.id)).length;
-            return <button key={entry.id} type="button" className={province===entry.id?'is-active':''} onClick={()=>update({province:entry.id,region:'cn'})}>
+            return <button key={entry.id} type="button" aria-pressed={province===entry.id} className={province===entry.id?'is-active':''} onClick={()=>update({province:entry.id,region:'cn'})}>
               {entry.name}<span>{count || '—'}</span></button>;
           })}
         </div>
@@ -117,32 +127,32 @@ export function RecentPage() {
       <section className="recent-feed" aria-label="资讯列表">
         <div className="recent-feed-top"><div className="recent-tabs" aria-label="国内外筛选">
           {([['cn','国内'],['global','国外'],['all','全部']] as const).map(([id,label])=>
-            <button key={id} type="button" className={region===id?'is-active':''} onClick={()=>update({region:id,province:'',company:''})}>{label}</button>)}
+            <button key={id} type="button" aria-pressed={region===id} className={region===id?'is-active':''} onClick={()=>update({region:id,province:'',company:''})}>{label}</button>)}
         </div><div className="recent-days" aria-label="时间范围">
-          {([1,7,30] as const).map((value)=><button type="button" key={value} className={days===value?'is-active':''} onClick={()=>update({days:String(value)})}>{value===1?'24 小时':`${value} 天`}</button>)}
+          {([1,7,30] as const).map((value)=><button type="button" key={value} aria-pressed={days===value} className={days===value?'is-active':''} onClick={()=>update({days:String(value)})}>{value===1?'24 小时':`${value} 天`}</button>)}
         </div></div>
-        <form className="recent-filters" onSubmit={(event)=>{event.preventDefault();update({q:query});}}>
+        <form className="recent-filters" onSubmit={(event)=>{event.preventDefault();update({q:String(new FormData(event.currentTarget).get('q')||'').trim()});}}>
           <label><Building2 size={15}/><select aria-label="公司筛选" value={company} onChange={(event)=>update({company:event.target.value})}>
             <option value="">全部公司</option>{companyOptions.map((entry)=><option key={entry.id} value={entry.id}>{entry.name}</option>)}
           </select></label>
           <label><SlidersHorizontal size={15}/><select aria-label="内容类型" value={category} onChange={(event)=>update({category:event.target.value})}>
             <option value="">全部类型</option>{Object.entries(labels).map(([id,label])=><option key={id} value={id}>{label}</option>)}
           </select></label>
-          <label className="recent-search"><Search size={15}/><input aria-label="搜索近期资讯" value={query} onChange={(event)=>setQuery(event.target.value)} placeholder="搜索标题、来源或公司"/><button type="submit">搜索</button></label>
+          <label className="recent-search"><Search size={15}/><input key={params.get('q')||''} name="q" aria-label="搜索近期资讯" defaultValue={params.get('q')||''} placeholder="搜索标题、来源或公司"/><button type="submit">搜索</button></label>
         </form>
         <div className="recent-focus" aria-label="关注领域">
-          {([['','全部领域'],['spaceport','发射场／建设项目'],['ttc','遥测／测运控']] as const).map(([id,label])=><button type="button" key={id} className={focus===id?'is-active':''} onClick={()=>update({focus:id,facility:''})}>{label}</button>)}
+          {([['','全部领域'],['spaceport','发射场／建设项目'],['ttc','遥测／测运控']] as const).map(([id,label])=><button type="button" key={id} aria-pressed={focus===id} className={focus===id?'is-active':''} onClick={()=>update({focus:id,facility:''})}>{label}</button>)}
           {facility&&<span>{snapshot.facilities.find((entry)=>entry.id===facility)?.name}</span>}
         </div>
         <div className="recent-results"><span>{province || (region==='cn'?'国内动态':region==='global'?'国外动态':'全部动态')}{company?` · ${companyMap.get(company) || company}`:''}{params.get('q')?` · 搜索：${params.get('q')}`:''}{category?` · ${labels[category as keyof typeof labels]||category}`:''}</span>
-          <span>{items.length} 条{(province||company||category||focus||facility||params.get('q')) && <button type="button" onClick={()=>{setQuery('');update({province:'',company:'',category:'',q:'',focus:'',facility:''});}}>清除筛选</button>}</span></div>
+          <span>{items.length} 条{(province||company||category||focus||facility||params.get('q')) && <button type="button" onClick={()=>update({province:'',company:'',category:'',q:'',focus:'',facility:''})}>清除筛选</button>}</span></div>
         {snapshot.truncated && <p className="recent-notice">已保留最新 {snapshot.items.length} 条资讯，实际覆盖自 {snapshot.coverageStart?dateLabel(snapshot.coverageStart):'本次更新'} 起。</p>}
         {!items.length && <div className="recent-empty"><Search size={28}/><h2>这个范围暂时没有近期资讯</h2><p>可以换一个地区、公司，或查看最近 30 天。</p>
-          <button type="button" onClick={()=>{setQuery('');update({days:'30',province:'',company:'',category:'',q:'',focus:'',facility:''});}}>查看近 30 天动态</button></div>}
+          <button type="button" onClick={()=>update({days:'30',province:'',company:'',category:'',q:'',focus:'',facility:''})}>查看近 30 天动态</button></div>}
         <div className="recent-cards">{items.slice(0,visibleLimit).map((item)=><article className="recent-card" key={item.id}>
           <div className="recent-card-meta"><span className={`recent-category category-${item.category}`}>{labels[item.category]}</span><span>{item.publisher}</span><time dateTime={item.publishedAt}>{dateLabel(item.publishedAt,item.datePrecision==='date')}</time></div>
           <a className="recent-card-title" href={item.url} target="_blank" rel="noreferrer"><h2>{item.title}</h2><ArrowUpRight size={19}/></a>
-          {item.summary && <p>{item.summary}</p>}
+          {articleSummary(item) && <p>{articleSummary(item)}</p>}
           <div className="recent-tags">{item.provinces.filter((id)=>id!=='未明确').map((id)=><button type="button" key={id} onClick={()=>update({province:id,region:'cn'})}>{id}</button>)}
             {item.accessLimited&&<span>原文访问可能受限</span>}
             {item.milestone&&<span className="recent-stage">{stageLabels[item.milestone]}</span>}
@@ -157,13 +167,16 @@ export function RecentPage() {
     {snapshot && view==='companies' && <section className="recent-directory"><div className="recent-directory-heading"><h2>公司动态</h2><span>按公司查看近 30 天资讯</span></div>
       <div className="recent-company-grid">{companyOptions.map((entry)=>{
         const count=windowItems.filter((item)=>item.companyIds.includes(entry.id)).length;
-        return <button type="button" key={entry.id} onClick={()=>update({view:'feed',company:entry.id,province:'',region:entry.country==='China'?'cn':'global',days:'30'})}>
+        return <button type="button" key={entry.id} onClick={()=>update({view:'feed',company:entry.id,province:'',region:entry.country==='China'?'cn':'global',days:'30',q:'',category:'',focus:'',facility:'',limit:''})}>
           <Building2 size={21}/><strong>{entry.name}</strong><span>{entry.country==='China'?'中国':'国外'} · {count} 条近期动态</span><ArrowUpRight size={17}/></button>;
       })}</div></section>}
 
     {snapshot&&view==='projects'&&<section className="recent-directory"><div className="recent-directory-heading"><h2>发射场与项目</h2><span>规划、报批、招采与建设进展</span></div>
       <p className="recent-project-note">跟踪对象与配套项目分开列出。公示、受理与批复分别标注，具体进展以原始公告为准。</p>
-      <div className="recent-project-grid">{snapshot.facilities.map((entry)=>{
+      <label className="recent-directory-search"><Search size={17}/><input aria-label="搜索项目" value={projectQuery} onChange={event=>setProjectQuery(event.target.value)} placeholder="搜索项目、地区或建设类型"/></label>
+      <p className="recent-directory-count">{filteredProjects.length} 个跟踪对象 · 含扩建工位与配套工程</p>
+      {!filteredProjects.length&&<p className="recent-empty">没有匹配的项目，试试其他名称或地区。</p>}
+      <div className="recent-project-grid">{filteredProjects.map((entry)=>{
         const related=windowItems.filter((item)=>item.facilityIds.includes(entry.id));
         const latest=related[0];
         return <article className="recent-source" key={entry.id}><div><strong>{entry.name}</strong><span className="recent-preview">{entry.province}</span></div>
@@ -176,8 +189,10 @@ export function RecentPage() {
       })}</div></section>}
 
     {snapshot && view==='sources' && <section className="recent-directory"><div className="recent-directory-heading"><h2>来源目录</h2><span>官方、公司与专业媒体</span></div>
+      <details className="recent-discovery-toggle"><summary>新发现的来源{discovery?` · ${discovery.candidates.length} 个候选`:''}</summary>
       <section aria-label="新发现的来源" className="recent-discovery">
         <h3>新发现的来源</h3><p>从已知官网发现新栏目，经过跨日试采后再核对接入。候选内容尚未进入资讯流。</p>
+        {discovery&&discoveryError&&<p role="status">候选来源更新暂不可用，以下保留上次结果。</p>}
         {!discovery?<p>{discoveryError?'暂时无法读取候选来源，请稍后再试。':'候选来源正在准备中。'}</p>:<>
           <p>{discovery.candidates.length} 个候选{discovery.lastCheckedAt?` · 最近核验 ${dateLabel(discovery.lastCheckedAt)}`:''}</p>
           <div className="recent-source-grid">{discovery.candidates.slice(0,discoveryLimit).map(candidate=><article className="recent-discovery-card" key={candidate.url}>
@@ -187,11 +202,22 @@ export function RecentPage() {
           {discovery.candidates.length>discoveryLimit&&<button className="recent-more" type="button" onClick={()=>setDiscoveryLimit(value=>value+12)}>查看更多候选</button>}
         </>}
       </section>
-      <div className="recent-source-grid">{snapshot.sources.map((source)=><article className="recent-source" key={source.id}>
+      </details>
+      <div className="recent-directory-tools">
+        <label className="recent-directory-search"><Search size={17}/><input aria-label="搜索来源" value={sourceQuery} onChange={event=>{setSourceQuery(event.target.value);setSourceLimit(60);}} placeholder="搜索名称、地区或网站"/></label>
+        <select aria-label="来源状态" value={sourceStatus} onChange={event=>{setSourceStatus(event.target.value);setSourceLimit(60);}}>
+          <option value="all">全部来源</option><option value="active">正在跟踪</option><option value="ok">正常解析</option><option value="error">读取失败</option><option value="directory">导航入口</option>
+        </select>
+      </div>
+      <p className="recent-directory-count">匹配 {filteredSources.length} / {snapshot.sources.length} 个入口 · 正在跟踪 {selectedSources.length} 个</p>
+      {!filteredSources.length&&<p className="recent-empty">没有匹配的来源，可以更换关键词或状态。</p>}
+      <div className="recent-source-grid">{filteredSources.slice(0,sourceLimit).map((source)=><article className="recent-source" key={source.id}>
         <div><a href={source.url} target="_blank" rel="noreferrer">{source.name}<ArrowUpRight size={15}/></a><span className={`recent-source-status ${source.status==='error'?'is-delayed':''}`}>{source.status==='directory'?'来源入口':source.errorCategory==='budget'?'本轮延后':source.status==='error'?'暂时不可用':source.status==='empty'?'待核验':source.recentCount?'有近期动态':'近期暂无更新'}</span></div>
         <p>{source.publisherRegion || (source.region==='cn'?'国内':'国外')} · {labels[source.category]}</p>
-        <small>{source.lastSuccessAt?`上次成功 ${dateLabel(source.lastSuccessAt)}`:'尚未确认成功更新'} · 本轮 {source.recentCount} 条近期资讯</small>
-      </article>)}</div></section>}
+        <small>{source.lastSuccessAt?`上次成功 ${dateLabel(source.lastSuccessAt)}`:'尚未确认成功更新'} · 保留 {source.recentCount} 条近期资讯</small>
+      </article>)}</div>
+      {filteredSources.length>sourceLimit&&<div className="recent-footnote"><button type="button" className="recent-more" onClick={()=>setSourceLimit(value=>value+60)}>查看更多来源 · 已显示 {sourceLimit} / {filteredSources.length} 个</button></div>}
+      </section>}
 
     <footer className="recent-footer"><span>航天信息 · 关注近期发展</span><span>最多保留 30 天资讯 · 原文由发布方提供</span></footer>
   </div>;
