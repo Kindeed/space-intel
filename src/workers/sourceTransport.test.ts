@@ -1,9 +1,11 @@
 import {describe,it,expect,vi} from 'vitest';
 import {fetchPreviewSource} from './sourceTransport';
 const token='a'.repeat(64);
+const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token));
+const sourceTokenHash=Array.from(new Uint8Array(digest),value=>value.toString(16).padStart(2,'0')).join('');
 const allowed={notice:'https://example.gov.cn/notices'};
 function request(query='source=notice',value=token){return new Request(`https://preview.example/recent/source-fetch?${query}`,{headers:{Authorization:`Bearer ${value}`,Accept:'application/json'}});}
-function environment(){const get=vi.fn(async()=>({size:150,json:async()=>({sourceToken:token})}));return {get,bucket:{get} as unknown as R2Bucket};}
+function environment(){const get=vi.fn(async()=>({size:150,json:async()=>({sourceTokenHash})}));return {get,bucket:{get} as unknown as R2Bucket};}
 describe('private preview source transport',()=>{
   it('rejects anonymous and unknown targets before reading private state',async()=>{
     const {bucket,get}=environment();const fetch=vi.fn();

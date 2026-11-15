@@ -20,8 +20,10 @@ export async function fetchPreviewSource(request:Request,bucket:R2Bucket,allowed
   try{
     const control=await bucket.get(controlKey);
     if(!control||control.size>4096)return errorResponse(503);
-    const stored=await control.json<{sourceToken?:string}>();
-    if(!stored.sourceToken||!sameToken(token,stored.sourceToken))return errorResponse(403);
+    const stored=await control.json<{sourceTokenHash?:string}>();
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token));
+    const hash=Array.from(new Uint8Array(digest),value=>value.toString(16).padStart(2,'0')).join('');
+    if(!stored.sourceTokenHash||!sameToken(hash,stored.sourceTokenHash))return errorResponse(403);
     const headers=new Headers({'User-Agent':'SpaceIntelBot/1.0 (+https://space.bytebaud.com)'});
     for(const header of ['Accept','If-None-Match','If-Modified-Since']){const value=request.headers.get(header);if(value)headers.set(header,value);}
     const response=await fetcher(target,{method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(15_000)});

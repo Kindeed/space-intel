@@ -7,10 +7,10 @@ const now=new Date('2026-11-14T10:17:00Z');
 const source={recent:{candidate:true,category:'policy'}} as SourceConfig;
 const previous={checkedSlot:'2026-11-14:4'} as RecentSource;
 describe('preview scheduler and budget',()=>{
-  it('preserves the private transport credential while resetting daily request accounting',()=>{
-    const control={...reserveBudget(undefined,now,'one').control,sourceToken:'1'.repeat(64)};
+  it('preserves only the transport digest while resetting daily request accounting',()=>{
+    const control={...reserveBudget(undefined,now,'one').control,sourceTokenHash:'1'.repeat(64)};
     const next=reserveBudget(control,new Date('2026-11-15T00:17:00Z'),'two');
-    expect(next.control.sourceToken).toBe(control.sourceToken);
+    expect(next.control.sourceTokenHash).toBe(control.sourceTokenHash);
     expect(next.control.reserved).toBe(150);
   });
   it('shares a 600-request daily cap with manual runs and preserves reservations on interruption',()=>{

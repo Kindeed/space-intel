@@ -6,14 +6,14 @@ export const controlSchema = z.object({
   version:z.literal(1), day:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   reserved:z.number().int().min(0).max(600), runId:z.string().max(100),
   lastRunAt:z.string().datetime(),
-  sourceToken:z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  sourceTokenHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),
 });
 export type PreviewControl = z.infer<typeof controlSchema>;
 export function reserveBudget(previous:PreviewControl|undefined, now:Date, runId:string) {
   const day=now.toISOString().slice(0,10);
   const used=previous?.day===day?previous.reserved:0;
   const budget=Math.min(150,600-used);
-  return {budget,control:controlSchema.parse({version:1,day,reserved:used+budget,runId,lastRunAt:now.toISOString(),sourceToken:previous?.sourceToken})};
+  return {budget,control:controlSchema.parse({version:1,day,reserved:used+budget,runId,lastRunAt:now.toISOString(),sourceTokenHash:previous?.sourceTokenHash})};
 }
 export function releaseUnused(control:PreviewControl, runId:string, budget:number, used:number):PreviewControl {
   if(control.runId!==runId || used<0 || used>budget) throw new Error('Invalid reservation completion');

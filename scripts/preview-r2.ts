@@ -2,7 +2,7 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {resolve} from 'node:path';
 import {rmSync} from 'node:fs';
-import {randomBytes} from 'node:crypto';
+import {randomBytes,createHash} from 'node:crypto';
 import {controlSchema,reserveBudget,releaseUnused,type PreviewControl} from '../src/recent/scheduler';
 import {recentSnapshotSchema} from '../src/recent/types';
 import {isRecentDate} from '../src/recent/snapshot';
@@ -31,10 +31,13 @@ if(operation==='prepare'){
   let control:PreviewControl|undefined;
   if(remote('get','control.json','.recent/control.json',true))control=controlSchema.parse(JSON.parse(await readFile('.recent/control.json','utf8')));
   const reservation=reserveBudget(control,new Date(),runId);
-  reservation.control.sourceToken??=randomBytes(32).toString('hex');
+  // Persist only a digest. The asset bucket's public-access setting must not
+  // determine whether a source transport credential stays private.
+  const sourceToken=randomBytes(32).toString('hex');
+  reservation.control.sourceTokenHash=createHash('sha256').update(sourceToken).digest('hex');
   await writeFile('.recent/control.json',JSON.stringify(reservation.control));
   remote('put','control.json','.recent/control.json');
-  await writeFile('.recent/reservation.json',JSON.stringify({runId,budget:reservation.budget,day:reservation.control.day,sourceToken:reservation.control.sourceToken}));
+  await writeFile('.recent/reservation.json',JSON.stringify({runId,budget:reservation.budget,day:reservation.control.day,sourceToken}));
   await writeFile('.recent/usage.json',JSON.stringify({runId,requests:0}));
   if(remote('get','current.json','.recent/previous.json',true)){
     const previous=recentSnapshotSchema.parse(JSON.parse(await readFile('.recent/previous.json','utf8')));
