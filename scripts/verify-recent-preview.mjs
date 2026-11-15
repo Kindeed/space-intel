@@ -9,6 +9,7 @@ await mkdir(output, {recursive:true});
 const browser = await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL || 'chrome',headless:true});
 const results=[];
 let activePage;
+let activeTrace=[];
 const snapshot=await (await fetch(`${base}/recent/current.json`)).json();
 const expectedSources=snapshot.sources.length;
 const populatedCompany=snapshot.companies.find(company=>company.country==='China'&&snapshot.items.some(item=>item.region==='cn'&&item.companyIds.includes(company.id)&&Date.parse(item.publishedAt)>=Date.now()-30*86400000));
@@ -17,6 +18,8 @@ try {
   for (const viewport of [{width:1440,height:1000},{width:820,height:1180},{width:390,height:844},{width:320,height:740}]) {
     const page = await browser.newPage({viewport});
     activePage=page;
+    activeTrace=[];
+    page.on('framenavigated',frame=>{if(frame===page.mainFrame())activeTrace.push(frame.url());});
     const errors=[]; const apis=[]; const dataRequests=[];
     page.on('pageerror',(error)=>errors.push(error.message));
     page.on('request',(request)=>{if(new URL(request.url()).pathname.startsWith('/api/'))apis.push(request.url());});
@@ -35,6 +38,7 @@ try {
 
     await page.getByRole('button',{name:'30 天',exact:true}).click();
     await page.waitForFunction(()=>new URLSearchParams(location.search).get('days')==='30');
+    await page.getByRole('button',{name:'30 天',exact:true,pressed:true}).waitFor();
     if(viewport.width<=620)await page.getByLabel('选择省份').selectOption('湖北');
     else await page.getByLabel('省份筛选').getByRole('button',{name:/湖北/}).click();
     await page.locator('.recent-results').filter({hasText:'湖北'}).waitFor();
@@ -160,7 +164,7 @@ try {
   console.log(JSON.stringify({passed:true,viewports:results,unavailableState:true}));
 } catch(error) {
   if(activePage&&!activePage.isClosed()){
-    console.error(JSON.stringify({failedUrl:activePage.url(),viewport:activePage.viewportSize(),results:await activePage.locator('.recent-results').allTextContents()}));
+    console.error(JSON.stringify({failedUrl:activePage.url(),viewport:activePage.viewportSize(),navigation:activeTrace,results:await activePage.locator('.recent-results').allTextContents()}));
     await activePage.screenshot({path:`${output}/failure.png`,fullPage:false});
   }
   throw error;

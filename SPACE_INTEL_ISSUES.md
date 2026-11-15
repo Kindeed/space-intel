@@ -37,20 +37,20 @@
 ### 2026-11-15 - SI-ISSUE-377 - Rejected discovery reservation erased valid candidate evidence
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | source-discovery
 - Evidence: A shared-budget rejection before an HTTP request was handled as a failed upstream check; candidate success dates could be cleared, the seed cursor advanced and the day marked complete despite zero requests.
 - Fix: Preserve candidate evidence and seed cursor on pre-request deferral; stop further work and record a checked day only after an actual accounted attempt.
-- Regression Check: Reservation-rejection regression verifies zero HTTP calls, unchanged evidence/cursor and no new checked day, with and without seed sources. Local full suite: 79 files / 538 tests passed. Hosted validation pending.
+- Regression Check: Reservation-rejection regression verifies zero HTTP calls, unchanged evidence/cursor and no new checked day, with and without seed sources. Local and hosted full suite: 79 files / 538 tests passed. Hosted run 43672058491 completed with zero new requests and daily accounting unchanged at 325/600. See `docs/UI_REVIEW_2026-11-15.md`.
 
 ### 2026-11-15 - SI-ISSUE-376 - Directory hierarchy and stale navigation filters obstruct browsing
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | frontend
 - Evidence: New-source candidates preceded the entire official directory; 181 source rows lacked search or paging. Company navigation retained project/category/query filters. Search input did not follow browser history. Mobile province selection required horizontal scrolling and small metadata reduced readability.
 - Fix: Collapse candidates, add local directory search/status/paging and project search; clear incompatible company filters, track URL search history, validate unknown view links; use a native mobile province selector and improve touch targets, metadata, wrapping and secondary-page hierarchy.
-- Regression Check: Local browser acceptance passed at 1440/820/390/320 widths, including intersections, empty/error states, URL history, company navigation, project search and directory paging. No legacy API/health calls or browser exceptions. Hosted validation pending.
+- Regression Check: Local and remote browser acceptance passed at 1440/820/390/320 widths, including intersections, empty/error states, back/forward URL history, company navigation, project search, directory paging and keyboard candidate disclosure. No horizontal overflow, legacy API/health calls or browser exceptions; source-directory filters issue no additional data requests. Manual review captured all four views on desktop/mobile. Runtime commit 655b7c4, deployment cc4d3192. See `docs/UI_REVIEW_2026-11-15.md`.
 
 ### 2026-11-15 - SI-ISSUE-375 - Source catalogue does not discover newly published columns
 

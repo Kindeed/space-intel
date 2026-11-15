@@ -1,0 +1,29 @@
+{
+  "items": 283,
+  "domestic": 214,
+  "domesticDirect": 20,
+  "companies": 35,
+  "facilities": 13,
+  "sources": 181,
+  "tracked": 150,
+  "categories": {
+    "news": 267,
+    "policy": 0,
+    "company": 15,
+    "procurement": 1,
+    "approval": 0
+  },
+  "sourceStatus": {
+    "ok": 89,
+    "empty": 8,
+    "error": 53,
+    "directory": 31
+  },
+  "lastCheckedAt": "2026-11-15T02:25:38.174Z",
+  "checks": {
+    "uniqueUrls": true,
+    "datedWithin30Days": true,
+    "validReferences": true,
+    "supplementaryLinksLabelled": true
+  }
+}
