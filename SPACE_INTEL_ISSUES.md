@@ -34,21 +34,31 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-373 - GitHub runner cannot reach some public domestic source origins
+
+- Priority: P2
+- Status: VERIFIED
+- Area: recent-preview | source-transport
+- Evidence: Same-runner Node/curl comparison fails on the same public sources. Authenticated Cloudflare preview probe 43662598142 reads CNSA HTML 200 but still times out on Hainan, demonstrating partial improvement only.
+- Fix: Add a preview-only GET transport with build-time fixed public source whitelist, no arbitrary target URL, no redirects and no forwarding of caller Authorization/Cookie. CI uses a per-run temporary credential; only its SHA-256 digest is stored in the existing preview control object. Configure it for 50 timeout/network failures, excluding explicit HTTP restrictions. Source requests remain in the shared 150/600 budget. Rate-limit and HTTP backoff survive transport changes.
+- Regression Check: Anonymous/unknown-target rejection, credential validation, credential/cookie non-forwarding, size limit and backoff regressions pass. Hosted 43665623470 and 43666269180 publish/deploy successfully; anonymous endpoint check returns 401. Full 77-file/524-test suite and remote 1440/820/390 browser acceptance pass. Final counters: 306/600 source requests, 283 articles, 20 domestic direct links. Remaining failures stay in SI-ISSUE-370.
+- Notes: No new server, plan, binding, production merge or D1 access. This verifies the transport implementation, not all origin availability. Source detail/status evidence is in `docs/source-recovery-evidence-2026-11-15.json`.
+
 ### 2026-11-15 - SI-ISSUE-372 - Public structured listings and payload notices are missed
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | official-sources | parsing
 - Found In: replay of the failed government sources and telemetry company pages
 - Evidence: Ningbo's official EIA page explicitly links a static JSON list containing 9,572 dated records, but the generic HTML collector sees only its iframe. EMPOSAT publishes news metadata in public inline Nuxt JSON; its releaseTime is older than updateTime, so using modification time would invent fresh news. A valid CNSA payload solicitation lacks the narrow classifier's existing keywords and is discarded.
 - Fix: Add opt-in, metadata-only public JSON/Nuxt adapters with strict dates and official article prefixes, ignoring full content and modification time; retain payload/deep-space notices while rejecting unrelated generic schemes. Correct six verified public columns, add Hainan project approval/tender lists and remove the login-only Inner Mongolia application portal from the active pilot. New sources stay disabled in legacy production ingestion.
-- Regression Check: Local cached replay verifies 12 target sources without new requests, including two TTC company articles and one CNSA notice. Nuxt stale-release/new-update, malformed data, old/future/undated rows and unsafe links are covered by the 75-file / 517-test suite; typecheck, lint, build and config checks pass. Hosted preview recovery is pending.
+- Regression Check: Cached replay verifies 13 target sources including the primary tender query. Full 77-file/524-test suite, typecheck/lint/config/build and hosted browser acceptance pass. EMPOSAT public data parses in hosted run 43661545852; the primary spaceport tender parses and publishes in 43666269180. Ningbo schema and CNSA classification are verified locally; their unstable hosted access is tracked separately in SI-ISSUE-370.
 - Notes: Ningbo and EMPOSAT parse successfully but have no qualifying recent rows in the sample. A repaired source is not evidence of a newly approved spaceport. No production merge is authorized.
 
 ### 2026-11-15 - SI-ISSUE-371 - Preview failures hide transport causes and retain replaced-column state
 
 - Priority: P2
-- Status: FIXED
+- Status: VERIFIED
 - Area: recent-preview | source-diagnostics | ingestion
 - Found In: investigation of the 72 failed sources
 - Evidence: 71 of 72 baseline failures return an HTTP response in a bounded local probe, whereas the hosted snapshot reports 61 generic network errors. Local probing finds a login redirect and renamed/empty government columns. Replacing a source URL previously retained old validators/backoff; skipped sources also left a 25-second timer running.
