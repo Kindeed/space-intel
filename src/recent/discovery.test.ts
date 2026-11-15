@@ -18,6 +18,15 @@ describe('source discovery',()=>{
   expect(consumed).toBe(1);expect(result.candidates).toHaveLength(1);
   await runDiscovery({...options,state:result});expect(consumed).toBe(1);
  });
+ it('rechecks promising candidates before new ones so a large pool can complete cross-day validation',async()=>{
+  const candidates=findSourceCandidates('<a href="/new/">政策公告</a><a href="/promising/">新闻动态</a>',parent,new Set(),now);
+  candidates[1]=recordDiscoveryCheck(candidates[1],1,1,now);
+  const visited:string[]=[];
+  const result=await runDiscovery({state:{version:1,seedCursor:0,requestsLastRun:0,candidates},config:[],hints:[],now:new Date('2026-11-16'),budget:1,persist:false,
+    consume:async()=>{},fetchHtml:async url=>{visited.push(url);return '<li><a href="/article/202611/123.html">商业航天产业项目公告</a><span>2026-11-15</span></li>';}});
+  expect(visited).toEqual(['https://example.gov.cn/promising/']);
+  expect(result.candidates.find(candidate=>candidate.url.endsWith('/promising/'))?.status).toBe('ready');
+ });
  it('finds new columns while excluding scripts, articles, login and configured URLs',()=>{
   const html='<a href="/notice/">公示公告</a><a href="/known/">政策文件</a><a href="/202611/article.html">航天新闻</a><a href="/login/">公告办理</a><script><a href="/fake/">招标公告</a></script>';
   expect(findSourceCandidates(html,parent,new Set(['https://example.gov.cn/known/']),now).map(c=>c.url)).toEqual(['https://example.gov.cn/notice/']);

@@ -53,8 +53,10 @@ export async function runDiscovery(options:{state:DiscoveryState;hints:Array<{ht
   try{const html=await fetch(source.url);state=mergeDiscovery(state,findSourceCandidates(html,source,known,now),now);}catch{/* keep existing evidence */}
  }
  const today=now.toISOString().slice(0,10);
- const queue=state.candidates.filter(candidate=>candidate.sameSite&&candidate.checkedAt?.slice(0,10)!==today)
-  .sort((a,b)=>(a.checkedAt??'').localeCompare(b.checkedAt??'')||a.firstSeen.localeCompare(b.firstSeen));
+ const priority={observing:0,pending:1,ready:2,unavailable:3,review:4};
+ const queue=state.candidates.filter(candidate=>candidate.sameSite&&candidate.checkedAt?.slice(0,10)!==today&&
+    (!['ready','unavailable'].includes(candidate.status)||!candidate.checkedAt||Date.parse(candidate.checkedAt)<=now.getTime()-7*86400000))
+  .sort((a,b)=>priority[a.status]-priority[b.status]||(a.checkedAt??'').localeCompare(b.checkedAt??'')||a.firstSeen.localeCompare(b.firstSeen));
  for(const candidate of queue){
   if(requests>=max)break;
   let dated=0,related=0;
