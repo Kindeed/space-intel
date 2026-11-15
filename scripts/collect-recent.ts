@@ -12,6 +12,7 @@ import { retryAt, scheduleSlot, sourceDue } from '../src/recent/scheduler';
 import { expandPublicListingData } from '../src/recent/htmlData';
 import {sourceFailureCode,sourceFailureCategory} from '../src/recent/sourceFailures';
 import {publicJsonListingCollector} from '../src/recent/publicJsonListing';
+import {priorSourceState} from '../src/recent/sourceState';
 
 const replayArg = process.argv.find((arg) => arg.startsWith('--replay='))?.split('=')[1];
 if (replayArg && !/^[a-zA-Z0-9_-]+$/.test(replayArg)) throw new Error('Invalid replay identifier');
@@ -50,11 +51,13 @@ const evidence: Array<{sourceId:string;items:NormalizedItem[];error?:string}> = 
 let requestCount = 0;
 let requestLimit=150;
 let budgetDay:string|undefined;
+let sourceToken:string|undefined;
 try {
-  const reservation=JSON.parse(await readFile('.recent/reservation.json','utf8')) as {budget:number;day:string};
+  const reservation=JSON.parse(await readFile('.recent/reservation.json','utf8')) as {budget:number;day:string;sourceToken?:string};
   if(!Number.isInteger(reservation.budget)||reservation.budget<0||reservation.budget>150)throw new Error('Invalid request reservation');
   requestLimit=reservation.budget;
   budgetDay=reservation.day;
+  sourceToken=reservation.sourceToken;
 }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
 if(process.argv.includes('--validate')){
   console.log(JSON.stringify({valid:true,round,sources:candidates.length,facilities:facilities.length,requests:0}));
@@ -74,7 +77,8 @@ async function collect(source: SourceConfig) {
   const started = Date.now();
   const prior = previous?.sources.find((item) => item.id === source.key);
   // A replaced column must not inherit validators/backoff from its old URL.
-  const old = prior?.url===source.url?prior:undefined;
+  const transport=source.recent?.transport==='preview'&&sourceToken?'preview':'direct';
+  const old = priorSourceState(prior,source.url,transport);
   if(!sourceDue(source,old,now,process.argv.includes('--force')) && old){
     statuses.push({...old,skipped:true,requests:0,durationMs:0});return;
   }
@@ -84,6 +88,7 @@ async function collect(source: SourceConfig) {
   let diagnostic:string|undefined;
   const status: RecentSource = {
     id: source.key, name: source.name, url: source.url, region: source.region,
+    transport,
     category: source.recent!.category, publisherRegion: source.recent?.publisher_region,
     companyIds: source.recent?.companies ?? [], selected: true,
     attemptedAt: now.toISOString(), lastSuccessAt: old?.lastSuccessAt ?? null,
@@ -104,7 +109,15 @@ async function collect(source: SourceConfig) {
           await recordUsage();
           const headers=new Headers(init?.headers);
           if(target===source.url&&!process.argv.includes('--force')){if(old?.etag)headers.set('if-none-match',old.etag);if(old?.lastModified)headers.set('if-modified-since',old.lastModified);}
-          response=await fetch(target,{...init,headers,signal:abort.signal,redirect:'manual'});
+          if(transport==='preview'&&target===source.url){
+            const endpoint=new URL('https://recent-aggregation-preview.space-intel.pages.dev/recent/source-fetch');
+            endpoint.searchParams.set('source',source.key);
+            const privateHeaders=new Headers(headers);privateHeaders.set('Authorization',`Bearer ${sourceToken}`);
+            response=await fetch(endpoint,{...init,headers:privateHeaders,signal:abort.signal,redirect:'manual'});
+            if(response.headers.get('X-Recent-Source-Transport')!=='v1'){
+              await response.body?.cancel();throw new Error('preview_transport_unavailable');
+            }
+          }else response=await fetch(target,{...init,headers,signal:abort.signal,redirect:'manual'});
           if([301,302,303,307,308].includes(response.status)){
             const location=response.headers.get('location');await response.body?.cancel();
             if(!location)throw new Error('invalid_redirect');

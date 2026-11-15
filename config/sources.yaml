@@ -512,6 +512,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 全国
+      transport: preview
 
   - key: miit-news
     name: 工业和信息化部新闻
@@ -1239,6 +1240,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 江苏
+      transport: preview
   - key: recent-hubei-industry
     name: 湖北经信热点聚焦
     type: official_page
@@ -1552,6 +1554,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 河北
+      transport: preview
 
   - key: regional-7c72e8effc6f
     name: 河北 省发展和改革委员会 · 公告公示
@@ -1581,6 +1584,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 河北
+      transport: preview
 
   - key: regional-ea98cd2ae8b7
     name: 河北 省科学技术厅 · 通知公告
@@ -1610,6 +1614,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 河北
+      transport: preview
 
   - key: regional-dc46727d8609
     name: 天津 市发展改革委 · 通知公告
@@ -1649,7 +1654,8 @@ sources:
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -1678,7 +1684,8 @@ sources:
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -1726,6 +1733,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 山西
+      transport: preview
 
   - key: regional-cb7fadf1b823
     name: 山西 省发展和改革委员会 · 审批核准备案
@@ -1755,6 +1763,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 山西
+      transport: preview
 
   - key: regional-0ea29d32dfdf
     name: 山西 省科学技术厅 · 政策法规
@@ -1784,6 +1793,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 山西
+      transport: preview
 
   - key: regional-8d31f0c212e2
     name: 国家 国家国防科技工业局 · 通知公告
@@ -2190,6 +2200,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 福建
+      transport: preview
 
   - key: regional-a9bbd69acbdf
     name: 福建 省科技厅 · 政策文件
@@ -2219,6 +2230,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 福建
+      transport: preview
 
   - key: regional-eb51a7017bc2
     name: 福建 福建省经济信息中心 · 通知公告
@@ -2277,6 +2289,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 重庆
+      transport: preview
 
   - key: regional-dc94216cbc6d
     name: 重庆 市发展改革委 · 政策文件
@@ -2306,6 +2319,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 重庆
+      transport: preview
 
   - key: regional-1f50b1ba571e
     name: 重庆经信 · 其他政策文件
@@ -2316,7 +2330,8 @@ sources:
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -2335,6 +2350,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 重庆
+      transport: preview
 
   - key: regional-3a8e41ec2f5b
     name: 四川 省发展改革委 · 通知公告
@@ -2364,6 +2380,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 四川
+      transport: preview
 
   - key: regional-b922a2143a80
     name: 四川 省发展改革委 · 政策文件
@@ -2393,6 +2410,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 四川
+      transport: preview
 
   - key: regional-e511fd76fa5a
     name: 四川 经济和信息化厅 · 新闻中心
@@ -2422,6 +2440,7 @@ sources:
       candidate: true
       category: news
       publisher_region: 四川
+      transport: preview
 
   - key: regional-ab81c2bca2eb
     name: 贵州 省发展改革委 · 通知公告
@@ -2451,6 +2470,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 贵州
+      transport: preview
 
   - key: regional-71abaf31e736
     name: 贵州 省发展改革委 · 政策文件
@@ -2480,6 +2500,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 贵州
+      transport: preview
 
   - key: regional-6e9cbdc0b6e5
     name: 贵州 省科技厅 · 通知公告
@@ -2596,6 +2617,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 陕西
+      transport: preview
 
   - key: regional-865cacecb026
     name: 陕西 省科技厅 · 通知公告
@@ -2625,6 +2647,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 陕西
+      transport: preview
 
   - key: regional-53a77ed6c6e6
     name: 陕西 省科技厅 · 工作动态
@@ -2654,6 +2677,7 @@ sources:
       candidate: true
       category: news
       publisher_region: 陕西
+      transport: preview
 
   - key: regional-cb11c3fc7ecc
     name: 西藏 自治区发展和改革委员会 · 通知公告
@@ -2683,6 +2707,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 西藏
+      transport: preview
 
   - key: regional-7e16a51924f7
     name: 西藏 自治区发展和改革委员会 · 通知公告
@@ -2712,6 +2737,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 西藏
+      transport: preview
 
   - key: regional-4e09f478fe28
     name: 西藏 自治区科学技术厅 · 通知公告
@@ -2741,6 +2767,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 西藏
+      transport: preview
 
   - key: regional-9bab3df08366
     name: 新疆 科学技术厅 · 政策文件
@@ -2770,6 +2797,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 新疆
+      transport: preview
 
   - key: regional-b1b067bd7718
     name: 新疆 科学技术厅 · 新闻中心
@@ -2799,6 +2827,7 @@ sources:
       candidate: true
       category: news
       publisher_region: 新疆
+      transport: preview
 
   - key: regional-2dfedef7a9c2
     name: 新疆 工业和信息化厅 · 政策文件
@@ -2828,6 +2857,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 新疆
+      transport: preview
 
   - key: regional-56cd6a4f7873
     name: 宁夏 自治区发展和改革委员会 · 通知公告
@@ -2857,6 +2887,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 宁夏
+      transport: preview
 
   - key: regional-75986457ba2e
     name: 宁夏 自治区发展和改革委员会 · 工作动态
@@ -2886,6 +2917,7 @@ sources:
       candidate: true
       category: news
       publisher_region: 宁夏
+      transport: preview
 
   - key: regional-cc602dbd5d8a
     name: 宁夏 自治区科学技术厅 · 通知公告
@@ -2915,6 +2947,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 宁夏
+      transport: preview
 
   - key: regional-787094b3e1dd
     name: 海南发展改革委 · 通知公告
@@ -2944,6 +2977,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 海南
+      transport: preview
 
   - key: regional-e9d53d3638ec
     name: 海南发展改革委 · 政策文件
@@ -2973,6 +3007,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 海南
+      transport: preview
 
   - key: regional-42565815064d
     name: 文昌政府 · 公示公告
@@ -3002,6 +3037,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 海南
+      transport: preview
 
   - key: regional-b4ddb96b2bdd
     name: 文昌政府 · 政策文件
@@ -3031,6 +3067,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 海南
+      transport: preview
 
   - key: regional-d46b33962a55
     name: 海阳政府 · 通知公告
@@ -3147,6 +3184,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 甘肃
+      transport: preview
 
   - key: regional-b76b3d1c32e6
     name: 酒泉生态环境 · 公示公告
@@ -3176,6 +3214,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 甘肃
+      transport: preview
 
   - key: regional-e8ac24d64f9e
     name: 酒泉生态环境 · 新闻中心
@@ -3205,6 +3244,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 甘肃
+      transport: preview
 
   - key: regional-a54f74f61bcb
     name: 酒泉生态环境 · 工作动态
@@ -3234,6 +3274,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 甘肃
+      transport: preview
 
   - key: regional-108fbac5b672
     name: 浙江生态环境厅 · 通知公告
@@ -3263,6 +3304,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-7991c1614409
     name: 浙江生态环境厅 · 政策文件及解读
@@ -3292,6 +3334,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-0cd68bf3a3df
     name: 浙江生态环境厅 · 环境影响评价审批
@@ -3302,7 +3345,8 @@ sources:
     enabled: false
     purpose: 跟踪商业发射场、海上发射及配套项目的规划、环评、用地和建设公示。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3321,6 +3365,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-c55de1289fe7
     name: 象山政府 · 公告公示
@@ -3408,6 +3453,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-31ae4c80314f
     name: 宁波自然资源规划 · 公示公告
@@ -3437,6 +3483,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-52dc9d461cf0
     name: 宁波自然资源规划 · 政策文件
@@ -3466,6 +3513,7 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-83ebcf73554b
     name: 宁波生态环境 · 公开环评清单
@@ -3476,7 +3524,8 @@ sources:
     enabled: false
     purpose: 读取宁波生态环境官网公开 iframe 明确引用的静态 JSON，跟踪商业航天相关环评受理、拟批复及决定。
     expected_content: 真实发布日期、项目标题、公告类别及官方详情链接；只保留近 30 天相关元数据，不下载报告书。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3729,6 +3778,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 安徽
+      transport: preview
 
   - key: regional-70e9f8e8b0ac
     name: 浙江经信 · 政策法规
@@ -3758,6 +3808,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-f8ca5ceb7e97
     name: 浙江经信 · 文件通知
@@ -3787,6 +3838,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 浙江
+      transport: preview
 
   - key: regional-f3899a4a00ee
     name: 江苏工信 · 文件通知
@@ -3816,6 +3868,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 江苏
+      transport: preview
 
   - key: regional-f9c305918c6e
     name: 海南工信 · 通知公告
@@ -3845,6 +3898,7 @@ sources:
       candidate: true
       category: policy
       publisher_region: 海南
+      transport: preview
 
   - key: ttc-emposat
     name: 航天驭星
@@ -3855,7 +3909,8 @@ sources:
     enabled: false
     purpose: 跟踪测运控、遥测、地面系统、星地通信及相关企业动态。
     expected_content: 带真实日期的公司新闻/业务进展/公开公告。
-    risk_notes: 仅解析官网公开内嵌 application/json 新闻元数据，不执行 JS、不调用未公开接口；使用 releaseTime 而不是 updateTime，无近期发布时保持空资讯。
+    risk_notes: 仅解析官网公开内嵌 application/json 新闻元数据，不执行 JS、不调用未公开接口；使用 releaseTime 而不是
+      updateTime，无近期发布时保持空资讯。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3907,6 +3962,7 @@ sources:
       companies:
         - tianta
       focus: ttc
+      transport: preview
 
   - key: ttc-tyspace
     name: 天银星际
@@ -5270,7 +5326,8 @@ sources:
     enabled: false
     purpose: 跟踪商业航天产业扶持及发射场/地面设施相关项目公示。
     expected_content: 有真实日期的政策、申报、公示与项目公告。
-    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
+    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。 2026-11-15
+      已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:

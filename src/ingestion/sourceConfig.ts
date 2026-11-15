@@ -71,6 +71,7 @@ const sourceSchema = z.object({
     directory: z.boolean().optional(),
     cadence:z.enum(['twice','four']).optional(),
     format:z.enum(['ningbo_eia_json','nuxt_news']).optional(),
+    transport:z.literal('preview').optional(),
     article_url_prefix:sourceUrlSchema.optional(),
   }).optional(),
 });

@@ -540,7 +540,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "全国"
+        "publisher_region": "全国",
+        "transport": "preview"
       }
     },
     {
@@ -1511,7 +1512,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "江苏"
+        "publisher_region": "江苏",
+        "transport": "preview"
       }
     },
     {
@@ -1888,7 +1890,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "河北"
+        "publisher_region": "河北",
+        "transport": "preview"
       }
     },
     {
@@ -1920,7 +1923,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "河北"
+        "publisher_region": "河北",
+        "transport": "preview"
       }
     },
     {
@@ -1952,7 +1956,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "河北"
+        "publisher_region": "河北",
+        "transport": "preview"
       }
     },
     {
@@ -2080,7 +2085,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "山西"
+        "publisher_region": "山西",
+        "transport": "preview"
       }
     },
     {
@@ -2112,7 +2118,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "山西"
+        "publisher_region": "山西",
+        "transport": "preview"
       }
     },
     {
@@ -2144,7 +2151,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "山西"
+        "publisher_region": "山西",
+        "transport": "preview"
       }
     },
     {
@@ -2592,7 +2600,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "福建"
+        "publisher_region": "福建",
+        "transport": "preview"
       }
     },
     {
@@ -2624,7 +2633,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "福建"
+        "publisher_region": "福建",
+        "transport": "preview"
       }
     },
     {
@@ -2688,7 +2698,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "重庆"
+        "publisher_region": "重庆",
+        "transport": "preview"
       }
     },
     {
@@ -2720,7 +2731,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "重庆"
+        "publisher_region": "重庆",
+        "transport": "preview"
       }
     },
     {
@@ -2752,7 +2764,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "重庆"
+        "publisher_region": "重庆",
+        "transport": "preview"
       }
     },
     {
@@ -2784,7 +2797,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "四川"
+        "publisher_region": "四川",
+        "transport": "preview"
       }
     },
     {
@@ -2816,7 +2830,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "四川"
+        "publisher_region": "四川",
+        "transport": "preview"
       }
     },
     {
@@ -2848,7 +2863,8 @@
       "recent": {
         "candidate": true,
         "category": "news",
-        "publisher_region": "四川"
+        "publisher_region": "四川",
+        "transport": "preview"
       }
     },
     {
@@ -2880,7 +2896,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "贵州"
+        "publisher_region": "贵州",
+        "transport": "preview"
       }
     },
     {
@@ -2912,7 +2929,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "贵州"
+        "publisher_region": "贵州",
+        "transport": "preview"
       }
     },
     {
@@ -3040,7 +3058,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "陕西"
+        "publisher_region": "陕西",
+        "transport": "preview"
       }
     },
     {
@@ -3072,7 +3091,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "陕西"
+        "publisher_region": "陕西",
+        "transport": "preview"
       }
     },
     {
@@ -3104,7 +3124,8 @@
       "recent": {
         "candidate": true,
         "category": "news",
-        "publisher_region": "陕西"
+        "publisher_region": "陕西",
+        "transport": "preview"
       }
     },
     {
@@ -3136,7 +3157,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "西藏"
+        "publisher_region": "西藏",
+        "transport": "preview"
       }
     },
     {
@@ -3168,7 +3190,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "西藏"
+        "publisher_region": "西藏",
+        "transport": "preview"
       }
     },
     {
@@ -3200,7 +3223,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "西藏"
+        "publisher_region": "西藏",
+        "transport": "preview"
       }
     },
     {
@@ -3232,7 +3256,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "新疆"
+        "publisher_region": "新疆",
+        "transport": "preview"
       }
     },
     {
@@ -3264,7 +3289,8 @@
       "recent": {
         "candidate": true,
         "category": "news",
-        "publisher_region": "新疆"
+        "publisher_region": "新疆",
+        "transport": "preview"
       }
     },
     {
@@ -3296,7 +3322,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "新疆"
+        "publisher_region": "新疆",
+        "transport": "preview"
       }
     },
     {
@@ -3328,7 +3355,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "宁夏"
+        "publisher_region": "宁夏",
+        "transport": "preview"
       }
     },
     {
@@ -3360,7 +3388,8 @@
       "recent": {
         "candidate": true,
         "category": "news",
-        "publisher_region": "宁夏"
+        "publisher_region": "宁夏",
+        "transport": "preview"
       }
     },
     {
@@ -3392,7 +3421,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "宁夏"
+        "publisher_region": "宁夏",
+        "transport": "preview"
       }
     },
     {
@@ -3424,7 +3454,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "海南"
+        "publisher_region": "海南",
+        "transport": "preview"
       }
     },
     {
@@ -3456,7 +3487,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "海南"
+        "publisher_region": "海南",
+        "transport": "preview"
       }
     },
     {
@@ -3488,7 +3520,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "海南"
+        "publisher_region": "海南",
+        "transport": "preview"
       }
     },
     {
@@ -3520,7 +3553,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "海南"
+        "publisher_region": "海南",
+        "transport": "preview"
       }
     },
     {
@@ -3648,7 +3682,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "甘肃"
+        "publisher_region": "甘肃",
+        "transport": "preview"
       }
     },
     {
@@ -3680,7 +3715,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "甘肃"
+        "publisher_region": "甘肃",
+        "transport": "preview"
       }
     },
     {
@@ -3712,7 +3748,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "甘肃"
+        "publisher_region": "甘肃",
+        "transport": "preview"
       }
     },
     {
@@ -3744,7 +3781,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "甘肃"
+        "publisher_region": "甘肃",
+        "transport": "preview"
       }
     },
     {
@@ -3776,7 +3814,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -3808,7 +3847,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -3840,7 +3880,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -3936,7 +3977,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -3968,7 +4010,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -4000,7 +4043,8 @@
       "recent": {
         "candidate": true,
         "category": "approval",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -4290,7 +4334,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "安徽"
+        "publisher_region": "安徽",
+        "transport": "preview"
       }
     },
     {
@@ -4322,7 +4367,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -4354,7 +4400,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "浙江"
+        "publisher_region": "浙江",
+        "transport": "preview"
       }
     },
     {
@@ -4386,7 +4433,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "江苏"
+        "publisher_region": "江苏",
+        "transport": "preview"
       }
     },
     {
@@ -4418,7 +4466,8 @@
       "recent": {
         "candidate": true,
         "category": "policy",
-        "publisher_region": "海南"
+        "publisher_region": "海南",
+        "transport": "preview"
       }
     },
     {
@@ -4488,7 +4537,8 @@
         "companies": [
           "tianta"
         ],
-        "focus": "ttc"
+        "focus": "ttc",
+        "transport": "preview"
       }
     },
     {

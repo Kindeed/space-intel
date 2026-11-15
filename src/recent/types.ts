@@ -25,6 +25,7 @@ export const recentSourceSchema = z.object({
   region: z.enum(['cn', 'global']), category: z.enum(recentCategories),
   publisherRegion: z.string().optional(), companyIds: z.array(z.string()),
   selected: z.boolean(), attemptedAt: z.string().datetime(),
+  transport:z.enum(['direct','preview']).optional(),
   lastSuccessAt: z.string().datetime().nullable(),
   status: z.enum(['ok', 'empty', 'error', 'directory']),
   errorCategory: z.enum(['http_error', 'rate_limited', 'timeout', 'parse_error', 'network_error', 'budget']).optional(),
