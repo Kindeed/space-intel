@@ -23,6 +23,13 @@ function build(incoming: RecentItem[], previous?: RecentSnapshot, sources=[statu
 }
 
 describe('recent news snapshots', () => {
+  it('retains genuine payload and deep-space notices without admitting generic schemes',()=>{
+    const policy={...source,recent:{...source.recent!,category:'policy' as const}};
+    const notice=classifyItem(raw({title:'关于开展天问四号任务有效载荷研制方案征集工作的通知'}),policy,companies,provinces,now);
+    expect(notice?.category).toBe('policy');
+    expect(build([notice!]).items).toHaveLength(1);
+    expect(classifyItem(raw({title:'关于征集充电设施研制方案的通知'}),policy,companies,provinces,now)).toBeNull();
+  });
   it('uses project locations rather than the company publisher headquarters', () => {
     expect(item().provinces).toEqual(['湖北']);
     expect(item({}).companyIds).toEqual(['minospace']);

@@ -70,6 +70,8 @@ const sourceSchema = z.object({
     focus: z.enum(['ttc', 'spaceport']).optional(),
     directory: z.boolean().optional(),
     cadence:z.enum(['twice','four']).optional(),
+    format:z.enum(['ningbo_eia_json','nuxt_news']).optional(),
+    article_url_prefix:sourceUrlSchema.optional(),
   }).optional(),
 });
 

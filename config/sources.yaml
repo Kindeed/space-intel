@@ -1641,15 +1641,15 @@ sources:
       publisher_region: 天津
 
   - key: regional-4a7413a5704b
-    name: 天津 市发展改革委 · 政策文件
+    name: 天津发改 · 委内文件
     type: official_page
     region: cn
-    url: https://fzgg.tj.gov.cn/zwgk_47325/zcfg_47338/zcwjx/
+    url: https://fzgg.tj.gov.cn/zwgk_47325/zcfg_47338/zcwjx/fgwj/
     credibility: 5
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -1670,15 +1670,15 @@ sources:
       publisher_region: 天津
 
   - key: regional-2af78325b39f
-    name: 天津 市工业和信息化局 · 政策法规
+    name: 天津工信 · 国家级政策文件
     type: official_page
     region: cn
-    url: https://gyxxh.tj.gov.cn/ZWGK4147/ZCWJ6355/
+    url: https://gyxxh.tj.gov.cn/ZWGK4147/ZCWJ6355/gjjwj/
     credibility: 5
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -1939,7 +1939,7 @@ sources:
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 2026-11-15 公开地址实际跳转统一登录办理系统，已退出自动试采；不获取登录态或绕过认证。未来须找到独立公开审批公示列表再启用。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -1955,7 +1955,7 @@ sources:
       - 北斗
     exclude_terms: []
     recent:
-      candidate: true
+      candidate: false
       category: policy
       publisher_region: 内蒙古
 
@@ -2308,15 +2308,15 @@ sources:
       publisher_region: 重庆
 
   - key: regional-1f50b1ba571e
-    name: 重庆 市经济信息委 · 政策文件
+    name: 重庆经信 · 其他政策文件
     type: official_page
     region: cn
-    url: https://jjxxw.cq.gov.cn/zwgk_213/zcwj/
+    url: https://jjxxw.cq.gov.cn/zwgk_213/zcwj/qtwj/
     credibility: 5
     enabled: false
     purpose: 跟踪省级商业航天政策、产业项目、申报和公告。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3294,15 +3294,15 @@ sources:
       publisher_region: 浙江
 
   - key: regional-0cd68bf3a3df
-    name: 浙江生态环境厅 · 行政许可（审批）公示
+    name: 浙江生态环境厅 · 环境影响评价审批
     type: official_page
     region: cn
-    url: https://sthjt.zj.gov.cn/col/col1229139805/index.html
+    url: https://sthjt.zj.gov.cn/col/col1201951/index.html
     credibility: 5
     enabled: false
     purpose: 跟踪商业发射场、海上发射及配套项目的规划、环评、用地和建设公示。
     expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3468,15 +3468,15 @@ sources:
       publisher_region: 浙江
 
   - key: regional-83ebcf73554b
-    name: 宁波生态环境 · 建设项目审批公告 >
+    name: 宁波生态环境 · 公开环评清单
     type: official_page
     region: cn
-    url: https://sthjj.ningbo.gov.cn/col/col1229194563/index.html
+    url: https://jyh.nbepb.gov.cn/Json/CPA/List-1.json
     credibility: 5
     enabled: false
-    purpose: 跟踪商业发射场、海上发射及配套项目的规划、环评、用地和建设公示。
-    expected_content: 带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。
-    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。
+    purpose: 读取宁波生态环境官网公开 iframe 明确引用的静态 JSON，跟踪商业航天相关环评受理、拟批复及决定。
+    expected_content: 真实发布日期、项目标题、公告类别及官方详情链接；只保留近 30 天相关元数据，不下载报告书。
+    risk_notes: 通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3495,6 +3495,8 @@ sources:
       candidate: true
       category: approval
       publisher_region: 浙江
+      format: ningbo_eia_json
+      article_url_prefix: https://sthjj.ningbo.gov.cn/art/2020/7/27/art_1229194563_53155072.html?InfoID=
 
   - key: regional-35e63e8ff095
     name: 北京经信 · 政策文件
@@ -3853,7 +3855,7 @@ sources:
     enabled: false
     purpose: 跟踪测运控、遥测、地面系统、星地通信及相关企业动态。
     expected_content: 带真实日期的公司新闻/业务进展/公开公告。
-    risk_notes: 仅预览；官网有动态渲染或访问限制时保留目录并标注未确认，不绕过限制。
+    risk_notes: 仅解析官网公开内嵌 application/json 新闻元数据，不执行 JS、不调用未公开接口；使用 releaseTime 而不是 updateTime，无近期发布时保持空资讯。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -3873,6 +3875,8 @@ sources:
       companies:
         - emposat
       focus: ttc
+      format: nuxt_news
+      article_url_prefix: https://www.emposat.com/dynamic/news/detail?id=
 
   - key: ttc-tianta
     name: 中科天塔
@@ -5258,15 +5262,15 @@ sources:
       publisher_region: 山东
 
   - key: yantai-eia-notices
-    name: 烟台生态环境环评公示
+    name: 烟台生态环境 · 环评公示
     type: official_page
     region: cn
-    url: https://hbj.yantai.gov.cn/col/col23569/index.html
+    url: https://hbj.yantai.gov.cn/col/col23547/index.html
     credibility: 5
     enabled: false
     purpose: 跟踪商业航天产业扶持及发射场/地面设施相关项目公示。
     expected_content: 有真实日期的政策、申报、公示与项目公告。
-    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。
+    risk_notes: 来自官方栏目导航；保留原站HTTP入口，不传输凭据，公示与最终批准分开标注。 2026-11-15 已按原页公开跳转/链接核对现栏目；云端出口可用性需独立验证，不把 HTTP 200 或栏目接入等同于近期相关公告。
     dedupe_strategy: canonical_url_title
     max_items: 30
     include_terms:
@@ -5283,3 +5287,61 @@ sources:
       candidate: true
       category: approval
       publisher_region: 山东
+  - type: official_page
+    region: cn
+    credibility: 5
+    enabled: false
+    dedupe_strategy: canonical_url_title
+    max_items: 30
+    include_terms:
+      - 商业航天
+      - 航天
+      - 卫星
+      - 火箭
+      - 发射场
+      - 测控
+      - 遥测
+      - 航天港
+      - 星地
+    exclude_terms: []
+    key: hainan-spaceport-project-approvals
+    name: 海南发改 · 项目审批
+    url: https://plan.hainan.gov.cn/sfgw/xmsp/list3.shtml
+    purpose: 跟踪商业发射场、卫星测控及地面设施的公开项目审批信息。
+    expected_content: 有真实日期、标题、项目主体及原始公告链接的航天相关记录。
+    risk_notes: 来自海南发改官网明确导航，2026-11-15 本地可访问；仅公开列表，不采集登录办理内容，不下载附件，栏目可用不等于本轮存在相关项目。
+    recent:
+      candidate: true
+      category: approval
+      publisher_region: 海南
+      focus: spaceport
+      cadence: twice
+  - type: official_page
+    region: cn
+    credibility: 5
+    enabled: false
+    dedupe_strategy: canonical_url_title
+    max_items: 30
+    include_terms:
+      - 商业航天
+      - 航天
+      - 卫星
+      - 火箭
+      - 发射场
+      - 测控
+      - 遥测
+      - 航天港
+      - 星地
+    exclude_terms: []
+    key: hainan-spaceport-tenders
+    name: 海南发改 · 招标投标
+    url: https://plan.hainan.gov.cn/sfgw/zbtb/list3.shtml
+    purpose: 跟踪发射场及商业航天地面设施的公开招投标通知与项目线索。
+    expected_content: 有真实日期、标题、项目主体及原始公告链接的航天相关记录。
+    risk_notes: 来自海南发改官网明确导航，2026-11-15 本地可访问；仅公开列表，不采集登录办理内容，不下载附件，栏目可用不等于本轮存在相关项目。
+    recent:
+      candidate: true
+      category: procurement
+      publisher_region: 海南
+      focus: spaceport
+      cadence: twice

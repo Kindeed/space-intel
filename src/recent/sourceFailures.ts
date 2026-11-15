@@ -16,3 +16,12 @@ export function sourceFailureCode(error:unknown):string {
   }
   return 'UNKNOWN';
 }
+
+export function sourceFailureCategory(error:unknown,aborted=false):'budget'|'timeout'|'http_error'|'parse_error'|'network_error' {
+  const code=sourceFailureCode(error);
+  if(code==='REQUEST_BUDGET')return 'budget';
+  if(aborted||code==='ETIMEDOUT'||code==='UND_ERR_CONNECT_TIMEOUT'||code==='UND_ERR_HEADERS_TIMEOUT'||code==='UND_ERR_BODY_TIMEOUT')return 'timeout';
+  if(code==='AUTH_REQUIRED'||code.startsWith('HTTP_'))return 'http_error';
+  if(error instanceof Error&&/parse|xml|charset/i.test(error.message))return 'parse_error';
+  return 'network_error';
+}

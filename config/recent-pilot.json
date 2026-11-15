@@ -41,7 +41,6 @@
     "regional-8faadedcb5bd",
     "regional-ccac393f359e",
     "regional-9ab1e018d5fe",
-    "regional-703c20d4e83a",
     "regional-35dec6b64ad7",
     "regional-c3d9397ca287",
     "regional-1674fa3bd0ea",
@@ -148,7 +147,9 @@
     "cn-company-discovery",
     "shandong-industry-notices",
     "shandong-industry-policy",
-    "yantai-eia-notices"
+    "yantai-eia-notices",
+    "hainan-spaceport-project-approvals",
+    "hainan-spaceport-tenders"
   ],
   "validation": "Expanded preview trial; source states distinguish parsed, quiet, blocked and directory-only entries. No production ingestion."
 }

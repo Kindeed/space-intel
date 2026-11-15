@@ -43,6 +43,8 @@ export type SourceConfig = {
     focus?: 'ttc' | 'spaceport';
     directory?: boolean;
     cadence?: 'twice'|'four';
+    format?: 'ningbo_eia_json'|'nuxt_news';
+    article_url_prefix?: string;
   };
 };
 

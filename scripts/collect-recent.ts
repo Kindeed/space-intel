@@ -10,7 +10,8 @@ import { classifyItem, buildRecentSnapshot, isRecentDate } from '../src/recent/s
 import { recentSnapshotSchema, type RecentSnapshot, type RecentSource } from '../src/recent/types';
 import { retryAt, scheduleSlot, sourceDue } from '../src/recent/scheduler';
 import { expandPublicListingData } from '../src/recent/htmlData';
-import {sourceFailureCode} from '../src/recent/sourceFailures';
+import {sourceFailureCode,sourceFailureCategory} from '../src/recent/sourceFailures';
+import {publicJsonListingCollector} from '../src/recent/publicJsonListing';
 
 const replayArg = process.argv.find((arg) => arg.startsWith('--replay='))?.split('=')[1];
 if (replayArg && !/^[a-zA-Z0-9_-]+$/.test(replayArg)) throw new Error('Invalid replay identifier');
@@ -102,7 +103,7 @@ async function collect(source: SourceConfig) {
           requestCount += 1; requests += 1;
           await recordUsage();
           const headers=new Headers(init?.headers);
-          if(target===source.url){if(old?.etag)headers.set('if-none-match',old.etag);if(old?.lastModified)headers.set('if-modified-since',old.lastModified);}
+          if(target===source.url&&!process.argv.includes('--force')){if(old?.etag)headers.set('if-none-match',old.etag);if(old?.lastModified)headers.set('if-modified-since',old.lastModified);}
           response=await fetch(target,{...init,headers,signal:abort.signal,redirect:'manual'});
           if([301,302,303,307,308].includes(response.status)){
             const location=response.headers.get('location');await response.body?.cancel();
@@ -142,7 +143,7 @@ async function collect(source: SourceConfig) {
         return new Response(text, {status:response.status,headers:response.headers});
       }) as typeof fetch,
     };
-    const collector = source.type === 'rss' ? rssCollector : source.type==='google_news_rss'?googleNewsRssCollector:officialPageCollector;
+    const collector = source.recent?.format?publicJsonListingCollector:source.type === 'rss' ? rssCollector : source.type==='google_news_rss'?googleNewsRssCollector:officialPageCollector;
     const items = await collector.collect({ ...source, enabled: true, strict_dates: true, max_items: 30 }, context);
     status.collected = items.length;
     const recent = items.map((item) => classifyItem(item,source,companies,regions,now,facilities)).filter((item) => item !== null);
@@ -161,8 +162,7 @@ async function collect(source: SourceConfig) {
     }
     const message = error instanceof Error ? error.message : String(error);
     diagnostic=sourceFailureCode(error);
-    status.errorCategory = error instanceof RateLimited?'rate_limited':/budget/.test(message) ? 'budget' : abort.signal.aborted ? 'timeout'
-      : /HTTP \d+/.test(message) ? 'http_error' : /parse|xml|charset/i.test(message) ? 'parse_error' : 'network_error';
+    status.errorCategory = error instanceof RateLimited?'rate_limited':sourceFailureCategory(error,abort.signal.aborted);
     evidence.push({sourceId:source.key,items:[],error:message.slice(0,300)});
     // A local budget deferral is not an upstream failure: allow the next slot
     // to pick it up, rather than repeatedly starving lower-priority sources.
