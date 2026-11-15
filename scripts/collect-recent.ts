@@ -13,6 +13,7 @@ import { expandPublicListingData } from '../src/recent/htmlData';
 import {sourceFailureCode,sourceFailureCategory} from '../src/recent/sourceFailures';
 import {publicJsonListingCollector} from '../src/recent/publicJsonListing';
 import {priorSourceState} from '../src/recent/sourceState';
+import {loadDiscovery,runDiscovery} from './recent-discovery';
 
 const replayArg = process.argv.find((arg) => arg.startsWith('--replay='))?.split('=')[1];
 if (replayArg && !/^[a-zA-Z0-9_-]+$/.test(replayArg)) throw new Error('Invalid replay identifier');
@@ -71,6 +72,10 @@ async function recordUsage(){
   await usageQueue;
 }
 class Unchanged extends Error {}
+const discoveryState=await loadDiscovery();
+const discoveryDue=!replay&&discoveryState.lastRunDay!==now.toISOString().slice(0,10);
+const collectionLimit=Math.max(0,requestLimit-(discoveryDue?Math.min(10,requestLimit):0));
+const discoveryHints:Array<{html:string;source:SourceConfig}>=[];
 class RateLimited extends Error {constructor(readonly nextAttempt:string){super('rate_limited');}}
 
 async function collect(source: SourceConfig) {
@@ -104,7 +109,7 @@ async function collect(source: SourceConfig) {
         let target=typeof url==='string'?url:url instanceof URL?url.href:url.url;
         let response:Response;
         for(;;){
-          if (requestCount >= requestLimit || requests >= 2 || (budgetDay&&new Date().toISOString().slice(0,10)!==budgetDay)) throw new Error('request_budget');
+          if (requestCount >= collectionLimit || requests >= 2 || (budgetDay&&new Date().toISOString().slice(0,10)!==budgetDay)) throw new Error('request_budget');
           requestCount += 1; requests += 1;
           await recordUsage();
           const headers=new Headers(init?.headers);
@@ -153,6 +158,7 @@ async function collect(source: SourceConfig) {
         for (const chunk of chunks) { body.set(chunk,position); position += chunk.length; }
         const charset = response.headers.get('content-type')?.match(/charset\s*=\s*([\w-]+)/i)?.[1];
         const text = new TextDecoder(charset || 'utf-8').decode(body);
+        if(target===source.url&&source.type==='official_page'&&discoveryHints.length<160)discoveryHints.push({html:text,source});
         return new Response(text, {status:response.status,headers:response.headers});
       }) as typeof fetch,
     };
@@ -201,6 +207,10 @@ if (replay) {
   }));
 }
 statuses.sort((a,b) => a.id.localeCompare(b.id));
+if(!replay)await runDiscovery({state:discoveryState,hints:discoveryHints,config,now,budget:Math.min(10,requestLimit-requestCount),consume:async()=>{
+  if(requestCount>=requestLimit||(budgetDay&&new Date().toISOString().slice(0,10)!==budgetDay))throw new Error('request_budget');
+  requestCount++;await recordUsage();
+}});
 const directories:RecentSource[]=config.filter((source)=>source.recent?.directory).map((source)=>({
   id:source.key,name:source.name,url:source.url,region:source.region,category:source.recent!.category,
   publisherRegion:source.recent?.publisher_region,companyIds:[],selected:false,attemptedAt:now.toISOString(),

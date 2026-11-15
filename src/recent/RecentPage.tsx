@@ -4,18 +4,29 @@ import { ArrowUpRight, Building2, Globe2, Radio, RefreshCw, Rocket, Search, Slid
 import { filterRecentItems } from './snapshot';
 import { recentSnapshotSchema, type RecentSnapshot } from './types';
 import './recent.css';
+import {discoveryStateSchema,type DiscoveryState} from './discovery';
 
 const labels = { news: '新闻动态', policy: '政策公告', company: '企业动态', procurement: '采购公告', approval:'报批公示' };
 const stageLabels={planning_notice:'规划公示',eia_notice:'环评受理／公示',eia_approved:'环评批复',land_notice:'用地／选址信息',tender:'招采公告',award_candidate:'中标候选人公示',award:'中标／成交',construction_update:'建设动态',operational_update:'运行／任务动态',withdrawn:'终止／撤销信息'};
 const dateLabel = (value: string, dateOnly = false) => new Intl.DateTimeFormat('zh-CN', { month:'2-digit',day:'2-digit',...(dateOnly?{}:{hour:'2-digit',minute:'2-digit'}),hour12:false,timeZone:'Asia/Shanghai' }).format(new Date(value));
 
 export function RecentPage() {
+  const [discovery,setDiscovery]=useState<DiscoveryState>();
+  const [discoveryError,setDiscoveryError]=useState(false);
+  const [discoveryLimit,setDiscoveryLimit]=useState(12);
   const [params, setParams] = useSearchParams();
   const [snapshot, setSnapshot] = useState<RecentSnapshot>();
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [query, setQuery] = useState(params.get('q') || '');
   const view = params.get('view') || 'feed';
+  useEffect(()=>{
+    if(view!=='sources')return;
+    const abort=new AbortController();
+    fetch('/recent/discovery.json',{signal:abort.signal,cache:'no-cache'}).then(response=>{if(!response.ok)throw new Error('unavailable');return response.json();})
+      .then(data=>{setDiscovery(discoveryStateSchema.parse(data));setDiscoveryError(false);}).catch(()=>{if(!abort.signal.aborted)setDiscoveryError(true);});
+    return ()=>abort.abort();
+  },[view]);
   const region = params.get('region') || 'cn';
   const days = [1,7,30].includes(Number(params.get('days'))) ? Number(params.get('days')) : 7;
   const province = region === 'global' ? '' : params.get('province') || '';
@@ -165,6 +176,17 @@ export function RecentPage() {
       })}</div></section>}
 
     {snapshot && view==='sources' && <section className="recent-directory"><div className="recent-directory-heading"><h2>来源目录</h2><span>官方、公司与专业媒体</span></div>
+      <section aria-label="新发现的来源" className="recent-discovery">
+        <h3>新发现的来源</h3><p>从已知官网发现新栏目，经过跨日试采后再核对接入。候选内容尚未进入资讯流。</p>
+        {!discovery?<p>{discoveryError?'暂时无法读取候选来源，请稍后再试。':'候选来源正在准备中。'}</p>:<>
+          <p>{discovery.candidates.length} 个候选{discovery.lastCheckedAt?` · 最近核验 ${dateLabel(discovery.lastCheckedAt)}`:''}</p>
+          <div className="recent-source-grid">{discovery.candidates.slice(0,discoveryLimit).map(candidate=><article className="recent-discovery-card" key={candidate.url}>
+            <p><a href={candidate.url} target="_blank" rel="noreferrer">{candidate.name}</a> · {{pending:'待试采',observing:'观察中',ready:'可接入',review:'归属待核对',unavailable:'尚未通过'}[candidate.status]}</p>
+            <small>发现于 <a href={candidate.parentUrl} target="_blank" rel="noreferrer">{candidate.parentName}</a> · 通过 {candidate.successDays.length} 个日期的核验</small>
+          </article>)}</div>
+          {discovery.candidates.length>discoveryLimit&&<button className="recent-more" type="button" onClick={()=>setDiscoveryLimit(value=>value+12)}>查看更多候选</button>}
+        </>}
+      </section>
       <div className="recent-source-grid">{snapshot.sources.map((source)=><article className="recent-source" key={source.id}>
         <div><a href={source.url} target="_blank" rel="noreferrer">{source.name}<ArrowUpRight size={15}/></a><span className={`recent-source-status ${source.status==='error'?'is-delayed':''}`}>{source.status==='directory'?'来源入口':source.errorCategory==='budget'?'本轮延后':source.status==='error'?'暂时不可用':source.status==='empty'?'待核验':source.recentCount?'有近期动态':'近期暂无更新'}</span></div>
         <p>{source.publisherRegion || (source.region==='cn'?'国内':'国外')} · {labels[source.category]}</p>

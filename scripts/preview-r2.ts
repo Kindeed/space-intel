@@ -6,6 +6,7 @@ import {randomBytes,createHash} from 'node:crypto';
 import {controlSchema,reserveBudget,releaseUnused,type PreviewControl} from '../src/recent/scheduler';
 import {recentSnapshotSchema} from '../src/recent/types';
 import {isRecentDate} from '../src/recent/snapshot';
+import {discoveryStateSchema} from '../src/recent/discovery';
 
 const prefix='space-intel-assets/recent/preview/v1/';
 const wrangler=resolve('node_modules/wrangler/bin/wrangler.js');
@@ -14,7 +15,7 @@ const operation=process.argv.includes('prepare')?'prepare':process.argv.includes
 if(!operation)throw new Error('Expected prepare, publish or finalize');
 await mkdir('.recent',{recursive:true});await mkdir('public/recent',{recursive:true});
 function remote(kind:'get'|'put',key:string,file:string,missing=false):boolean{
-  if(!['control.json','current.json','previous.json'].includes(key))throw new Error('Object is outside preview scope');
+  if(!['control.json','current.json','previous.json','discovery.json'].includes(key))throw new Error('Object is outside preview scope');
   const result=spawnSync(process.execPath,[wrangler,'r2','object',kind,`${prefix}${key}`,'--file',file,'--remote','--config','wrangler.preview.toml'],{encoding:'utf8',maxBuffer:2*1024*1024,windowsHide:true});
   if(result.status===0)return true;
   const message=`${result.stdout||''}\n${result.stderr||''}`;
@@ -43,8 +44,14 @@ if(operation==='prepare'){
     const previous=recentSnapshotSchema.parse(JSON.parse(await readFile('.recent/previous.json','utf8')));
     await writeFile('public/recent/current.json',JSON.stringify(previous));
   }
+  remote('get','discovery.json','.recent/discovery.json',true);
   console.log(JSON.stringify({previewBudget:reservation.budget,runId,prefix:'recent/preview/v1/'}));
 }else if(operation==='publish'){
+  try{
+    const discovery=discoveryStateSchema.parse(JSON.parse(await readFile('.recent/discovery.json','utf8')));
+    if(Buffer.byteLength(JSON.stringify(discovery))>256*1024)throw new Error('Discovery state exceeds limit');
+    await writeFile('.recent/discovery.json',JSON.stringify(discovery));remote('put','discovery.json','.recent/discovery.json');
+  }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
   const current=recentSnapshotSchema.parse(JSON.parse(await readFile('public/recent/current.json','utf8')));
   const summary=JSON.parse(await readFile('.recent/run-summary.json','utf8')) as {requests:number;successful:number};
     // An all-failed run cannot replace the published last-good data.

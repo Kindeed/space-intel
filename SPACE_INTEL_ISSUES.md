@@ -34,6 +34,16 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-375 - Source catalogue does not discover newly published columns
+
+- Priority: P2
+- Status: FIXED
+- Area: recent-preview | source-discovery
+- Evidence: The configured pilot collects new articles but cannot record new source URLs linked by existing official pages. Source admission has no persistent observation history.
+- Fix: Harvest public navigation from already collected HTML; rotate four configured government portal seeds daily and trial candidates within ten shared requests. Persist a bounded candidate pool under the preview prefix, require relevant dated records on distinct days, retain cross-site links for ownership review and generate disabled YAML proposals. Show evidence/status separately from the active source directory. Candidates do not enter the article pipeline until admitted through source configuration.
+- Regression Check: Tests cover script/login/article exclusion, URL credential/private-host rejection, public IPv4 pinning rules, cross-day checks, daily/shared request bounds and a fixed discovery read object. Hosted validation remains pending.
+- Notes: No whole-web search API, paid service, production merge or automatic weakening of the configured source whitelist is introduced.
+
 ### 2026-11-15 - SI-ISSUE-374 - Facility catalogue misses construction phases and supporting port projects
 
 - Priority: P2

@@ -8,6 +8,13 @@ function environment(body='{"items":[]}'){
 }
 const context={waitUntil:vi.fn(),passThroughOnException:vi.fn(),props:{}};
 describe('isolated recent preview worker',()=>{
+  it('serves discovery from its fixed separate object without exposing control state',async()=>{
+    const {env,get}=environment('{"version":1,"candidates":[]}');
+    const response=await worker.fetch(new Request('https://preview.example/recent/discovery.json'),env,context as ExecutionContext);
+    expect(response.status).toBe(200);
+    expect(get).toHaveBeenCalledWith('recent/preview/v1/discovery.json');
+    expect(await response.json()).toEqual({version:1,candidates:[]});
+  });
   it('serves one fixed R2 object and respects client validators without a database',async()=>{
     const {env,get}=environment();
     const response=await readPreviewSnapshot(new Request('https://preview.example/recent/current.json'),env,context);

@@ -6,12 +6,12 @@ const allowedSources=typeof __RECENT_ALLOWED_SOURCES__==='undefined'?{}:__RECENT
 export type RecentPreviewEnv={R2_ASSETS:R2Bucket;ASSETS:Fetcher};
 export const previewSnapshotKey='recent/preview/v1/current.json';
 
-export async function readPreviewSnapshot(request:Request,env:Pick<RecentPreviewEnv,'R2_ASSETS'>,context:Pick<ExecutionContext,'waitUntil'>,cache?:Cache):Promise<Response>{
+export async function readPreviewSnapshot(request:Request,env:Pick<RecentPreviewEnv,'R2_ASSETS'>,context:Pick<ExecutionContext,'waitUntil'>,cache?:Cache,kind:'current.json'|'discovery.json'='current.json'):Promise<Response>{
   if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{Allow:'GET, HEAD','Cache-Control':'no-store'}});
-  const cacheKey=new Request(new URL('/recent/current.json',request.url),{method:'GET'});
+  const cacheKey=new Request(new URL(`/recent/${kind}`,request.url),{method:'GET'});
   if(request.method==='GET'&&cache){try{const hit=await cache.match(cacheKey);if(hit){if(request.headers.get('if-none-match')===hit.headers.get('ETag'))return new Response(null,{status:304,headers:hit.headers});return hit;}}catch{/* read the origin */}}
   try{
-    const object=await env.R2_ASSETS.get(previewSnapshotKey);
+    const object=await env.R2_ASSETS.get(kind==='current.json'?previewSnapshotKey:'recent/preview/v1/discovery.json');
     if(!object||object.size>snapshotByteLimit)return Response.json({error:'recent_data_unavailable'},{status:503,headers:{'Cache-Control':'no-store'}});
     const headers=new Headers({'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=0, s-maxage=600','ETag':object.httpEtag,'X-Content-Type-Options':'nosniff'});
     if(request.headers.get('if-none-match')===object.httpEtag)return new Response(null,{status:304,headers});
@@ -26,9 +26,9 @@ export default {
     const path=new URL(request.url).pathname;
     if(path==='/')return Response.redirect(new URL('/recent',request.url).href,302);
     if(path==='/recent/source-fetch')return fetchPreviewSource(request,env.R2_ASSETS,allowedSources);
-    if(path==='/recent/current.json'){
+    if(path==='/recent/current.json'||path==='/recent/discovery.json'){
       const cache=typeof caches==='undefined'?undefined:(caches as CacheStorage&{default?:Cache}).default;
-      return readPreviewSnapshot(request,env,context,cache);
+      return readPreviewSnapshot(request,env,context,cache,path.endsWith('/discovery.json')?'discovery.json':'current.json');
     }
     // Pages canonicalizes /index.html to /. Fetch the root asset directly so
     // its canonical redirect cannot loop through our / -> /recent redirect.

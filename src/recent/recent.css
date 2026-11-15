@@ -1,4 +1,9 @@
 .recent-app { max-width: 1440px; margin: 0 auto; padding: 0 36px; color: #dbe5ef; }
+.recent-discovery { margin:20px 0 30px;padding:16px;border:1px solid var(--border);border-radius:8px; }
+.recent-discovery > p,.recent-discovery-card small { color:#8da8ba;font-size:12px;line-height:1.8; }
+.recent-discovery-card { min-width:0;padding:12px;overflow-wrap:anywhere;background:#0e1b27;border-radius:5px; }
+.recent-discovery-card p { font-size:13px;line-height:1.8; }
+.recent-discovery-card a { color:#89d9d5; }
 .recent-focus { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
 .recent-more { border:1px solid #2a565a;background:#102a30;color:#73d7cb;border-radius:5px;padding:9px 16px;font-size:12px; }
 .recent-focus button { border:1px solid var(--border);border-radius:5px;background:transparent;color:#8da8ba;font-size:11px;padding:6px 10px; }
