@@ -10,6 +10,7 @@ import { classifyItem, buildRecentSnapshot, isRecentDate } from '../src/recent/s
 import { recentSnapshotSchema, type RecentSnapshot, type RecentSource } from '../src/recent/types';
 import { retryAt, scheduleSlot, sourceDue } from '../src/recent/scheduler';
 import { expandPublicListingData } from '../src/recent/htmlData';
+import {sourceFailureCode} from '../src/recent/sourceFailures';
 
 const replayArg = process.argv.find((arg) => arg.startsWith('--replay='))?.split('=')[1];
 if (replayArg && !/^[a-zA-Z0-9_-]+$/.test(replayArg)) throw new Error('Invalid replay identifier');
@@ -70,13 +71,16 @@ class RateLimited extends Error {constructor(readonly nextAttempt:string){super(
 
 async function collect(source: SourceConfig) {
   const started = Date.now();
-  const abort = new AbortController();
-  const timeout = setTimeout(() => abort.abort(), 25_000);
-  let requests = 0;
-  const old = previous?.sources.find((item) => item.id === source.key);
+  const prior = previous?.sources.find((item) => item.id === source.key);
+  // A replaced column must not inherit validators/backoff from its old URL.
+  const old = prior?.url===source.url?prior:undefined;
   if(!sourceDue(source,old,now,process.argv.includes('--force')) && old){
     statuses.push({...old,skipped:true,requests:0,durationMs:0});return;
   }
+  const abort = new AbortController();
+  const timeout = setTimeout(() => abort.abort(), 25_000);
+  let requests = 0;
+  let diagnostic:string|undefined;
   const status: RecentSource = {
     id: source.key, name: source.name, url: source.url, region: source.region,
     category: source.recent!.category, publisherRegion: source.recent?.publisher_region,
@@ -105,6 +109,7 @@ async function collect(source: SourceConfig) {
             if(!location)throw new Error('invalid_redirect');
             const next=new URL(location,target);
             if(!['http:','https:'].includes(next.protocol))throw new Error('invalid_redirect');
+            if(/\/(?:sso|login|signin|oauth)(?:\/|$)/i.test(next.pathname))throw new Error('source_auth_required');
             target=next.href;continue;
           }
           break;
@@ -155,6 +160,7 @@ async function collect(source: SourceConfig) {
       return;
     }
     const message = error instanceof Error ? error.message : String(error);
+    diagnostic=sourceFailureCode(error);
     status.errorCategory = error instanceof RateLimited?'rate_limited':/budget/.test(message) ? 'budget' : abort.signal.aborted ? 'timeout'
       : /HTTP \d+/.test(message) ? 'http_error' : /parse|xml|charset/i.test(message) ? 'parse_error' : 'network_error';
     evidence.push({sourceId:source.key,items:[],error:message.slice(0,300)});
@@ -163,7 +169,7 @@ async function collect(source: SourceConfig) {
     status.nextAttemptAt=status.errorCategory==='budget'?undefined:error instanceof RateLimited?error.nextAttempt:retryAt(null,now);
   } finally {
     clearTimeout(timeout); status.requests = requests; status.durationMs = Date.now()-started; statuses.push(status);
-    console.log(JSON.stringify({source:source.key,status:status.status,parsed:status.collected,recent:status.recentCount,requests,ms:status.durationMs}));
+    console.log(JSON.stringify({source:source.key,status:status.status,parsed:status.collected,recent:status.recentCount,requests,ms:status.durationMs,diagnostic}));
   }
 }
 

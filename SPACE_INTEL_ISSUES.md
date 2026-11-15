@@ -34,6 +34,17 @@
 
 ## Current Issues
 
+### 2026-11-15 - SI-ISSUE-371 - Preview failures hide transport causes and retain replaced-column state
+
+- Priority: P2
+- Status: IN_PROGRESS
+- Area: recent-preview | source-diagnostics | ingestion
+- Found In: investigation of the 72 failed sources
+- Evidence: 71 of 72 baseline failures return an HTTP response in a bounded local probe, whereas the hosted snapshot reports 61 generic network errors. Local probing finds a login redirect and renamed/empty government columns. Replacing a source URL previously retained old validators/backoff; skipped sources also left a 25-second timer running.
+- Fix: Log safe nested transport/HTTP codes, stop before authentication redirects, reset state when the configured column URL changes and create timers only for actual attempts. Next: inspect one hosted run and repair verified public columns without increasing the daily limit.
+- Regression Check: Safe diagnostic tests cover nested timeout/DNS/HTTP codes and redaction; hosted source recovery remains in progress. Detailed local public-source evidence is kept outside tracked files.
+- Notes: Only the preview branch is authorized. Do not merge, cut over production, bypass authentication or upgrade service plans.
+
 ### 2026-11-15 - SI-ISSUE-370 - Expanded domestic coverage still depends heavily on supplementary reporting
 
 - Priority: P2
