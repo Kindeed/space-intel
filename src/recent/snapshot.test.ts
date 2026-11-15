@@ -23,6 +23,23 @@ function build(incoming: RecentItem[], previous?: RecentSnapshot, sources=[statu
 }
 
 describe('recent news snapshots', () => {
+  it('links newly catalogued construction phases to retained articles without a new fetch',()=>{
+    const previous=build([item({title:'海南商业航天发射场（二期）消防车采购招标公告'})]);
+    const facilities=[{id:'phase-two',name:'二期',province:'海南',kind:'扩建',aliases:['海南商业航天发射场（二期）'],sourceUrls:[]}];
+    const updated=buildRecentSnapshot({previous,incoming:[],sources:[status()],companies,provinces,now,facilities});
+    expect(updated.items[0].facilityIds).toEqual(['phase-two']);
+    expect(updated.items[0].fetchedAt).toBe(previous.items[0].fetchedAt);
+  });
+  it('keeps verified construction projects even when their titles omit the space keyword',()=>{
+    const facilities=[{id:'dock',name:'火箭码头',province:'上海',kind:'配套码头',aliases:['临沧路码头'],sourceUrls:[]}];
+    const government={...source,recent:{...source.recent!,category:'approval' as const}};
+    const classified=classifyItem(raw({title:'临沧路码头主体施工招标公告'}),government,companies,provinces,now,facilities);
+    expect(classified?.facilityIds).toEqual(['dock']);
+    expect(classified?.provinces).toEqual(['上海']);
+    expect(classified?.milestone).toBe('tender');
+    expect(classifyItem(raw({title:'普通港区码头主体施工招标公告'}),government,companies,provinces,now,facilities)).toBeNull();
+    expect(classifyItem(raw({title:'临沧路码头组织消防演练'}),government,companies,provinces,now,facilities)).toBeNull();
+  });
   it('retains spaceport firefighting equipment tenders while excluding fire drills',()=>{
     const procurement={...source,recent:{...source.recent!,category:'procurement' as const}};
     expect(classifyItem(raw({title:'海南商业航天发射场（二期）消防车采购项目招标公告'}),procurement,companies,provinces,now)?.milestone).toBe('tender');

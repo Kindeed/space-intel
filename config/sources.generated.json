@@ -2844,7 +2844,7 @@
       "enabled": false,
       "purpose": "跟踪省级商业航天政策、产业项目、申报和公告。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -2861,7 +2861,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "news",
         "publisher_region": "四川",
         "transport": "preview"
@@ -3105,7 +3105,7 @@
       "enabled": false,
       "purpose": "跟踪省级商业航天政策、产业项目、申报和公告。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -3122,7 +3122,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "news",
         "publisher_region": "陕西",
         "transport": "preview"
@@ -3270,7 +3270,7 @@
       "enabled": false,
       "purpose": "跟踪省级商业航天政策、产业项目、申报和公告。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -3287,7 +3287,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "news",
         "publisher_region": "新疆",
         "transport": "preview"
@@ -3369,7 +3369,7 @@
       "enabled": false,
       "purpose": "跟踪省级商业航天政策、产业项目、申报和公告。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -3386,7 +3386,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "news",
         "publisher_region": "宁夏",
         "transport": "preview"
@@ -3729,7 +3729,7 @@
       "enabled": false,
       "purpose": "跟踪商业发射场、海上发射及配套项目的规划、环评、用地和建设公示。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -3746,7 +3746,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "approval",
         "publisher_region": "甘肃",
         "transport": "preview"
@@ -3762,7 +3762,7 @@
       "enabled": false,
       "purpose": "跟踪商业发射场、海上发射及配套项目的规划、环评、用地和建设公示。",
       "expected_content": "带真实日期的航天/卫星/火箭/测控相关标题、原始链接与公告类型。",
-      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。",
+      "risk_notes": "通过官方主页栏目链接发现；仅独立预览试采，公示不等于获批，不获取登录/验证码或绕过访问限制。 2026-11-15 将低相关综合动态替换为项目属地及承建方连续栏目，保留研究记录。",
       "dedupe_strategy": "canonical_url_title",
       "max_items": 30,
       "include_terms": [
@@ -3779,7 +3779,7 @@
       ],
       "exclude_terms": [],
       "recent": {
-        "candidate": true,
+        "candidate": false,
         "category": "approval",
         "publisher_region": "甘肃",
         "transport": "preview"
@@ -6160,6 +6160,180 @@
       "recent": {
         "candidate": true,
         "category": "procurement",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-cscec-five",
+      "name": "中建五局工程建设动态",
+      "url": "https://5bur.cscec.com/5bur/oa/dtxw/",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "news",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-yangjiang-notices",
+      "name": "阳江项目公告公示",
+      "url": "https://www.yangjiang.gov.cn/yj/ywdt/gggs/index.html",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "approval",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-yangjiang-news",
+      "name": "阳江项目建设动态",
+      "url": "https://www.yangjiang.gov.cn/yj/ywdt/yjyw/index.html",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "news",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-shanghai-district",
+      "name": "上海地区工程建设动态",
+      "url": "https://www.shanghai.gov.cn/nw15343/index.html",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "news",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-guannan-notices",
+      "name": "灌南公示公告",
+      "url": "https://www.guannan.gov.cn/gnzx/gsgg/",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "approval",
+        "focus": "spaceport",
+        "cadence": "twice"
+      }
+    },
+    {
+      "key": "build-liangshan-news",
+      "name": "凉山州政务动态",
+      "url": "https://www.lsz.gov.cn/",
+      "type": "official_page",
+      "region": "cn",
+      "credibility": 5,
+      "enabled": false,
+      "purpose": "跟踪在建发射工位、海上发射母港与运输码头的规划、报批和建设节点。",
+      "expected_content": "有真实日期、明确项目名称及原文链接的公示或工程进度。",
+      "risk_notes": "政府官网或施工单位公开栏目；仅元数据，栏目可访问不等于稳定产出，不把规划视为开工，不将普通厂房或码头视作发射场。",
+      "dedupe_strategy": "canonical_url_title",
+      "include_terms": [
+        "航天",
+        "发射场",
+        "航天港",
+        "临沧路码头",
+        "海上发射",
+        "火箭"
+      ],
+      "exclude_terms": [],
+      "max_items": 30,
+      "recent": {
+        "candidate": true,
+        "category": "news",
         "focus": "spaceport",
         "cadence": "twice"
       }

@@ -27,7 +27,7 @@
       ],
       "sourceUrls": [
         "https://www.haiyang.gov.cn/col/col14046/index.html",
-        "https://hbj.yantai.gov.cn/col/col23569/index.html"
+        "https://hbj.yantai.gov.cn/col/col23547/index.html"
       ]
     },
     {
@@ -97,6 +97,110 @@
       ],
       "sourceUrls": [
         "https://www.zj.gov.cn/"
+      ]
+    },
+    {
+      "id": "hainan-commercial-phase-two",
+      "name": "海南商业航天发射场二期（三／四号工位）",
+      "province": "海南",
+      "kind": "既有发射场扩建工程，独立跟踪工位建设与调试",
+      "aliases": [
+        "海南商业航天发射场二期",
+        "海南商业航天发射场（二期）",
+        "二期三号、四号工位"
+      ],
+      "stageNote": "报道确认主体工程完成并进行设备调试，整体投用仍待后续公告",
+      "evidenceDate": "2026-10-22",
+      "evidenceUrl": "https://gxt.hunan.gov.cn/gxt/xxgk_71033/gzdt/xintszs/202610/t20261022_34086084.html",
+      "sourceUrls": [
+        "https://5bur.cscec.com/5bur/oa/dtxw/",
+        "https://cgci.china-tender.com.cn/search.jspx?dq=&hy=&q=%E6%B5%B7%E5%8D%97%E5%95%86%E4%B8%9A%E8%88%AA%E5%A4%A9"
+      ]
+    },
+    {
+      "id": "yangjiang-launch-port",
+      "name": "广东（阳江）航天发射母港／太空港",
+      "province": "广东",
+      "kind": "海上发射母港及配套基地规划跟踪",
+      "aliases": [
+        "阳江太空港",
+        "阳江航天发射母港",
+        "阳江商业航天",
+        "海陵商业航天发射岛"
+      ],
+      "stageNote": "政府规划明确布局母港与发射岛；规划文本不等于项目已开工或获批",
+      "evidenceUrl": "https://www.yangjiang.gov.cn/attachment/0/88/88552/963892.pdf",
+      "sourceUrls": [
+        "https://www.yangjiang.gov.cn/yj/ywdt/gggs/index.html",
+        "https://www.yangjiang.gov.cn/yj/ywdt/yjyw/index.html"
+      ]
+    },
+    {
+      "id": "liangshan-western-spaceport",
+      "name": "凉山西部商业航天港",
+      "province": "四川",
+      "kind": "发射场园区与服务区规划跟踪",
+      "aliases": [
+        "西部商业航天港",
+        "凉山商业航天港"
+      ],
+      "stageNote": "规划及重大合作机遇已发布；不据此宣称发射场已经开工",
+      "evidenceDate": "2026-04-26",
+      "evidenceUrl": "https://www.scjg.gov.cn/news/5620.html",
+      "sourceUrls": [
+        "https://www.lsz.gov.cn/",
+        "https://www.scjg.gov.cn/"
+      ]
+    },
+    {
+      "id": "guannan-sea-launch-service",
+      "name": "连云港灌南海上发射技术服务港",
+      "province": "江苏",
+      "kind": "海上发射服务港、专用码头及总装测试配套规划",
+      "aliases": [
+        "运载火箭海上发射技术服务港",
+        "海上火箭发射技术服务港",
+        "灌南海上发射"
+      ],
+      "stageNote": "县政府公开答复提出建设内容；具体开工、报批及工程节点待确认",
+      "evidenceUrl": "https://xxgk.guannan.gov.cn/news/show-39797.html",
+      "sourceUrls": [
+        "https://www.guannan.gov.cn/gnzx/gsgg/",
+        "https://xxgk.guannan.gov.cn/"
+      ]
+    },
+    {
+      "id": "shanghai-lincang-rocket-dock",
+      "name": "上海火箭星城临沧路码头",
+      "province": "上海",
+      "kind": "大型火箭运输及海上发射／回收保障码头，非发射工位",
+      "aliases": [
+        "临沧路码头",
+        "火箭星城临沧路",
+        "火箭星城码头"
+      ],
+      "stageNote": "政府公告确认启动建设，后续完工与投用仍待确认",
+      "evidenceDate": "2026-08-31",
+      "evidenceUrl": "https://www.shanghai.gov.cn/nw15343/20260903/6d0309bc3c074cddae8e8000d1c23fce.html",
+      "sourceUrls": [
+        "https://www.shanghai.gov.cn/nw15343/index.html"
+      ]
+    },
+    {
+      "id": "tianlong-three-launch-pad",
+      "name": "天龙三号酒泉发射工位（一期）",
+      "province": "未明确",
+      "kind": "东风商业航天创新试验区内专用工位，属地不按企业注册地推断",
+      "aliases": [
+        "天龙三号大型液体运载火箭酒泉发射工位",
+        "天龙三号发射工位",
+        "天龙三号酒泉发射工位"
+      ],
+      "stageNote": "政府报道确认已通过竣工验收并完成箭地合练；不再简单列为在建",
+      "evidenceDate": "2025-08-07",
+      "evidenceUrl": "https://www.zjg.gov.cn/zjg/qykb_zxxx/202508/e1245a7ade2b4cb294ad9c876d804bf5.shtml",
+      "sourceUrls": [
+        "https://www.zjg.gov.cn/zjg/qykb_zxxx/"
       ]
     }
   ]

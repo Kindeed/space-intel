@@ -157,7 +157,9 @@ export function RecentPage() {
         const latest=related[0];
         return <article className="recent-source" key={entry.id}><div><strong>{entry.name}</strong><span className="recent-preview">{entry.province}</span></div>
           <p>{entry.kind}</p><small>{latest?`${dateLabel(latest.publishedAt,true)} · ${latest.milestone?stageLabels[latest.milestone]:'近期动态'}`:'本轮暂无可确认的近期公告'}</small>
+          {entry.stageNote&&<p>{entry.stageNote}{entry.evidenceDate?`（依据 ${entry.evidenceDate}）`:''}</p>}
           <div className="recent-project-actions"><button type="button" onClick={()=>update({view:'feed',region:'cn',province:'',company:'',category:'',q:'',focus:'spaceport',facility:entry.id,days:'30'})}>查看近期信息 · {related.length}</button>
+          {entry.evidenceUrl&&<a href={entry.evidenceUrl} target="_blank" rel="noreferrer">阶段依据<ArrowUpRight size={12}/></a>}
           {entry.sourceUrls.slice(0,2).map((url,index)=><a href={url} key={url} target="_blank" rel="noreferrer">{index?'相关部门':'官方入口'}<ArrowUpRight size={12}/></a>)}</div>
         </article>;
       })}</div></section>}

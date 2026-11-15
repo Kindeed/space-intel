@@ -46,6 +46,6 @@ export const recentSnapshotSchema = z.object({
   items: z.array(recentItemSchema).max(2000), sources: z.array(recentSourceSchema).max(250),
   companies: z.array(z.object({ id: z.string(), name: z.string(), aliases: z.array(z.string()), country: z.string() })),
   provinces: z.array(z.object({ id: z.string(), name: z.string(), aliases: z.array(z.string()) })),
-  facilities: z.array(z.object({id:z.string(),name:z.string(),province:z.string(),kind:z.string(),aliases:z.array(z.string()),sourceUrls:z.array(publicUrl)})).default([]),
+  facilities: z.array(z.object({id:z.string(),name:z.string(),province:z.string(),kind:z.string(),aliases:z.array(z.string()),sourceUrls:z.array(publicUrl),stageNote:z.string().optional(),evidenceUrl:publicUrl.optional(),evidenceDate:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()})).default([]),
 });
 export type RecentSnapshot = z.infer<typeof recentSnapshotSchema>;
